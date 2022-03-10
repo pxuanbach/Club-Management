@@ -1,7 +1,17 @@
-.App {
-  text-align: center;
+:root{
+  --primary-color: #1B264D;
+  --secondary-color: #E3E3E3;
+  --background-color: #fff;
+  --accent-color: #5FE321;
 }
-
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body{
+  padding-left: 70px;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;

@@ -2,8 +2,12 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { UserContext } from "./UserContext";
 import "./App.css";
-import Home from './components/home/home'
-import Manage from "./components/manage/manage";
+import Home from './components/home/Home'
+import ManageAccount from "./components/manage/MngAccount";
+import ManageClub from "./components/manage/MngClub";
+import Info from "./components/info/Info";
+import Navbar from "./components/layout/Navbar";
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -11,9 +15,13 @@ function App() {
     <Router>
       <div className="App">
         <UserContext.Provider value={{ user, setUser }}>
+          <Navbar/>
           <Switch>
             <Route exact path="/" component={Home}/>
-            <Route path="/manage" component={Manage}/>
+            <Route path="/mng-account" component={ManageAccount}/>
+            <Route path="/mng-club" component={ManageClub}/>
+            <Route path="/info" component={Info}/>
+            
           </Switch>
         </UserContext.Provider>
       </div>

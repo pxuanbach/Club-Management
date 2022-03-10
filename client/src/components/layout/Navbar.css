@@ -1,0 +1,57 @@
+@import "../../App.css";
+
+nav {
+  position: relative;
+}
+.nav-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  animation: onShow 0.6s linear;
+}
+.nav-wrapper a {
+  text-decoration: none;
+  color: var(--secondary-color);
+}
+.brand-logo {
+  margin-bottom: 100px;
+}
+.nav-menu {
+    height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.list-btn, .avatar-logout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.list-btn a, .avatar-logout a {
+  color: var(--secondary-color);
+  font-size: 28px;
+  padding: 6px;
+}
+
+.avatar-logout a img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  border: 2px solid var(--secondary-color);
+}
+@keyframes onShow {
+  from {
+    left: -70px;
+  }
+  to {
+    left: 0;
+  }
+}

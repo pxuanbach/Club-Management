@@ -1,15 +1,22 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import { UserContext } from '../../UserContext'
+import './Navbar.css'
+import SignedInMenu from './SignedInMenu'
+import SignedOutMenu from './SignedOutMenu'
 
 const Navbar = () => {
+    const {user, setUser} = useContext(UserContext);
+
+    const logout = () => {
+
+    }
+
+    const menu = user ? <SignedInMenu logout={logout}/> : <SignedOutMenu/>
     return (
         <nav>
             <div className="nav-wrapper">
                 <a href="#" className="brand-logo">Logo</a>
-                <ul id="nav-mobile" className="left hide-on-med-and-down">
-                    <li><a href="#">My Team</a></li>
-                    <li><a href="#">Manage</a></li>
-                    <li><a href="#">Logout</a></li>
-                </ul>
+                <SignedInMenu logout={logout}/>
             </div>
         </nav>
     )
