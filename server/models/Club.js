@@ -5,6 +5,7 @@ const clubSchema = new mongoose.Schema({
         type: String,
         require: true
     },
+    img_url: String,
     description: String,
     fund: Number,
 })
