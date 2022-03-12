@@ -1,0 +1,21 @@
+.container{
+    padding: 20px;
+    height: 100%;
+    display: flex;
+}
+.data-table{
+    height: 400px;
+    width: 100%;
+    text-align: center;
+}
+  .MuiDataGrid-columnHeaders {
+    display: block; 
+    text-align:center; 
+    width: 100%; 
+}
+
+.MuiDataGrid-cell {
+    display: block;
+    position: relative;
+    text-align: center;
+}
