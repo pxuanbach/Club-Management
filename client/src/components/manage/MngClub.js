@@ -16,31 +16,36 @@ const handleBlock = (event, param) => {
   //param.isblock = !param.isblock
 }
 
+const handleDelte = (event, param) => {
+  event.stopPropagation();
+
+}
+
 const columns = [
-  { field: 'id', headerName: 'ID', width: 70, headerAlign: 'center', align: 'center' },
+  { field: 'id', headerName: 'ID', width: 70, headerAlign: 'center', align: 'center', flex: 0.3 },
   {
     field: 'img_url',
     headerName: 'Hình đại diện',
-    width: 120,
+    width: 100,
     align: 'center',
+    flex: 0.5,
     renderCell: (value) => {
       return (
         <Avatar src={value.row.img_url} />
       )
     }
   },
-  { field: 'name', headerName: 'Tên câu lạc bộ', width: 300 },
-  { field: 'description', headerName: 'Mô tả', width: 300 },
-  {
-    field: 'fund',
-    headerName: 'Quỹ',
-    type: 'number',
-    width: 120,
-  },
+  { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
+  { field: 'description', headerName: 'Mô tả', flex: 1.5 },
+  { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
+  { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
+  { field: 'members', headerName: "Thành viên", type: 'number', flex: 0.5 },
+  
   {
     field: 'btn-edit',
     headerName: '',
     align: 'center',
+    flex: 0.5,
     renderCell: (value) => {
       return (
         <Tooltip title="Chỉnh sửa" placement="right-start">
@@ -55,13 +60,33 @@ const columns = [
     field: 'btn-block',
     headerName: '',
     align: 'center',
+    flex: 0.5,
     renderCell: (value) => {
       return (
         <Tooltip title={value.row.isblock ? "Gỡ chặn" : "Chặn"} placement="right-start">
           <Button onClick={(event) => {
-            handleEdit(event, value.row)
+            handleBlock(event, value.row)
           }}>
-            <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"} style={{ fontSize: 20 }}></i>
+            <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
+              style={{ fontSize: 20 }}></i>
+          </Button>
+        </Tooltip>
+      )
+    }
+  },
+  {
+    field: 'btn-delete',
+    headerName: '',
+    align: 'center',
+    flex: 0.5,
+    renderCell: (value) => {
+      return (
+        <Tooltip title="Xóa" placement="right-start">
+          <Button onClick={(event) => {
+            handleDelte(event, value.row)
+          }}>
+            <i class="fa-solid fa-trash-can"
+              style={{ fontSize: 20 }}></i>
           </Button>
         </Tooltip>
       )
@@ -74,8 +99,10 @@ const rows = [
     id: "1",
     img_url: "https://i.pinimg.com/564x/26/0e/13/260e13ad0a24c196d2bc97c8ac0249ca.jpg",
     name: "CLB Xuân Tình Nguyện",
-    description: "Yêu thương mùa xuân",
+    description: "Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân",
     fund: 2500000,
+    members: 89,
+    leader: "Lê Công Huân",
     isblock: false
   },
   {
@@ -84,6 +111,8 @@ const rows = [
     name: "CLB Data Science",
     description: "Logic is...",
     fund: 1400000,
+    members: 20,
+    leader: "Nguyễn Cung",
     isblock: false
   },
   {
@@ -92,6 +121,8 @@ const rows = [
     name: "CLB Google Dev",
     description: "Dev là developer",
     fund: 500000,
+    members: 19,
+    leader: "Ninh Diêu",
     isblock: false
   },
   {
@@ -100,6 +131,8 @@ const rows = [
     name: "CLB Data Science",
     description: "Logic is...",
     fund: 1400000,
+    members: 101,
+    leader: "Trần Bình An",
     isblock: true
   },
   {
@@ -108,6 +141,8 @@ const rows = [
     name: "CLB Google Dev",
     description: "Dev là developer",
     fund: 500000,
+    members: 5,
+    leader: "Vũ Ngọc Tân",
     isblock: false
   },
   {
@@ -116,6 +151,8 @@ const rows = [
     name: "CLB Data Science",
     description: "Logic is...",
     fund: 1400000,
+    members: 8,
+    leader: "Phạm Tuấn Kiệt",
     isblock: false
   },
   {
@@ -124,6 +161,18 @@ const rows = [
     name: "CLB Google Dev",
     description: "Dev là developer",
     fund: 500000,
+    members: 11,
+    leader: "Nguyễn Tiến Đạt",
+    isblock: true
+  },
+  {
+    id: "8",
+    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
+    name: "CLB Google Dev",
+    description: "Dev là developer",
+    fund: 500000,
+    members: 11,
+    leader: "Công Vinh",
     isblock: true
   },
 ];
@@ -132,13 +181,14 @@ const ManageClub = () => {
 
   return (
     <div className='container'>
+      <div>
 
+      </div>
       <div className='data-table'>
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
+          pageSize={7}
           autoHeight
         />
       </div>
