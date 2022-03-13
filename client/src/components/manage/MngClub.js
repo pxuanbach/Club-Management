@@ -40,7 +40,6 @@ const columns = [
   { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
   { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
   { field: 'members', headerName: "Thành viên", type: 'number', flex: 0.5 },
-  
   {
     field: 'btn-edit',
     headerName: '',
