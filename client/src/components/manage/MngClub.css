@@ -1,20 +1,17 @@
+@import url('../../App.css');
+
 .container{
     padding: 30px;
     height: 100%;
-    display: flex;
 }
-.data-table{
-    width: 100%;
-    text-align: center;
+.mng__header h2{
+    font-size: 36px;
+    color: var(--primary-color);
+    margin-bottom: 30px;
 }
-  .MuiDataGrid-columnHeaders {
-    display: block; 
-    text-align:center; 
-    width: 100%; 
+.header__stack{
+    margin-bottom: 50px;
 }
-
-.MuiDataGrid-cell {
-    display: block;
-    position: relative;
-    text-align: center;
+.header__btn-icon i{
+    margin-right: 5px;
 }

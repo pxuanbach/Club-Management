@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import { makeStyles } from '@mui/styles';
+import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip'
 import './MngClub.css'
 
@@ -22,13 +22,22 @@ const handleDelte = (event, param) => {
 }
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 70, headerAlign: 'center', align: 'center', flex: 0.3 },
+  { 
+    field: 'id', 
+    headerName: 'ID', 
+    width: 70, 
+    headerAlign: 'center', 
+    align: 'center', 
+    flex: 0.3,
+    disableColumnMenu: true,
+  },
   {
     field: 'img_url',
     headerName: 'Hình đại diện',
-    width: 100,
+    disableColumnMenu: true,
+    sortable: false,
     align: 'center',
-    flex: 0.5,
+    flex: 0.6,
     renderCell: (value) => {
       return (
         <Avatar src={value.row.img_url} />
@@ -38,17 +47,19 @@ const columns = [
   { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
   { field: 'description', headerName: 'Mô tả', flex: 1.5 },
   { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
-  { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
   { field: 'members', headerName: "Thành viên", type: 'number', flex: 0.5 },
+  { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
   {
     field: 'btn-edit',
     headerName: '',
     align: 'center',
-    flex: 0.5,
+    flex: 0.4,
+    disableColumnMenu: true,
+    sortable: false,
     renderCell: (value) => {
       return (
         <Tooltip title="Chỉnh sửa" placement="right-start">
-          <Button onClick={(event) => {
+          <Button disableElevation onClick={(event) => {
             handleEdit(event, value.row)
           }}><i class="fa-solid fa-pen-to-square" style={{ fontSize: 20 }}></i></Button>
         </Tooltip>
@@ -59,11 +70,13 @@ const columns = [
     field: 'btn-block',
     headerName: '',
     align: 'center',
-    flex: 0.5,
+    flex: 0.4,
+    disableColumnMenu: true,
+    sortable: false,
     renderCell: (value) => {
       return (
         <Tooltip title={value.row.isblock ? "Gỡ chặn" : "Chặn"} placement="right-start">
-          <Button onClick={(event) => {
+          <Button disableElevation onClick={(event) => {
             handleBlock(event, value.row)
           }}>
             <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
@@ -77,11 +90,13 @@ const columns = [
     field: 'btn-delete',
     headerName: '',
     align: 'center',
-    flex: 0.5,
+    flex: 0.4,
+    disableColumnMenu: true,
+    sortable: false,
     renderCell: (value) => {
       return (
         <Tooltip title="Xóa" placement="right-start">
-          <Button onClick={(event) => {
+          <Button disableElevation onClick={(event) => {
             handleDelte(event, value.row)
           }}>
             <i class="fa-solid fa-trash-can"
@@ -174,21 +189,57 @@ const rows = [
     leader: "Công Vinh",
     isblock: true
   },
+  {
+    id: "9",
+    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
+    name: "CLB Google Dev",
+    description: "Dev là developer",
+    fund: 500000,
+    members: 11,
+    leader: "Công Vinh",
+    isblock: true
+  },
+  {
+    id: "10",
+    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
+    name: "CLB Google Dev",
+    description: "Dev là developer",
+    fund: 500000,
+    members: 11,
+    leader: "Công Vinh",
+    isblock: true
+  },
+  {
+    id: "11",
+    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
+    name: "CLB Google Dev",
+    description: "Dev là developer",
+    fund: 500000,
+    members: 11,
+    leader: "Công Vinh",
+    isblock: true
+  },
 ];
 
 const ManageClub = () => {
 
   return (
     <div className='container'>
-      <div>
-
+      <div className='mng__header'>
+        <h2>Quản lý các câu lạc bộ</h2>
+        <Stack className='header__stack' direction="row" spacing={2}>
+          <Button className='header__btn-icon' variant="contained" disableElevation>
+            <i class="fa-solid fa-plus"></i>
+            <span>Tạo Câu lạc bộ mới</span>
+          </Button>
+        </Stack>
       </div>
       <div className='data-table'>
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={7}
           autoHeight
+          pageSize={8}
         />
       </div>
 
