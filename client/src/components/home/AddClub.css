@@ -1,0 +1,168 @@
+.div-add{
+    width: 700px;
+    height: 540px;
+    background-color:#ffffffff;
+}
+.title{
+    width: 630px;
+    color: #1B264D;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-left: 40px;
+    font-size: 20px;
+}
+.title > p{
+    font-weight: normal;
+    font-size: 15px;
+    margin-top: 10px;
+  
+    
+
+}
+.info{
+    display: flex;
+    margin-top: 10px;
+    
+}
+.div-left{
+    margin-top: 16px;
+}
+.div-right{
+    margin-left: 30px;
+    margin-top: 10px;
+}
+.div-team-name{
+    display: flex;
+    flex-direction: column;
+    
+}
+.label{
+    color: #1B264D;
+    font-size: 15px;
+  
+}
+
+.input-name{
+    width: 440px;
+    height: 40px;
+    border: none;
+    margin: 0 auto;
+    border: 1px solid #c7c2c2;
+    padding-left: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+.div-description{
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+}
+.desciption{
+    width: 440px;
+    border: 1px solid #c7c2c2;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+.div-image{
+    
+    display: flex;
+    flex-direction: column;
+}
+.input-name:hover{
+    border-bottom: 2px solid #1B264D;
+
+}
+.btn-image{
+    width: 150px;
+    height: 150px;
+    margin-left:40px ;
+    border: 1px solid #c7c2c2;
+    cursor: pointer;
+    /* border-radius: 5px; */
+    margin-top: 20px;
+    border-radius: 50%;
+}
+.btn-image:hover{
+    background-color: #1B264D; 
+    color: white;
+}
+.div-team-search{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+.div-team-search>i{
+    position: fixed;
+    margin-left: 630px;
+    margin-top: 37px;
+    color: #1B264D;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+.label-search{
+    margin-left: 40px;
+    color: #1B264D;
+    font-size: 15px;
+}
+.input-search{
+    width: 620px;
+    height: 40px;
+    border: none;
+    margin: 0 auto;
+    border: 1px solid #c7c2c2;
+    padding-left: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+.input-search:hover{
+    border-bottom: 2px solid #1B264D;
+
+}
+
+.avatagroup{
+    margin-top: 10px;
+    /* margin-right: 35px; */
+    width: 200px;
+    
+}
+
+.btn-next {
+    width: 100px;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 105px;
+    margin: 15px;
+    right: 440px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+    font-weight: 500px;
+    border: 1px solid #b4b0b0;
+    background-color: #ffffffff;
+}
+.btn-next:hover{
+    background-color: #1B264D; 
+    color: white;
+}
+.btn-exit {
+    width: 100px;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 105px;
+    margin: 15px;
+    right: 550px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+    font-weight: 500px;
+    border: 1px solid #b4b0b0;
+    background-color: #ffffffff;
+}
+.btn-exit:hover{
+    background-color: #1B264D; 
+    color: white;
+}
