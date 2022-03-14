@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
+import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './MngClub.css'
+
+const theme = createTheme({
+  overrides: {
+    MuiInputLabel: {
+      root: {
+        color: "#1B264D",
+        "&$focused": {
+          color: "#1B264D"
+        }
+      }
+    }
+  }
+});
 
 const handleEdit = (event, param) => {
   event.stopPropagation();
@@ -22,12 +36,12 @@ const handleDelte = (event, param) => {
 }
 
 const columns = [
-  { 
-    field: 'id', 
-    headerName: 'ID', 
-    width: 70, 
-    headerAlign: 'center', 
-    align: 'center', 
+  {
+    field: 'id',
+    headerName: 'ID',
+    width: 70,
+    headerAlign: 'center',
+    align: 'center',
     flex: 0.3,
     disableColumnMenu: true,
   },
@@ -59,7 +73,7 @@ const columns = [
     renderCell: (value) => {
       return (
         <Tooltip title="Chỉnh sửa" placement="right-start">
-          <Button disableElevation onClick={(event) => {
+          <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
             handleEdit(event, value.row)
           }}><i class="fa-solid fa-pen-to-square" style={{ fontSize: 20 }}></i></Button>
         </Tooltip>
@@ -76,7 +90,7 @@ const columns = [
     renderCell: (value) => {
       return (
         <Tooltip title={value.row.isblock ? "Gỡ chặn" : "Chặn"} placement="right-start">
-          <Button disableElevation onClick={(event) => {
+          <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
             handleBlock(event, value.row)
           }}>
             <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
@@ -96,7 +110,7 @@ const columns = [
     renderCell: (value) => {
       return (
         <Tooltip title="Xóa" placement="right-start">
-          <Button disableElevation onClick={(event) => {
+          <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
             handleDelte(event, value.row)
           }}>
             <i class="fa-solid fa-trash-can"
@@ -222,19 +236,70 @@ const rows = [
 ];
 
 const ManageClub = () => {
+  const [search, setSearch] = useState()
+
+  const handleChangeSearchField = (e) => {
+    setSearch(e.target.value)
+  }
+
+  const handleSearch = (e) => {
+    console.log(search)
+  }
 
   return (
     <div className='container'>
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
-        <Stack className='header__stack' direction="row" spacing={2}>
-          <Button className='header__btn-icon' variant="contained" disableElevation>
-            <i class="fa-solid fa-plus"></i>
-            <span>Tạo Câu lạc bộ mới</span>
-          </Button>
-        </Stack>
+        <div className='header__stack'>
+          <div className='stack-left'>
+            <ThemeProvider theme={theme}>
+              <TextField
+                id="search-field"
+                label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
+                variant="standard"
+                value={search}
+                onChange={handleChangeSearchField}
+                size='small'
+              />
+            </ThemeProvider>
+
+            <Tooltip title='Tìm kiếm' placement='right-start'>
+              <Button
+                className='btn-search'
+                variant="text"
+                disableElevation
+                onClick={handleSearch}>
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </Button>
+            </Tooltip>
+          </div>
+
+          <div className='stack-right'>
+            <Button
+              style={{ background: '#1B264D' }}
+              variant="contained"
+              disableElevation
+              startIcon={<i class="fa-solid fa-plus"></i>}>
+              Tạo Câu lạc bộ mới
+            </Button>
+            <Button
+              style={{ background: '#1B264D' }}
+              variant="contained"
+              disableElevation
+              startIcon={<i class="fa-solid fa-file-import"></i>}>
+              <span>Nhập file</span>
+            </Button>
+            <Button
+              style={{ background: '#1B264D' }}
+              variant="contained"
+              disableElevation
+              startIcon={<i class="fa-solid fa-file-export"></i>}>
+              <span>Xuất file</span>
+            </Button>
+          </div>
+        </div>
       </div>
-      <div className='data-table'>
+      <div className='mng__body'>
         <DataGrid
           rows={rows}
           columns={columns}
