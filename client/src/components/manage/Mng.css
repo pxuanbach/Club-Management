@@ -36,3 +36,11 @@
 .stack-right button:last-child{
     margin-right: 0px;
 }
+
+#modal-modal-title{
+    color: var(--primary-color);
+    margin-bottom: 30px;
+}
+#modal-modal-description{
+    padding: 0 25px;
+}

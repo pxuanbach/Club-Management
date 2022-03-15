@@ -1,24 +1,45 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import './MngClub.css'
+import Tooltip from '@mui/material/Tooltip';
+import ModalUnstyled from "@mui/core/ModalUnstyled";
+import { styled } from '@mui/material/styles';
+import AddClub from '../home/AddClub'
+import './Mng.css';
 
-const theme = createTheme({
-  overrides: {
-    MuiInputLabel: {
-      root: {
-        color: "#1B264D",
-        "&$focused": {
-          color: "#1B264D"
-        }
-      }
-    }
-  }
+const CustomTextField = styled(TextField)({
+  '& label.Mui-focused': {
+    color: '#1B264D',
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#1B264D',
+  },
 });
+
+const StyledModal = styled(ModalUnstyled)`
+  position: fixed;
+  z-index: 1300;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Backdrop = styled("div")`
+  z-index: -1;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-tap-highlight-color: transparent;
+`;
 
 const handleEdit = (event, param) => {
   event.stopPropagation();
@@ -236,6 +257,7 @@ const rows = [
 ];
 
 const ManageClub = () => {
+  const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [search, setSearch] = useState()
 
   const handleChangeSearchField = (e) => {
@@ -248,12 +270,22 @@ const ManageClub = () => {
 
   return (
     <div className='container'>
+       <StyledModal
+        aria-labelledby="unstyled-modal-title"
+        aria-describedby="unstyled-modal-description"
+        open={showFormAddClub}
+        onClose={() => {
+          setShowFormAddClub(false);
+        }}
+        BackdropComponent={Backdrop}
+      >
+        <AddClub setShowFormAddClub={setShowFormAddClub}/>
+      </StyledModal>
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
         <div className='header__stack'>
           <div className='stack-left'>
-            <ThemeProvider theme={theme}>
-              <TextField
+              <CustomTextField
                 id="search-field"
                 label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
                 variant="standard"
@@ -261,7 +293,6 @@ const ManageClub = () => {
                 onChange={handleChangeSearchField}
                 size='small'
               />
-            </ThemeProvider>
 
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
@@ -279,7 +310,8 @@ const ManageClub = () => {
               style={{ background: '#1B264D' }}
               variant="contained"
               disableElevation
-              startIcon={<i class="fa-solid fa-plus"></i>}>
+              startIcon={<i class="fa-solid fa-plus"></i>}
+              onClick={() => {setShowFormAddClub(true)}}>
               Tạo Câu lạc bộ mới
             </Button>
             <Button

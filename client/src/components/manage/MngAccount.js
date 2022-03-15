@@ -3,22 +3,33 @@ import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import './MngClub.css'
+import Tooltip from '@mui/material/Tooltip';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import { styled } from '@mui/material/styles';
+import './Mng.css'
+import AddAccount from './AddAccount';
 
-const theme = createTheme({
-  overrides: {
-    MuiInputLabel: { 
-      root: { 
-        color: "#1B264D",
-        "&$focused": { 
-          color: "#1B264D"
-        }
-      }
-    }
-  }
+const CustomTextField = styled(TextField)({
+  '& label.Mui-focused': {
+    color: '#1B264D',
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#1B264D',
+  },
 });
+
+const style = {
+  position: 'absolute',
+  top: '30%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+};
 
 const handleEdit = (event, param) => {
   event.stopPropagation();
@@ -28,11 +39,6 @@ const handleEdit = (event, param) => {
 const handleBlock = (event, param) => {
   event.stopPropagation();
   //param.isblock = !param.isblock
-}
-
-const handleDelte = (event, param) => {
-  event.stopPropagation();
-
 }
 
 const columns = [
@@ -152,6 +158,7 @@ const rows = [
 
 
 const ManageAccount = () => {
+  const [openModal, setOpenModal] = useState(false);
   const [search, setSearch] = useState()
 
   const handleChangeSearchField = (e) => {
@@ -162,14 +169,27 @@ const ManageAccount = () => {
     console.log(search)
   }
 
+  const handleOpen = () => setOpenModal(true);
+
+  const handleClose = () => setOpenModal(false);
+
   return (
     <div className='container'>
+      <Modal
+        open={openModal}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <AddAccount/>
+        </Box>
+      </Modal>
       <div className='mng__header'>
         <h2>Quản lý tài khoản</h2>
         <div className='header__stack'>
           <div className='stack-left'>
-            <ThemeProvider theme={theme}>
-              <TextField
+              <CustomTextField
                 id="search-field"
                 label="Tìm kiếm (Tài khoản, tên, email)"
                 variant="standard"
@@ -177,7 +197,6 @@ const ManageAccount = () => {
                 onChange={handleChangeSearchField}
                 size='small'
               />
-            </ThemeProvider>
 
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
@@ -195,7 +214,8 @@ const ManageAccount = () => {
               style={{ background: '#1B264D' }}
               variant="contained"
               disableElevation
-              startIcon={<i class="fa-solid fa-plus"></i>}>
+              startIcon={<i class="fa-solid fa-plus"></i>}
+              onClick={handleOpen}>
               Thêm tài khoản mới
             </Button>
             <Button

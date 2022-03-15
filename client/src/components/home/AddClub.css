@@ -128,7 +128,7 @@
     
 }
 
-.btn-next {
+.btn-save {
     width: 100px;
     height: 40px;
     border: none;
@@ -143,7 +143,7 @@
     border: 1px solid #b4b0b0;
     background-color: #ffffffff;
 }
-.btn-next:hover{
+.btn-save:hover{
     background-color: #1B264D; 
     color: white;
 }
