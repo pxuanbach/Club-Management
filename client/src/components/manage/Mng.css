@@ -30,6 +30,10 @@
     color: var(--primary-color);
     font-size: 18px;
 }
+.stack-right{
+    display: flex;
+    justify-content: flex-end;
+}
 .stack-right button{
  margin-right: 10px;
 }
@@ -42,5 +46,21 @@
     margin-bottom: 30px;
 }
 #modal-modal-description{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 0 25px;
+}
+.modal-avatar{
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center;
+}
+.modal-form{
+    min-width: 320px;
+    display: grid;
+    gap: 20px;   
 }

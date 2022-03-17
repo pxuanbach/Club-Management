@@ -21,10 +21,10 @@ const CustomTextField = styled(TextField)({
 
 const style = {
   position: 'absolute',
-  top: '30%',
+  top: '40%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
+  width: 700,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -182,7 +182,7 @@ const ManageAccount = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <AddAccount/>
+          <AddAccount handleClose={handleClose}/>
         </Box>
       </Modal>
       <div className='mng__header'>
@@ -200,7 +200,6 @@ const ManageAccount = () => {
 
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
-                className='btn-search'
                 variant="text"
                 disableElevation
                 onClick={handleSearch}>
