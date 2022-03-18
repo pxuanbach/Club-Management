@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
@@ -16,11 +16,19 @@ let socket;
 
 const AddAccount = ({ handleClose }) => {
     const ENDPT = 'localhost:5000'
+	const inputAvatarImage = useRef(null);
+    const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
         username: '',
         password: '',
     });
     const [showPassword, setShowPassword] = useState(false);
+
+    const handleImageChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+            setAvatarImage(event.target.files[0]);
+        }
+    };
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -33,14 +41,15 @@ const AddAccount = ({ handleClose }) => {
     const handleSave = event => {
         event.preventDefault();
         if (values.username && values.password) {
-            socket.emit('saveAccount', values.username, values.password, () => { })
+            //socket.emit('saveAccount', values.username, values.password, handleClose)
         }
         console.log('Username', values.username);
         console.log('Password', values.password);
+        console.log('Avatar', avatarImage)
     }
 
     useEffect(() => {
-        socket = io(ENDPT);
+        //socket = io(ENDPT);
         //socket.emit('join', { username: values.username, password: values.password})
     }, [])
 
@@ -51,7 +60,10 @@ const AddAccount = ({ handleClose }) => {
             </h2>
             <div id="modal-modal-description">
                 <div className='modal-avatar'>
-                    <img id='avatar' alt="Avatar" src="https://i.pinimg.com/236x/69/69/2a/69692a5bcbe75766e5bc1c6bd9a3024c.jpg" />
+                    <input id="avatar" type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
+                    <img onClick={() => {inputAvatarImage.current.click()}}
+                    src={avatarImage ? URL.createObjectURL(avatarImage) 
+                    : ''}/>
                 </div>
                 <form className='modal-form'>
                     <TextField
