@@ -2,7 +2,18 @@ import React, {useState,useRef} from 'react'
 import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
+
 const AddClub = ({setShowFormAddClub})=>{
+    const [values, setValues] = useState({
+        name: '',
+        img_url: '',
+        description: '',
+    });
+
+    const handleChange = (prop) => (event) => {
+        setValues({ ...values, [prop]: event.target.value });
+    };
+
     const onExitClick = () => {
         setShowFormAddClub(false);
       };
@@ -23,11 +34,17 @@ const AddClub = ({setShowFormAddClub})=>{
                     <div className='div-right'>
                         <div className='div-team-name'>
                             <label className='label'>Tên câu lạc bộ</label>
-                            <input className='input-name'></input>
+                            <input className='input-name' 
+                                value={values.name}
+                                onChange={handleChange('name')}></input>
                         </div>
                         <div className='div-description'>
                             <label className='label'>Mô tả</label>
-                            <textarea className='desciption' cols="100" rows="4" placeholder="Vui lòng nhập tại đây..."></textarea>
+                            <textarea className='desciption' 
+                                cols="100" rows="4" 
+                                placeholder="Vui lòng nhập tại đây..."
+                                value={values.description}
+                                onChange={handleChange('description')}></textarea>
                         </div>
                     </div>
                 </div>

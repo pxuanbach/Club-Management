@@ -197,7 +197,6 @@ const ManageAccount = () => {
                 onChange={handleChangeSearchField}
                 size='small'
               />
-
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
                 variant="text"

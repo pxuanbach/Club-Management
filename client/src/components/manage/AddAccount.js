@@ -8,7 +8,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
+import Avatar from '@mui/material/Avatar';
 import io from 'socket.io-client';
 import './Mng.css'
 
@@ -60,20 +60,24 @@ const AddAccount = ({ handleClose }) => {
             </h2>
             <div id="modal-modal-description">
                 <div className='modal-avatar'>
-                    <input id="avatar" type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
-                    <img onClick={() => {inputAvatarImage.current.click()}}
-                    src={avatarImage ? URL.createObjectURL(avatarImage) 
-                    : ''}/>
+                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
+                    <Avatar className='avatar'
+                        sx={{ width: 190, height: 190 }}
+                        onClick={() => {inputAvatarImage.current.click()}}
+                        src={avatarImage ? URL.createObjectURL(avatarImage) 
+                        : ''}>
+                        Chọn ảnh đại diện
+                    </Avatar>
                 </div>
                 <form className='modal-form'>
                     <TextField
-                        label="Username"
+                        label="Tài khoản"
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={handleChange('username')}
                     />
                     <FormControl sx={{ width: '100%' }} variant="outlined">
-                        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
                             type={showPassword ? 'text' : 'password'}
@@ -94,7 +98,7 @@ const AddAccount = ({ handleClose }) => {
                             label="Password"
                         />
                     </FormControl>
-                    <div className='stack-right' item xs={6}>
+                    <div className='stack-right'>
                         <Button
                             variant="contained"
                             disableElevation

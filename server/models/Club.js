@@ -7,7 +7,10 @@ const clubSchema = new mongoose.Schema({
     },
     img_url: String,
     description: String,
-    fund: Number,
+    fund: {
+        type: Number,
+        default: 0,
+    },
 })
 
 const Club = mongoose.model('club', clubSchema)
