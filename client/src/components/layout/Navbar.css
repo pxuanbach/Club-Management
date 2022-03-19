@@ -22,6 +22,7 @@ nav {
   margin-bottom: 100px;
 }
 .nav-menu {
+  width: 60px;
     height: 100%;
   display: flex;
   flex-direction: column;

@@ -43,11 +43,11 @@ const AddClub = ({setShowFormAddClub})=>{
                 </div>
             </div>
             <div  className="div-todo">
-                <button className='btn-next'>
-                    Next
-                </button>
                 <button onClick={onExitClick} className='btn-exit'>
                     Cancel
+                </button>
+                <button className='btn-next'>
+                    Next
                 </button>
             </div>
         </div>
