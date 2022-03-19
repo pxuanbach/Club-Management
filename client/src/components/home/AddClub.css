@@ -51,6 +51,7 @@
     padding-left: 10px;
     margin-top: 5px;
     border-radius: 5px;
+    outline: none;
 }
 
 .div-description{
@@ -64,6 +65,7 @@
     padding: 10px;
     margin-top: 5px;
     border-radius: 5px;
+    outline: none;
 }
 .div-image{
     
@@ -115,6 +117,7 @@
     padding-left: 10px;
     margin-top: 5px;
     border-radius: 5px;
+    outline: none;
 }
 .input-search:hover{
     border-bottom: 2px solid #1B264D;
@@ -127,16 +130,19 @@
     width: 200px;
     
 }
-
+.div-todo{
+    width: 100%;
+    display: flex;
+    
+    
+}
 .btn-next {
     width: 100px;
     height: 40px;
     border: none;
     border-radius: 5px;
-    position: absolute;
-    bottom: 105px;
+    align-items: flex-end;   
     margin: 15px;
-    right: 440px;
     cursor: pointer;
     transition-duration: 0.4s;
     font-weight: 500px;
@@ -152,10 +158,8 @@
     height: 40px;
     border: none;
     border-radius: 5px;
-    position: absolute;
-    bottom: 105px;
-    margin: 15px;
-    right: 550px;
+    margin-top: 15px;
+    margin-left: 450px;
     cursor: pointer;
     transition-duration: 0.4s;
     font-weight: 500px;

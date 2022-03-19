@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import AddClub from './AddClub';
 import { styled, Box } from "@mui/system";
 import ModalUnstyled from "@mui/core/ModalUnstyled";
@@ -57,121 +57,118 @@ const Home = (props) => {
         }}
         BackdropComponent={Backdrop}
       >
-        <AddClub setShowFormAddClub={setShowFormAddClub}/>
+        <AddClub setShowFormAddClub={setShowFormAddClub} />
       </StyledModal>
-       
+
       <div className='div-header'>
         <div className='div-search'>
           <input
-              type="text"
-              placeholder="Tìm kiếm câu lạc bộ"
+            type="text"
+            placeholder="Tìm kiếm câu lạc bộ"
 
-            />
+          />
           <i class="fa-solid fa-magnifying-glass"></i>
-          
+
         </div>
       </div>
-      
+
       <div className='div-body'>
         <div className='header-body'>
           <div className='header-title'> Câu lạc bộ của bạn</div>
           <div className='div-btnadd'>
-            <button onClick={()=> setShowFormAddClub(true)} className='btnAdd' >Tạo câu lạc bộ</button>
+            <button onClick={() => setShowFormAddClub(true)} className='btnAdd' >Tạo câu lạc bộ</button>
             <i class="fa-solid fa-plus"></i>
           </div>
         </div>
         <div className='div-card-team'>
-            <div className='card-team'>
+          <div className='card-team'>   
             <div className='div-menu'>
-                <IconButton 
-                  aria-label="more"
-                  id="long-button"
-                  aria-controls={open ? 'long-menu' : undefined}
-                  aria-expanded={open ? 'true' : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon className='icon-menu'/>
-                </IconButton>
-                <Menu
-                  id="long-menu"
-                  MenuListProps={{
-                    'aria-labelledby': 'long-button',
-                  }}
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                  PaperProps={{
-                    style: {
-                      maxHeight: ITEM_HEIGHT * 4.5,
-                      width: '15ch',
-                    },
-                  }}
-                >
-                  {options.map((option) => (
-                    <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </div>
+              <IconButton
+                aria-label="more"
+                id="long-button"
+                aria-controls={open ? 'long-menu' : undefined}
+                aria-expanded={open ? 'true' : undefined}
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                <MoreVertIcon className='icon-menu' />
+              </IconButton>
+              <Menu
+                id="long-menu"
+                MenuListProps={{
+                  'aria-labelledby': 'long-button',
+                }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                  style: {
+                    maxHeight: ITEM_HEIGHT * 4.5,
+                    width: '15ch',
+                  },
+                }}
+              >
+                {options.map((option) => (
+                  <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </div>
+            <a href='/club' style={{textDecoration: 'none'}}>
               <div className='image-team'>
-
               </div>
               <div className='name-team'>
-                  CLB Chạy bộ
+                CLB Chạy bộ
               </div>
-              <div className='div-activity'>
-
-              </div>
-              
-            </div>
-            <div className='card-team'>
+              <div className='div-activity'></div>
+            </a>
+          </div>
+          <div className='card-team'>
             {/* <i className="fa-solid fa-ellipsis"></i> */}
             <div className='div-menu'>
-                <IconButton 
-                  aria-label="more"
-                  id="long-button"
-                  aria-controls={open ? 'long-menu' : undefined}
-                  aria-expanded={open ? 'true' : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon className='icon-menu'/>
-                </IconButton>
-                <Menu
-                  id="long-menu"
-                  MenuListProps={{
-                    'aria-labelledby': 'long-button',
-                  }}
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                  PaperProps={{
-                    style: {
-                      maxHeight: ITEM_HEIGHT * 4.5,
-                      width: '15ch',
-                    },
-                  }}
-                >
-                  {options.map((option) => (
-                    <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </div>
+              <IconButton
+                aria-label="more"
+                id="long-button"
+                aria-controls={open ? 'long-menu' : undefined}
+                aria-expanded={open ? 'true' : undefined}
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                <MoreVertIcon className='icon-menu' />
+              </IconButton>
+              <Menu
+                id="long-menu"
+                MenuListProps={{
+                  'aria-labelledby': 'long-button',
+                }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                  style: {
+                    maxHeight: ITEM_HEIGHT * 4.5,
+                    width: '15ch',
+                  },
+                }}
+              >
+                {options.map((option) => (
+                  <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </div>
+            <a href='/club' style={{textDecoration: 'none'}}>
               <div className='image-team'>
-
               </div>
               <div className='name-team'>
-                  CLB Chạy bộ
+                CLB Chạy bộ
               </div>
               <div className='div-activity'>
-
               </div>
-              
-            </div>
+            </a>
+          </div>
         </div>
 
       </div>
