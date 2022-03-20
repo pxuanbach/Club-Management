@@ -63,8 +63,8 @@ const AddClub = ({setShowFormAddClub})=>{
                 <button onClick={onExitClick} className='btn-exit'>
                     Cancel
                 </button>
-                <button className='btn-save'>
-                    Save
+                <button className='btn-next'>
+                    Next
                 </button>
             </div>
         </div>

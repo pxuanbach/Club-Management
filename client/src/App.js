@@ -7,6 +7,7 @@ import ManageAccount from "./components/manage/MngAccount";
 import ManageClub from "./components/manage/MngClub";
 import Info from "./components/info/Info";
 import Navbar from "./components/layout/Navbar";
+import Club from './components/club/Club'
 
 
 function App() {
@@ -21,7 +22,8 @@ function App() {
             <Route path="/mng-account" component={ManageAccount}/>
             <Route path="/mng-club" component={ManageClub}/>
             <Route path="/info" component={Info}/>
-            
+            <Route path="/club" component={Club}/>
+
           </Switch>
         </UserContext.Provider>
       </div>
