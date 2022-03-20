@@ -1,0 +1,76 @@
+@import url('../../App.css');
+
+.container{
+    padding: 30px;
+    height: 100vh;
+}
+.mng__header h2{
+    width: max-content;
+    text-transform: uppercase;
+    font-size: 36px;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    border-bottom: 4px solid var(--primary-color);
+}
+.header__stack{
+    margin-bottom: 55px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+.stack-left{
+    display: flex;
+    align-items: flex-end;
+}
+#search-field{
+    min-width: 300px;
+    font-size: 16px;
+}
+.btn-search i{
+    color: var(--primary-color);
+    font-size: 18px;
+}
+.stack-right{
+    display: flex;
+    justify-content: flex-end;
+}
+.stack-right button{
+ margin-right: 10px;
+}
+.stack-right button:last-child{
+    margin-right: 0px;
+}
+
+#modal-modal-title{
+    color: var(--primary-color);
+    margin-bottom: 30px;
+}
+#modal-modal-description{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+}
+.modal-avatar{
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center;
+}
+.modal-avatar input{
+    display: none;
+}
+
+.modal-avatar .avatar{
+    cursor: pointer;
+}
+.modal-avatar .avatar:hover{
+    background-color: var(--primary-color);
+}
+.modal-form{
+    min-width: 320px;
+    display: grid;
+    gap: 20px;   
+}
