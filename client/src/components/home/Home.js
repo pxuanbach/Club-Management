@@ -59,6 +59,12 @@ const Home = () => {
     })
   }, [])
 
+  useEffect(() => {
+    socket.on('club-created', clb => {
+      setClubs([...clubs, clb])
+    })
+  }, [clubs])
+
 
   return (
     <div>
@@ -95,10 +101,9 @@ const Home = () => {
           </div>
         </div>
         <div className='div-card-team'>
-          {clubs && clubs.map(club => {
-            <ClubItem club={club}/>
-          })}
-
+          {clubs && clubs.map(club => (
+            <ClubItem club={club} />
+          ))}
         </div>
 
       </div>
