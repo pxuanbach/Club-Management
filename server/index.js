@@ -10,15 +10,26 @@ const PORT = process.env.PORT || 5000
 const Club = require('./models/Club')
 
 io.on('connection', (socket) => {
-    console.log('a user connected')
-    socket.on('create-club', (name, img_url, description) => {
+    console.log(socket.id)
+    Club.find().then(result => {
+        //console.log('output-clubs: ', result)
+        socket.emit('output-clubs', result)
+    })
+    socket.on('create-club', (name, img_url, description, callback) => {
         const club = new Club({name, img_url, description});
         club.save().then(result => {
             io.emit('club-created', result)
+            console.log(result)
+            callback();
         })
     })
-    socket.on('saveAccount', (username, password, callback) => {
+    socket.on('create-account', (username, password, callback) => {
         console.log(username, password)
+    })
+
+
+    socket.on('disconnect', () => {
+        //
     })
 })
 

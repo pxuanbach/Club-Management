@@ -11,11 +11,12 @@ import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
 import io from 'socket.io-client';
 import './Mng.css'
+import ENDPT from '../../Helper'
 
 let socket;
 
 const AddAccount = ({ handleClose }) => {
-    const ENDPT = 'localhost:5000'
+    
 	const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
@@ -41,7 +42,7 @@ const AddAccount = ({ handleClose }) => {
     const handleSave = event => {
         event.preventDefault();
         if (values.username && values.password) {
-            //socket.emit('saveAccount', values.username, values.password, handleClose)
+            //socket.emit('create-account', values.username, values.password, handleClose)
         }
         console.log('Username', values.username);
         console.log('Password', values.password);
@@ -62,11 +63,11 @@ const AddAccount = ({ handleClose }) => {
                 <div className='modal-avatar'>
                     <input type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
                     <Avatar className='avatar'
-                        sx={{ width: 190, height: 190 }}
+                        sx={{ width: 180, height: 180 }}
                         onClick={() => {inputAvatarImage.current.click()}}
                         src={avatarImage ? URL.createObjectURL(avatarImage) 
                         : ''}>
-                        Chọn ảnh đại diện
+                            Ảnh đại diện
                     </Avatar>
                 </div>
                 <form className='modal-form'>

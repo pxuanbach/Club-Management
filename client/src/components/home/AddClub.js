@@ -1,9 +1,16 @@
-import React, {useState,useRef} from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
+import io from 'socket.io-client';
+import ENDPT from '../../Helper'
 
-const AddClub = ({setShowFormAddClub})=>{
+let socket;
+
+const AddClub = ({ setShowFormAddClub }) => {
+    const ENDPT = 'localhost:5000'
+    const inputAvatarImage = useRef(null);
+    const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
         name: '',
         img_url: '',
@@ -14,10 +21,34 @@ const AddClub = ({setShowFormAddClub})=>{
         setValues({ ...values, [prop]: event.target.value });
     };
 
+    const handleImageChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+            setAvatarImage(event.target.files[0]);
+        }
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log(values)
+        if (values.name && values.description) {
+            socket.emit('create-club', values.name, values.img_url, values.description, onExitClick)
+        }
+    }
+
     const onExitClick = () => {
         setShowFormAddClub(false);
-      };
-    return(
+    };
+
+    useEffect(() => {
+        socket = io(ENDPT);
+        //socket.emit('join', { username: values.username, password: values.password})
+        return () => {
+            socket.emit('disconnect');
+            socket.off();
+        }
+    }, [ENDPT])
+
+    return (
         <div className='div-add'>
             <div className='div-info'>
                 <div className='title'>
@@ -26,22 +57,28 @@ const AddClub = ({setShowFormAddClub})=>{
                 </div>
                 <div className='info'>
                     <div className='div-left'>
-                        <div className='div-image'>
-                            <button className='btn-image'>Chọn ảnh CLB</button>
-                            {/* <label className='label1'>Ảnh minh họa</label> */}
+                        <div className='modal-avatar'>
+                            <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
+                            <Avatar className='avatar'
+                                sx={{ width: 150, height: 150 }}
+                                onClick={() => { inputAvatarImage.current.click() }}
+                                src={avatarImage ? URL.createObjectURL(avatarImage)
+                                : ''}>
+                                    Ảnh đại diện
+                            </Avatar>
                         </div>
                     </div>
                     <div className='div-right'>
                         <div className='div-team-name'>
                             <label className='label'>Tên câu lạc bộ</label>
-                            <input className='input-name' 
+                            <input className='input-name'
                                 value={values.name}
                                 onChange={handleChange('name')}></input>
                         </div>
                         <div className='div-description'>
                             <label className='label'>Mô tả</label>
-                            <textarea className='desciption' 
-                                cols="100" rows="4" 
+                            <textarea className='desciption'
+                                cols="100" rows="4"
                                 placeholder="Vui lòng nhập tại đây..."
                                 value={values.description}
                                 onChange={handleChange('description')}></textarea>
@@ -59,11 +96,11 @@ const AddClub = ({setShowFormAddClub})=>{
                     </AvatarGroup>
                 </div>
             </div>
-            <div  className="div-todo">
+            <div className="div-todo">
                 <button onClick={onExitClick} className='btn-exit'>
                     Cancel
                 </button>
-                <button className='btn-next'>
+                <button onClick={handleSubmit} className='btn-next'>
                     Next
                 </button>
             </div>

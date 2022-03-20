@@ -2,17 +2,12 @@ import React, { useState, useEffect } from 'react'
 import AddClub from './AddClub';
 import { styled, Box } from "@mui/system";
 import ModalUnstyled from "@mui/core/ModalUnstyled";
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import io from 'socket.io-client'
 import "./Home.css";
-const options = [
-  'Ẩn',
-  'Xóa',
-];
-const ITEM_HEIGHT = 48;
+import ClubItem from './ClubItem';
+import ENDPT from '../../Helper';
 
+let socket;
 
 const StyledModal = styled(ModalUnstyled)`
   position: fixed;
@@ -36,16 +31,35 @@ const Backdrop = styled("div")`
   background-color: rgba(0, 0, 0, 0.5);
   -webkit-tap-highlight-color: transparent;
 `;
-const Home = (props) => {
+
+const clb = {
+  _id: 1,
+  name: 'ABC',
+  img_url: '',
+  description: 'haha',
+}
+
+const Home = () => {
   const [showFormAddClub, setShowFormAddClub] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [clubs, setClubs] = useState([])
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    //socket.emit('join', { username: values.username, password: values.password})
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [ENDPT])
+
+  useEffect(() => {
+    socket.on('output-clubs', clbs => {
+      setClubs(clbs)
+      console.log('clubs', clubs)
+    })
+  }, [])
+
+
   return (
     <div>
       <StyledModal
@@ -81,94 +95,10 @@ const Home = (props) => {
           </div>
         </div>
         <div className='div-card-team'>
-          <div className='card-team'>   
-            <div className='div-menu'>
-              <IconButton
-                aria-label="more"
-                id="long-button"
-                aria-controls={open ? 'long-menu' : undefined}
-                aria-expanded={open ? 'true' : undefined}
-                aria-haspopup="true"
-                onClick={handleClick}
-              >
-                <MoreVertIcon className='icon-menu' />
-              </IconButton>
-              <Menu
-                id="long-menu"
-                MenuListProps={{
-                  'aria-labelledby': 'long-button',
-                }}
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                PaperProps={{
-                  style: {
-                    maxHeight: ITEM_HEIGHT * 4.5,
-                    width: '15ch',
-                  },
-                }}
-              >
-                {options.map((option) => (
-                  <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </div>
-            <a href='/club' style={{textDecoration: 'none'}}>
-              <div className='image-team'>
-              </div>
-              <div className='name-team'>
-                CLB Chạy bộ
-              </div>
-              <div className='div-activity'></div>
-            </a>
-          </div>
-          <div className='card-team'>
-            {/* <i className="fa-solid fa-ellipsis"></i> */}
-            <div className='div-menu'>
-              <IconButton
-                aria-label="more"
-                id="long-button"
-                aria-controls={open ? 'long-menu' : undefined}
-                aria-expanded={open ? 'true' : undefined}
-                aria-haspopup="true"
-                onClick={handleClick}
-              >
-                <MoreVertIcon className='icon-menu' />
-              </IconButton>
-              <Menu
-                id="long-menu"
-                MenuListProps={{
-                  'aria-labelledby': 'long-button',
-                }}
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                PaperProps={{
-                  style: {
-                    maxHeight: ITEM_HEIGHT * 4.5,
-                    width: '15ch',
-                  },
-                }}
-              >
-                {options.map((option) => (
-                  <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </div>
-            <a href='/club' style={{textDecoration: 'none'}}>
-              <div className='image-team'>
-              </div>
-              <div className='name-team'>
-                CLB Chạy bộ
-              </div>
-              <div className='div-activity'>
-              </div>
-            </a>
-          </div>
+          {clubs && clubs.map(club => {
+            <ClubItem club={club}/>
+          })}
+
         </div>
 
       </div>
