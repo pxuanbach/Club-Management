@@ -7,7 +7,11 @@ import Tooltip from '@mui/material/Tooltip';
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from '@mui/material/styles';
 import AddClub from '../home/AddClub'
+import io from 'socket.io-client'
 import './Mng.css';
+import {ENDPT} from '../../Helper';
+
+let socket;
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -58,12 +62,11 @@ const handleDelte = (event, param) => {
 
 const columns = [
   {
-    field: 'id',
+    field: '_id',
     headerName: 'ID',
-    width: 70,
     headerAlign: 'center',
     align: 'center',
-    flex: 0.3,
+    flex: 0.5,
     disableColumnMenu: true,
   },
   {
@@ -110,11 +113,11 @@ const columns = [
     sortable: false,
     renderCell: (value) => {
       return (
-        <Tooltip title={value.row.isblock ? "Gỡ chặn" : "Chặn"} placement="right-start">
+        <Tooltip title={value.row.isblocked ? "Gỡ chặn" : "Chặn"} placement="right-start">
           <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
             handleBlock(event, value.row)
           }}>
-            <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
+            <i class={value.row.isblocked ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
               style={{ fontSize: 20 }}></i>
           </Button>
         </Tooltip>
@@ -143,9 +146,9 @@ const columns = [
   }
 ];
 
-const rows = [
+const datas = [
   {
-    id: "1",
+    _id: "1",
     img_url: "https://i.pinimg.com/564x/26/0e/13/260e13ad0a24c196d2bc97c8ac0249ca.jpg",
     name: "CLB Xuân Tình Nguyện",
     description: "Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân",
@@ -155,7 +158,7 @@ const rows = [
     isblock: false
   },
   {
-    id: "2",
+    _id: "2",
     img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
     name: "CLB Data Science",
     description: "Logic is...",
@@ -165,7 +168,7 @@ const rows = [
     isblock: false
   },
   {
-    id: "3",
+    _id: "3",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -175,7 +178,7 @@ const rows = [
     isblock: false
   },
   {
-    id: "4",
+    _id: "4",
     img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
     name: "CLB Data Science",
     description: "Logic is...",
@@ -185,7 +188,7 @@ const rows = [
     isblock: true
   },
   {
-    id: "5",
+    _id: "5",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -195,7 +198,7 @@ const rows = [
     isblock: false
   },
   {
-    id: "6",
+    _id: "6",
     img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
     name: "CLB Data Science",
     description: "Logic is...",
@@ -205,7 +208,7 @@ const rows = [
     isblock: false
   },
   {
-    id: "7",
+    _id: "7",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -215,7 +218,7 @@ const rows = [
     isblock: true
   },
   {
-    id: "8",
+    _id: "8",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -225,7 +228,7 @@ const rows = [
     isblock: true
   },
   {
-    id: "9",
+    _id: "9",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -235,7 +238,7 @@ const rows = [
     isblock: true
   },
   {
-    id: "10",
+    _id: "10",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -245,7 +248,7 @@ const rows = [
     isblock: true
   },
   {
-    id: "11",
+    _id: "11",
     img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
     name: "CLB Google Dev",
     description: "Dev là developer",
@@ -259,6 +262,8 @@ const rows = [
 const ManageClub = () => {
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [search, setSearch] = useState()
+  const [clubs, setClubs] = useState([])
+  const [rows, setRows] = useState([])
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -268,9 +273,35 @@ const ManageClub = () => {
     console.log(search)
   }
 
+  const handleGetRowId = (e) => {
+    return e.uniId
+  }
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    //socket.emit('join', { username: values.username, password: values.password})
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [ENDPT])
+
+  useEffect(() => {
+    socket.on('output-clubs', clbs => {
+      setClubs(clbs)
+      console.log('clubs', clubs)
+    })
+  }, [])
+
+  useEffect(() => {
+    socket.on('club-created', clb => {
+      setClubs([...clubs, clb])
+    })
+  }, [clubs])
+
   return (
     <div className='container'>
-       <StyledModal
+      <StyledModal
         aria-labelledby="unstyled-modal-title"
         aria-describedby="unstyled-modal-description"
         open={showFormAddClub}
@@ -279,20 +310,20 @@ const ManageClub = () => {
         }}
         BackdropComponent={Backdrop}
       >
-        <AddClub setShowFormAddClub={setShowFormAddClub}/>
+        <AddClub setShowFormAddClub={setShowFormAddClub} />
       </StyledModal>
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
         <div className='header__stack'>
           <div className='stack-left'>
-              <CustomTextField
-                id="search-field"
-                label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
-                variant="standard"
-                value={search}
-                onChange={handleChangeSearchField}
-                size='small'
-              />
+            <CustomTextField
+              id="search-field"
+              label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
+              variant="standard"
+              value={search}
+              onChange={handleChangeSearchField}
+              size='small'
+            />
 
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
@@ -311,7 +342,7 @@ const ManageClub = () => {
               variant="contained"
               disableElevation
               startIcon={<i class="fa-solid fa-plus"></i>}
-              onClick={() => {setShowFormAddClub(true)}}>
+              onClick={() => { setShowFormAddClub(true) }}>
               Tạo Câu lạc bộ mới
             </Button>
             <Button
@@ -333,13 +364,13 @@ const ManageClub = () => {
       </div>
       <div className='mng__body'>
         <DataGrid
-          rows={rows}
+          getRowId={(r) => r._id}
+          rows={clubs}
           columns={columns}
           autoHeight
           pageSize={8}
         />
       </div>
-
     </div>
   )
 }

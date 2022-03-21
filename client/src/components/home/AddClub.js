@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
+import Axios from 'axios'
 import io from 'socket.io-client';
-import ENDPT from '../../Helper'
+import {ENDPT, upload_preset, cloudinary_API} from '../../Helper'
 
 let socket;
 
@@ -13,7 +14,6 @@ const AddClub = ({ setShowFormAddClub }) => {
     const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
         name: '',
-        img_url: '',
         description: '',
     });
 
@@ -27,12 +27,32 @@ const AddClub = ({ setShowFormAddClub }) => {
         }
     };
 
-    const handleSubmit = (event) => {
+    const uploadImage = () => {
+        
+    }
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(values)
-        if (values.name && values.description) {
-            socket.emit('create-club', values.name, values.img_url, values.description, onExitClick)
-        }
+
+        const formData = new FormData()
+        formData.append('file', avatarImage)
+        formData.append('folder', 'Club-Management')
+        formData.append('upload_preset', upload_preset)
+
+        Axios.post(cloudinary_API, formData)
+        .then((res) => {
+            console.log(res.data.secure_url)
+            if (values.name && values.description) {
+                socket.emit('create-club', values.name, res.data.secure_url, values.description, onExitClick)
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+            if (values.name && values.description) {
+                socket.emit('create-club', values.name, '', values.description, onExitClick)
+            }
+        })
     }
 
     const onExitClick = () => {

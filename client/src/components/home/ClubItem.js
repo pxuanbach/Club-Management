@@ -66,7 +66,7 @@ const ClubItem = ({club}) => {
                 <div className='name-team'>
                     {club.name}
                 </div>
-                <div className='div-activity'>{club.description}</div>
+                <div className='div-activity'></div>
             </a>
         </div>
     )

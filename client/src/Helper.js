@@ -1,3 +1,9 @@
 const ENDPT = 'localhost:5000'
+const cloudinary_API = 'https://api.cloudinary.com/v1_1/ddpmmci58/image/upload'
+const upload_preset = 'euq5n0ei'
 
-export default ENDPT
+export {
+    ENDPT,
+    upload_preset,
+    cloudinary_API
+}

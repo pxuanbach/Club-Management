@@ -11,6 +11,10 @@ const clubSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    isblocked: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const Club = mongoose.model('club', clubSchema)

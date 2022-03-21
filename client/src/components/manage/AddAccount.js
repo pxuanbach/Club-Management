@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
 import io from 'socket.io-client';
 import './Mng.css'
-import ENDPT from '../../Helper'
+import {ENDPT} from '../../Helper'
 
 let socket;
 
