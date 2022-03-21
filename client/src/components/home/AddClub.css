@@ -67,29 +67,28 @@
     border-radius: 5px;
     outline: none;
 }
-.div-image{
-    
-    display: flex;
-    flex-direction: column;
-}
-.input-name:hover{
-    border-bottom: 2px solid #1B264D;
 
-}
-.btn-image{
-    width: 150px;
-    height: 150px;
-    margin-left:40px ;
-    border: 1px solid #c7c2c2;
-    cursor: pointer;
-    /* border-radius: 5px; */
-    margin-top: 20px;
+.modal-avatar{
     border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
-.btn-image:hover{
-    background-color: #1B264D; 
-    color: white;
+.modal-avatar input{
+    display: none;
 }
+
+.modal-avatar .avatar{
+
+    cursor: pointer;
+}
+.modal-avatar .avatar:hover{
+    background-color: var(--primary-color);
+}
+
 .div-team-search{
     display: flex;
     flex-direction: column;
@@ -130,6 +129,7 @@
     width: 200px;
     
 }
+
 .div-todo{
     width: 100%;
     display: flex;
@@ -149,7 +149,7 @@
     border: 1px solid #b4b0b0;
     background-color: #ffffffff;
 }
-.btn-next:hover{
+.btn-save:hover{
     background-color: #1B264D; 
     color: white;
 }
