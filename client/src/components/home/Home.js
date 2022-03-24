@@ -5,7 +5,7 @@ import ModalUnstyled from "@mui/core/ModalUnstyled";
 import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
-import {ENDPT} from '../../Helper';
+import {ENDPT} from '../../helper/Helper';
 
 let socket;
 

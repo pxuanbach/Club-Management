@@ -5,20 +5,25 @@ const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: [true, 'Please enter a username']
+        required: [true, 'Tài khoản đang trống'],
+        minlength: [6, 'Tài khoản ít hơn 6 ký tự'],
     },
     password: {
         type: String,
-        required: [true, 'Please enter a password'],
-        minlength: [6, 'The password should be at least 6 characters long'],
+        required: [true, 'Mật khẩu đang trống'],
+        minlength: [6, 'Mật khẩu ít hơn 6 ký tự'],
     },
     img_url: String,
-    name: String,
+    name: {
+        type: String,
+        required: [true, 'Tên đang trống'],
+    },
     email: {
         type: String,
-        unique: [true, 'Duplicate'],
+        required: [true, 'Email đang trống'],
+        unique: [true, 'Email đã tồn tại'],
         lowercase: true,
-        validate: [isEmail, 'Please enter a valid email address']
+        validate: [isEmail, 'Email không hợp lệ']
     },
     description: {
         type: String,

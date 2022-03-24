@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 import AddClub from '../home/AddClub'
 import io from 'socket.io-client'
 import './Mng.css';
-import {ENDPT} from '../../Helper';
+import {ENDPT} from '../../helper/Helper';
 
 let socket;
 

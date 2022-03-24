@@ -9,6 +9,8 @@ import Modal from '@mui/material/Modal';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './AddAccount';
+import io from 'socket.io-client'
+import { ENDPT } from '../../helper/Helper';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -43,12 +45,12 @@ const handleBlock = (event, param) => {
 
 const columns = [
   {
-    field: 'id',
+    field: '_id',
     headerName: 'ID',
     width: 70,
     headerAlign: 'center',
     align: 'center',
-    flex: 0.3,
+    flex: 0.5,
     disableColumnMenu: true,
   },
   {
@@ -156,10 +158,12 @@ const rows = [
 
 ];
 
+let socket;
 
 const ManageAccount = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [search, setSearch] = useState()
+  const [search, setSearch] = useState();
+  const [users, setUsers] = useState([]);
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -171,7 +175,24 @@ const ManageAccount = () => {
 
   const handleOpen = () => setOpenModal(true);
 
-  const handleClose = () => setOpenModal(false);
+  const handleClose = () => {
+    setOpenModal(false);
+  }
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [ENDPT])
+
+  useEffect(() => {
+    socket.on('output-users', users => {
+      setUsers(users)
+      //console.log('users', users)
+    })
+  }, [])
 
   return (
     <div className='container'>
@@ -235,7 +256,8 @@ const ManageAccount = () => {
       </div>
       <div className='mng__body'>
         <DataGrid
-          rows={rows}
+          getRowId={(r) => r._id}
+          rows={users}
           columns={columns}
           autoHeight
           pageSize={8}

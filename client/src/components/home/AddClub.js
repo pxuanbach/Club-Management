@@ -4,7 +4,7 @@ import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Axios from 'axios'
 import io from 'socket.io-client';
-import {ENDPT, upload_preset, cloudinary_API} from '../../Helper'
+import {ENDPT, upload_preset, cloudinary_API} from '../../helper/Helper'
 
 let socket;
 

@@ -10,10 +10,9 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
 import FormHelperText from '@mui/material/FormHelperText';
-import io from 'socket.io-client';
 import './Mng.css'
-import {ENDPT} from '../../Helper'
-import Validator from './Validator'
+import io from 'socket.io-client'
+import {ENDPT} from '../../helper/Helper'
 
 let socket;
 
@@ -27,12 +26,10 @@ const AddAccount = ({ handleClose }) => {
         password: '',
         email: '',
     });
-    const [errors, setErrors] = useState({
-        name: '',
-        username: '',
-        password: '',
-        email: '',
-    });
+    const [nameErr, setNameErr] = useState('');
+    const [usernameErr, setUsernameErr] = useState('');
+    const [passwordErr, setPasswordErr] = useState('');
+    const [emailErr, setEmailErr] = useState('');
 
     const handleImageChange = (event) => {
         if (event.target.files && event.target.files[0]) {
@@ -48,24 +45,46 @@ const AddAccount = ({ handleClose }) => {
         setShowPassword(!showPassword)
     };
 
-    const handleSave = event => {
+    const handleSave = async event => {
         event.preventDefault();
 
-        Validator(values, errors, setErrors)
-        //if (values.username && values.password) {
-            //socket.emit('create-account', values.username, values.password, handleClose)
-        //}
-        console.log('Username', values.username);
-        console.log('Password', values.password);
-        console.log('Name', values.name);
-        console.log('Email', values.email);
-        console.log('Avatar', avatarImage)
+        try {
+            const res = await fetch('http://localhost:5000/signup', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({
+                    'username': values.username, 
+                    'password': values.password,
+                    'img_url': '',
+                    'name': values.name,
+                    'email': values.email,
+                }),
+                headers: {'Content-Type':'application/json'}
+            })
+            const data = await res.json();
+            console.log(data)
+            if (data.errors) {
+                setUsernameErr(data.errors.username)
+                setPasswordErr(data.errors.password);
+                setNameErr(data.errors.name);
+                setEmailErr(data.errors.email);
+            } else {
+                socket.emit('account-created');
+                handleClose();
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     useEffect(() => {
         socket = io(ENDPT);
-        //socket.emit('join', { username: values.username, password: values.password})
-    }, [])
+        return () => {
+          socket.emit('disconnect');
+          socket.off();
+        }
+      }, [ENDPT])
 
     return (
         <div>
@@ -89,18 +108,18 @@ const AddAccount = ({ handleClose }) => {
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={handleChange('name')}
-                        helperText={errors.name}
-                        error={errors.name === '' ? false : true}
+                        helperText={nameErr}
+                        error={nameErr}
                     />
                     <TextField
                         label="Tài khoản"
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={handleChange('username')}
-                        helperText={errors.username}
-                        error={errors.username === '' ? false : true}
+                        helperText={usernameErr}
+                        error={usernameErr}
                     />
-                    <FormControl sx={{ width: '100%' }} variant="outlined" error={errors.password}>
+                    <FormControl sx={{ width: '100%' }} variant="outlined" error={passwordErr}>
                         <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
@@ -121,15 +140,15 @@ const AddAccount = ({ handleClose }) => {
                             }
                             label="Password"
                         />
-                        <FormHelperText id="outlined-adornment-password">{errors.password}</FormHelperText>
+                        <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
                     <TextField
                         label="Email"
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={handleChange('email')}
-                        helperText={errors.email}
-                        error={errors.email === '' ? false : true}
+                        helperText={emailErr}
+                        error={emailErr}
                     />
                     <div className='stack-right'>
                         <Button
