@@ -9,21 +9,30 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
+import FormHelperText from '@mui/material/FormHelperText';
 import io from 'socket.io-client';
 import './Mng.css'
 import {ENDPT} from '../../Helper'
+import Validator from './Validator'
 
 let socket;
 
 const AddAccount = ({ handleClose }) => {
-    
 	const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
+    const [showPassword, setShowPassword] = useState(false);
     const [values, setValues] = useState({
+        name: '',
         username: '',
         password: '',
+        email: '',
     });
-    const [showPassword, setShowPassword] = useState(false);
+    const [errors, setErrors] = useState({
+        name: '',
+        username: '',
+        password: '',
+        email: '',
+    });
 
     const handleImageChange = (event) => {
         if (event.target.files && event.target.files[0]) {
@@ -41,16 +50,20 @@ const AddAccount = ({ handleClose }) => {
 
     const handleSave = event => {
         event.preventDefault();
-        if (values.username && values.password) {
+
+        Validator(values, errors, setErrors)
+        //if (values.username && values.password) {
             //socket.emit('create-account', values.username, values.password, handleClose)
-        }
+        //}
         console.log('Username', values.username);
         console.log('Password', values.password);
+        console.log('Name', values.name);
+        console.log('Email', values.email);
         console.log('Avatar', avatarImage)
     }
 
     useEffect(() => {
-        //socket = io(ENDPT);
+        socket = io(ENDPT);
         //socket.emit('join', { username: values.username, password: values.password})
     }, [])
 
@@ -63,7 +76,7 @@ const AddAccount = ({ handleClose }) => {
                 <div className='modal-avatar'>
                     <input type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
                     <Avatar className='avatar'
-                        sx={{ width: 180, height: 180 }}
+                        sx={{ width: 200, height: 200 }}
                         onClick={() => {inputAvatarImage.current.click()}}
                         src={avatarImage ? URL.createObjectURL(avatarImage) 
                         : ''}>
@@ -72,12 +85,22 @@ const AddAccount = ({ handleClose }) => {
                 </div>
                 <form className='modal-form'>
                     <TextField
+                        label="Họ và tên"
+                        variant='outlined'
+                        sx={{ width: '100%' }}
+                        onChange={handleChange('name')}
+                        helperText={errors.name}
+                        error={errors.name === '' ? false : true}
+                    />
+                    <TextField
                         label="Tài khoản"
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={handleChange('username')}
+                        helperText={errors.username}
+                        error={errors.username === '' ? false : true}
                     />
-                    <FormControl sx={{ width: '100%' }} variant="outlined">
+                    <FormControl sx={{ width: '100%' }} variant="outlined" error={errors.password}>
                         <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
@@ -98,7 +121,16 @@ const AddAccount = ({ handleClose }) => {
                             }
                             label="Password"
                         />
+                        <FormHelperText id="outlined-adornment-password">{errors.password}</FormHelperText>
                     </FormControl>
+                    <TextField
+                        label="Email"
+                        variant='outlined'
+                        sx={{ width: '100%' }}
+                        onChange={handleChange('email')}
+                        helperText={errors.email}
+                        error={errors.email === '' ? false : true}
+                    />
                     <div className='stack-right'>
                         <Button
                             variant="contained"

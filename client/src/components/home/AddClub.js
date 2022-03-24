@@ -27,31 +27,24 @@ const AddClub = ({ setShowFormAddClub }) => {
         }
     };
 
-    const uploadImage = () => {
-        
-    }
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(values)
 
         const formData = new FormData()
         formData.append('file', avatarImage)
-        formData.append('folder', 'Club-Management')
+        formData.append('folder', 'Club-Management/Club-Avatar')
         formData.append('upload_preset', upload_preset)
 
         Axios.post(cloudinary_API, formData)
         .then((res) => {
             console.log(res.data.secure_url)
-            if (values.name && values.description) {
+            if (values.name) {
                 socket.emit('create-club', values.name, res.data.secure_url, values.description, onExitClick)
             }
         })
         .catch((err) => {
             console.log(err)
-            if (values.name && values.description) {
-                socket.emit('create-club', values.name, '', values.description, onExitClick)
-            }
         })
     }
 
