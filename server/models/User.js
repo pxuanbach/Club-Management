@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    groups: [{
+        type: String,
+        ref: 'club'
+    }]
 })
 userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt();

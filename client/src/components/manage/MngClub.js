@@ -85,7 +85,7 @@ const columns = [
   { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
   { field: 'description', headerName: 'Mô tả', flex: 1.5 },
   { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
-  { field: 'members', headerName: "Thành viên", type: 'number', flex: 0.5 },
+  { field: 'members_num', headerName: "Thành viên", type: 'number', flex: 0.5 },
   { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
   {
     field: 'btn-edit',

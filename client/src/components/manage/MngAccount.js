@@ -69,7 +69,7 @@ const columns = [
   { field: 'username', headerName: 'Tài khoản', flex: 0.7 },
   { field: 'name', headerName: 'Tên người dùng', flex: 1 },
   { field: 'email', headerName: 'Email', flex: 1.5 },
-  { field: 'description', headerName: 'Mô tả', flex: 1.5 , sortable: false},
+  { field: 'groups_num', headerName: 'Số nhóm tham gia', flex: 1 , sortable: false},
   {
     field: 'btn-edit',
     headerName: '',
@@ -109,55 +109,6 @@ const columns = [
   },
 ];
 
-const rows = [
-  {
-    id: "1",
-    img_url: "https://i.pinimg.com/564x/26/0e/13/260e13ad0a24c196d2bc97c8ac0249ca.jpg",
-    username: "19521233",
-    name: "Phạm Xuân Bách",
-    description: "Facebook: http://...",
-    email: "pxuanbach1412@gmail.com",
-    isblock: false
-  },
-  {
-    id: "2",
-    img_url: "https://i.pinimg.com/236x/f8/e8/70/f8e87017fd7a250adddbfb0077e52088.jpg",
-    username: "19521345",
-    name: "Nguyễn Tiến Đạt",
-    description: "Facebook: http://... Instagram:...",
-    email: "datdovlog@gmail.com",
-    isblock: false
-  },
-  {
-    id: "3",
-    img_url: "https://i.pinimg.com/236x/fb/cd/57/fbcd576b47cd78afcade6c8d28144cca.jpg",
-    username: "19521344",
-    name: "Nguyễn Đức Chí Đạt",
-    description: "Facebook: http://...",
-    email: "ducdat@gmail.com",
-    isblock: false
-  },
-  {
-    id: "4",
-    img_url: "https://i.pinimg.com/236x/a6/3f/85/a63f851d50c42fd640ab222d63669397.jpg",
-    username: "19521750",
-    name: "Hồ Quang Linh",
-    description: "Facebook: http://...",
-    email: "linkhoquang@gmail.com",
-    isblock: false
-  },
-  {
-    id: "5",
-    img_url: "https://i.pinimg.com/236x/8a/09/fb/8a09fb018a275a35aa588a7b93752207.jpg",
-    username: "19522283",
-    name: "Nguyễn Ngọc Thịnh",
-    description: "Facebook: http://... Tôi là Thịnh",
-    email: "thinhnn@gmail.com",
-    isblock: false
-  },
-
-];
-
 let socket;
 
 const ManageAccount = () => {
@@ -190,7 +141,7 @@ const ManageAccount = () => {
   useEffect(() => {
     socket.on('output-users', users => {
       setUsers(users)
-      //console.log('users', users)
+      console.log('users', users)
     })
   }, [])
 

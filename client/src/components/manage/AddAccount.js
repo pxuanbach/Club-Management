@@ -12,7 +12,8 @@ import Avatar from '@mui/material/Avatar';
 import FormHelperText from '@mui/material/FormHelperText';
 import './Mng.css'
 import io from 'socket.io-client'
-import {ENDPT} from '../../helper/Helper'
+import {ENDPT, my_API} from '../../helper/Helper'
+import UploadImage from '../../helper/UploadImage'
 
 let socket;
 
@@ -49,7 +50,7 @@ const AddAccount = ({ handleClose }) => {
         event.preventDefault();
 
         try {
-            const res = await fetch('http://localhost:5000/signup', {
+            const res = await fetch(my_API + 'signup', {
                 method: 'POST',
                 credentials: 'include',
                 body: JSON.stringify({
@@ -69,7 +70,9 @@ const AddAccount = ({ handleClose }) => {
                 setNameErr(data.errors.name);
                 setEmailErr(data.errors.email);
             } else {
-                socket.emit('account-created');
+                let img_url = await UploadImage(avatarImage);
+
+                socket.emit('account-created', data.user._id, img_url);
                 handleClose();
             }
 
