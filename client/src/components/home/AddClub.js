@@ -3,7 +3,7 @@ import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import io from 'socket.io-client';
-import UploadImage from '../../helper/UploadImage';
+import {UploadImageClub} from '../../helper/UploadImage';
 import {ENDPT} from '../../helper/Helper'
 
 let socket;
@@ -30,7 +30,7 @@ const AddClub = ({ setShowFormAddClub }) => {
         event.preventDefault();
         console.log(values)
         if (values.name) {
-            let img_url = await UploadImage(avatarImage);
+            let img_url = await UploadImageClub(avatarImage);
             socket.emit('create-club', values.name, img_url, values.description, onExitClick)
         }
     }

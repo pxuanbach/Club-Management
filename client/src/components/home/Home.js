@@ -6,6 +6,7 @@ import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
 import {ENDPT} from '../../helper/Helper';
+import { Link } from 'react-router-dom'
 
 let socket;
 
@@ -102,7 +103,9 @@ const Home = () => {
         </div>
         <div className='div-card-team'>
           {clubs && clubs.map(club => (
-            <ClubItem club={club} />
+            <Link to={'/club/' + club._id + '/' + club.name}>
+              <ClubItem club={club} />
+            </Link>
           ))}
         </div>
 

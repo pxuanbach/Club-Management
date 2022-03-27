@@ -1,4 +1,4 @@
-import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
+import { Switch, Route, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import { UserContext } from "../../UserContext";
 import Activity from "../leader-club/Activity"
@@ -9,10 +9,10 @@ import Fund from "../leader-club/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
 import './Club.css'
 const Club = () => {
-  const { path } = useRouteMatch();
-  //const { type } = useParams();
+  const { club_id } = useParams();
+
   useEffect(() => {
-    console.log(path)
+    console.log(club_id)
   }, [])
 
   return (
@@ -20,10 +20,10 @@ const Club = () => {
       <NavbarClub/>
       <div className="div-right">
         <Switch >
-          <Route path={`${path}/activity`}>
+          <Route path={`/club/${club_id}/activity`}>
             <Activity />
           </Route>
-          <Route path={`${path}/calendar`}>
+          <Route path={`/club/${club_id}/calendar`}>
             <Calendar />
           </Route>
         </Switch>

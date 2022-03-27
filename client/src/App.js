@@ -22,7 +22,7 @@ function App() {
             <Route path="/mng-account" component={ManageAccount}/>
             <Route path="/mng-club" component={ManageClub}/>
             <Route path="/info" component={Info}/>
-            <Route path="/club" component={Club}/>
+            <Route path="/club/:club_id/:club_name" component={Club}/>
 
           </Switch>
         </UserContext.Provider>

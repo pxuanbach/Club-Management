@@ -13,7 +13,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import './Mng.css'
 import io from 'socket.io-client'
 import {ENDPT, my_API} from '../../helper/Helper'
-import UploadImage from '../../helper/UploadImage'
+import {UploadImageUser} from '../../helper/UploadImage'
 
 let socket;
 
@@ -70,7 +70,7 @@ const AddAccount = ({ handleClose }) => {
                 setNameErr(data.errors.name);
                 setEmailErr(data.errors.email);
             } else {
-                let img_url = await UploadImage(avatarImage);
+                let img_url = await UploadImageUser(avatarImage);
 
                 socket.emit('account-created', data.user._id, img_url);
                 handleClose();
