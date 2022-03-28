@@ -2,7 +2,7 @@ import { Switch, Route, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import { UserContext } from "../../UserContext";
 import Activity from "../leader-club/Activity"
-import Calendartab from "../leader-club/calendar/Calendar"
+import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/Member"
 import Message from "../leader-club/Message"
 import Fund from "../leader-club/Fund"
