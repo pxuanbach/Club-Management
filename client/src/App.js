@@ -7,11 +7,29 @@ import ManageAccount from "./components/manage/MngAccount";
 import ManageClub from "./components/manage/MngClub";
 import Info from "./components/info/Info";
 import Navbar from "./components/layout/Navbar";
-import Club from './components/club/Club'
+import Club from './components/club/Club';
+import Login from './components/auth/Login'
+import {my_API} from './helper/Helper'
 
 
 function App() {
   const [user, setUser] = useState(null);
+  useEffect(() => {
+    const verifyUser = async () => {
+      try {
+        const res = await fetch( my_API + 'verifyuser', {
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        setUser(data);
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    verifyUser();
+  }, [])
   return (
     <Router>
       <div className="App">
@@ -23,7 +41,7 @@ function App() {
             <Route path="/mng-club" component={ManageClub}/>
             <Route path="/info" component={Info}/>
             <Route path="/club/:club_id/:club_name" component={Club}/>
-
+            <Route path='/login' component={Login}/>
           </Switch>
         </UserContext.Provider>
       </div>

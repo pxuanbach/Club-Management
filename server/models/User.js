@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
+        unique: [true, 'Tài khoản đã tồn tại'],
         required: [true, 'Tài khoản đang trống'],
         minlength: [6, 'Tài khoản ít hơn 6 ký tự'],
     },
@@ -50,9 +51,9 @@ userSchema.statics.login = async function(username, password) {
         if (isAuthenticated) {
             return user;
         }
-        throw Error('incorrect password');
+        throw Error('Mật khẩu sai');
     } else {
-        throw Error('incorrect email');
+        throw Error('Tài khoản không tồn tại');
     }
 }
 const User = mongoose.model('user', userSchema)

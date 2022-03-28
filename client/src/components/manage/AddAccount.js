@@ -12,13 +12,13 @@ import Avatar from '@mui/material/Avatar';
 import FormHelperText from '@mui/material/FormHelperText';
 import './Mng.css'
 import io from 'socket.io-client'
-import {ENDPT, my_API} from '../../helper/Helper'
-import {UploadImageUser} from '../../helper/UploadImage'
+import { ENDPT, my_API } from '../../helper/Helper'
+import { UploadImageUser } from '../../helper/UploadImage'
 
 let socket;
 
 const AddAccount = ({ handleClose }) => {
-	const inputAvatarImage = useRef(null);
+    const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [showPassword, setShowPassword] = useState(false);
     const [values, setValues] = useState({
@@ -48,19 +48,22 @@ const AddAccount = ({ handleClose }) => {
 
     const handleSave = async event => {
         event.preventDefault();
-
+        setUsernameErr('')
+        setPasswordErr('');
+        setNameErr('');
+        setEmailErr('');
         try {
             const res = await fetch(my_API + 'signup', {
                 method: 'POST',
                 credentials: 'include',
                 body: JSON.stringify({
-                    'username': values.username, 
+                    'username': values.username,
                     'password': values.password,
                     'img_url': '',
                     'name': values.name,
                     'email': values.email,
                 }),
-                headers: {'Content-Type':'application/json'}
+                headers: { 'Content-Type': 'application/json' }
             })
             const data = await res.json();
             console.log(data)
@@ -84,10 +87,10 @@ const AddAccount = ({ handleClose }) => {
     useEffect(() => {
         socket = io(ENDPT);
         return () => {
-          socket.emit('disconnect');
-          socket.off();
+            socket.emit('disconnect');
+            socket.off();
         }
-      }, [ENDPT])
+    }, [ENDPT])
 
     return (
         <div>
@@ -96,13 +99,13 @@ const AddAccount = ({ handleClose }) => {
             </h2>
             <div id="modal-modal-description">
                 <div className='modal-avatar'>
-                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
+                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
                     <Avatar className='avatar'
                         sx={{ width: 200, height: 200 }}
-                        onClick={() => {inputAvatarImage.current.click()}}
-                        src={avatarImage ? URL.createObjectURL(avatarImage) 
-                        : ''}>
-                            Ảnh đại diện
+                        onClick={() => { inputAvatarImage.current.click() }}
+                        src={avatarImage ? URL.createObjectURL(avatarImage)
+                            : ''}>
+                        Ảnh đại diện
                     </Avatar>
                 </div>
                 <form className='modal-form'>

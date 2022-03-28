@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import AddClub from './AddClub';
 import { styled, Box } from "@mui/system";
 import ModalUnstyled from "@mui/core/ModalUnstyled";
@@ -6,7 +6,8 @@ import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
 import {ENDPT} from '../../helper/Helper';
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
+import {UserContext} from '../../UserContext'
 
 let socket;
 
@@ -33,14 +34,8 @@ const Backdrop = styled("div")`
   -webkit-tap-highlight-color: transparent;
 `;
 
-const clb = {
-  _id: 1,
-  name: 'ABC',
-  img_url: '',
-  description: 'haha',
-}
-
 const Home = () => {
+  const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [clubs, setClubs] = useState([])
 
@@ -66,7 +61,9 @@ const Home = () => {
     })
   }, [clubs])
 
-
+  if (!user) {
+    return <Redirect to='/login'/>
+  }
   return (
     <div>
       <StyledModal
