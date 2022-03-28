@@ -1,6 +1,6 @@
 .div-add{
     width: 700px;
-    height: 540px;
+    height: 570px;
     background-color:#ffffffff;
 }
 .title{
@@ -143,13 +143,14 @@
     border-radius: 5px;
     align-items: flex-end;   
     margin: 15px;
+    margin-top: 0;
     cursor: pointer;
     transition-duration: 0.4s;
     font-weight: 500px;
     border: 1px solid #b4b0b0;
     background-color: #ffffffff;
 }
-.btn-save:hover{
+.btn-next:hover{
     background-color: #1B264D; 
     color: white;
 }
@@ -158,7 +159,7 @@
     height: 40px;
     border: none;
     border-radius: 5px;
-    margin-top: 15px;
+    /* margin-top: 15px; */
     margin-left: 450px;
     cursor: pointer;
     transition-duration: 0.4s;
