@@ -2,7 +2,7 @@ import { Switch, Route, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import { UserContext } from "../../UserContext";
 import Activity from "../leader-club/Activity"
-import Calendar from "../leader-club/Calendar"
+import Calendartab from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/Member"
 import Message from "../leader-club/Message"
 import Fund from "../leader-club/Fund"
@@ -17,8 +17,10 @@ const Club = () => {
 
   return (
     <div className='club'>
+      <div >
       <NavbarClub/>
-      <div className="div-right">
+      </div>
+      <div className="div-right-club">
         <Switch >
           <Route path={`/club/${club_id}/activity`}>
             <Activity />
