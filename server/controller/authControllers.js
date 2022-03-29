@@ -25,6 +25,10 @@ const alertError = (err) => {
         }
         return errors;
     }
+    if (err.message === 'Mật khẩu sai') {
+        errors.password = 'Mật khẩu sai';
+        return errors;
+    }
     if (err.message.includes('user validation failed')) {
         Object.values(err.errors).forEach(({ properties }) => {
             errors[properties.path] = properties.message
@@ -54,6 +58,7 @@ module.exports.login = async (req, res) => {
         res.status(201).json({ user });
     } catch (error) {
         let errors = alertError(error);
+        console.log(error.message)
         res.status(400).json({ errors })
     }
     res.send()
@@ -75,4 +80,8 @@ module.exports.verifyuser = (req, res, next) => {
     } else {
         next();
     }
+}
+module.exports.logout = (req, res) => {
+    res.cookie('jwt', "", { maxAge: 1 })
+    res.status(200).json({ logout: true })
 }

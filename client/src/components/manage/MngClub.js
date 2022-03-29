@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
@@ -10,6 +10,8 @@ import AddClub from '../home/AddClub'
 import io from 'socket.io-client'
 import './Mng.css';
 import {ENDPT} from '../../helper/Helper';
+import {UserContext} from '../../UserContext'
+import { Redirect } from 'react-router-dom'
 
 let socket;
 
@@ -146,124 +148,11 @@ const columns = [
   }
 ];
 
-const datas = [
-  {
-    _id: "1",
-    img_url: "https://i.pinimg.com/564x/26/0e/13/260e13ad0a24c196d2bc97c8ac0249ca.jpg",
-    name: "CLB Xuân Tình Nguyện",
-    description: "Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân",
-    fund: 2500000,
-    members: 89,
-    leader: "Lê Công Huân",
-    isblock: false
-  },
-  {
-    _id: "2",
-    img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
-    name: "CLB Data Science",
-    description: "Logic is...",
-    fund: 1400000,
-    members: 20,
-    leader: "Nguyễn Cung",
-    isblock: false
-  },
-  {
-    _id: "3",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 19,
-    leader: "Ninh Diêu",
-    isblock: false
-  },
-  {
-    _id: "4",
-    img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
-    name: "CLB Data Science",
-    description: "Logic is...",
-    fund: 1400000,
-    members: 101,
-    leader: "Trần Bình An",
-    isblock: true
-  },
-  {
-    _id: "5",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 5,
-    leader: "Vũ Ngọc Tân",
-    isblock: false
-  },
-  {
-    _id: "6",
-    img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
-    name: "CLB Data Science",
-    description: "Logic is...",
-    fund: 1400000,
-    members: 8,
-    leader: "Phạm Tuấn Kiệt",
-    isblock: false
-  },
-  {
-    _id: "7",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Nguyễn Tiến Đạt",
-    isblock: true
-  },
-  {
-    _id: "8",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-  {
-    _id: "9",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-  {
-    _id: "10",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-  {
-    _id: "11",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-];
-
 const ManageClub = () => {
+  const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [search, setSearch] = useState()
   const [clubs, setClubs] = useState([])
-  const [rows, setRows] = useState([])
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -299,6 +188,9 @@ const ManageClub = () => {
     })
   }, [clubs])
 
+  if (!user) {
+    return <Redirect to='/login'/>
+  }
   return (
     <div className='container'>
       <StyledModal
@@ -368,7 +260,7 @@ const ManageClub = () => {
           rows={clubs}
           columns={columns}
           autoHeight
-          pageSize={8}
+          pageSize={7}
         />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
@@ -11,6 +11,8 @@ import './Mng.css'
 import AddAccount from './AddAccount';
 import io from 'socket.io-client'
 import { ENDPT } from '../../helper/Helper';
+import {UserContext} from '../../UserContext'
+import { Redirect } from 'react-router-dom'
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -112,6 +114,7 @@ const columns = [
 let socket;
 
 const ManageAccount = () => {
+  const { user, setUser } = useContext(UserContext);
   const [openModal, setOpenModal] = useState(false);
   const [search, setSearch] = useState();
   const [users, setUsers] = useState([]);
@@ -145,6 +148,9 @@ const ManageAccount = () => {
     })
   }, [])
 
+  if (!user) {
+    return <Redirect to='/login'/>
+  }
   return (
     <div className='container'>
       <Modal
@@ -211,7 +217,7 @@ const ManageAccount = () => {
           rows={users}
           columns={columns}
           autoHeight
-          pageSize={8}
+          pageSize={7}
         />
       </div>
 

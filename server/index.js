@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
         //console.log('output-clubs: ', result)
         socket.emit('output-clubs', ConvertClubs(result))
     })
-    User.find({username: {$ne: 'admin'}}).then(result => {
+    User.find({username: {$nin: ['admin', 'admin0']}}).then(result => {
         
         socket.emit('output-users', ConvertUsers(result))
         //console.log(result)
@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
             doc.img_url = img_url;
             doc.save();
         })
-        User.find({username: {$ne: 'admin'}}).then(result => {
+        User.find({username: {$nin: ['admin', 'admin0']}}).then(result => {
             io.emit('output-users', ConvertUsers(result))
         })
     })
