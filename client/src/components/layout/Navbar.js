@@ -4,11 +4,22 @@ import './Navbar.css'
 import SignedInMenu from './SignedInMenu'
 import SignedOutMenu from './SignedOutMenu'
 import logo_web from "../../assets/logoweb.png";
+import { my_API } from '../../helper/Helper'
+
 const Navbar = () => {
     const {user, setUser} = useContext(UserContext);
 
-    const logout = () => {
-
+    const logout = async () => {
+        try {
+            const res = await fetch(my_API + 'logout', {
+                credentials: 'include',
+            });
+            const data = res.json();
+            console.log('logout data', data);
+            setUser(null);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const menu = user ? <SignedInMenu logout={logout}/> : <SignedOutMenu/>
@@ -18,7 +29,7 @@ const Navbar = () => {
                 <a href="#" className="brand-logo">
                     <img src={logo_web} className="logo-web" />
                 </a>
-                <SignedInMenu logout={logout}/>
+                {menu}
             </div>
         </nav>
     )

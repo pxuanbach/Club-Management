@@ -9,21 +9,28 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
-import io from 'socket.io-client';
-import './Mng.css'
-import ENDPT from '../../Helper'
+import FormHelperText from '@mui/material/FormHelperText';
+import '../Mng.css'
+import io from 'socket.io-client'
+import { ENDPT, my_API } from '../../../helper/Helper'
+import { UploadImageUser } from '../../../helper/UploadImage'
 
 let socket;
 
 const AddAccount = ({ handleClose }) => {
-    
-	const inputAvatarImage = useRef(null);
+    const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
+    const [showPassword, setShowPassword] = useState(false);
     const [values, setValues] = useState({
+        name: '',
         username: '',
         password: '',
+        email: '',
     });
-    const [showPassword, setShowPassword] = useState(false);
+    const [nameErr, setNameErr] = useState('');
+    const [usernameErr, setUsernameErr] = useState('');
+    const [passwordErr, setPasswordErr] = useState('');
+    const [emailErr, setEmailErr] = useState('');
 
     const handleImageChange = (event) => {
         if (event.target.files && event.target.files[0]) {
@@ -39,20 +46,51 @@ const AddAccount = ({ handleClose }) => {
         setShowPassword(!showPassword)
     };
 
-    const handleSave = event => {
+    const handleSave = async event => {
         event.preventDefault();
-        if (values.username && values.password) {
-            //socket.emit('create-account', values.username, values.password, handleClose)
+        setUsernameErr('')
+        setPasswordErr('');
+        setNameErr('');
+        setEmailErr('');
+        try {
+            const res = await fetch(my_API + 'signup', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({
+                    'username': values.username,
+                    'password': values.password,
+                    'img_url': '',
+                    'name': values.name,
+                    'email': values.email,
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            const data = await res.json();
+            console.log(data)
+            if (data.errors) {
+                setUsernameErr(data.errors.username)
+                setPasswordErr(data.errors.password);
+                setNameErr(data.errors.name);
+                setEmailErr(data.errors.email);
+            } else {
+                let img_url = await UploadImageUser(avatarImage);
+
+                socket.emit('account-created', data.user._id, img_url);
+                handleClose();
+            }
+
+        } catch (error) {
+            console.log(error)
         }
-        console.log('Username', values.username);
-        console.log('Password', values.password);
-        console.log('Avatar', avatarImage)
     }
 
     useEffect(() => {
-        //socket = io(ENDPT);
-        //socket.emit('join', { username: values.username, password: values.password})
-    }, [])
+        socket = io(ENDPT);
+        return () => {
+            socket.emit('disconnect');
+            socket.off();
+        }
+    }, [ENDPT])
 
     return (
         <div>
@@ -61,23 +99,33 @@ const AddAccount = ({ handleClose }) => {
             </h2>
             <div id="modal-modal-description">
                 <div className='modal-avatar'>
-                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange}/>
+                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
                     <Avatar className='avatar'
-                        sx={{ width: 180, height: 180 }}
-                        onClick={() => {inputAvatarImage.current.click()}}
-                        src={avatarImage ? URL.createObjectURL(avatarImage) 
-                        : ''}>
-                            Ảnh đại diện
+                        sx={{ width: 200, height: 200 }}
+                        onClick={() => { inputAvatarImage.current.click() }}
+                        src={avatarImage ? URL.createObjectURL(avatarImage)
+                            : ''}>
+                        Ảnh đại diện
                     </Avatar>
                 </div>
                 <form className='modal-form'>
+                    <TextField
+                        label="Họ và tên"
+                        variant='outlined'
+                        sx={{ width: '100%' }}
+                        onChange={handleChange('name')}
+                        helperText={nameErr}
+                        error={nameErr}
+                    />
                     <TextField
                         label="Tài khoản"
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={handleChange('username')}
+                        helperText={usernameErr}
+                        error={usernameErr}
                     />
-                    <FormControl sx={{ width: '100%' }} variant="outlined">
+                    <FormControl sx={{ width: '100%' }} variant="outlined" error={passwordErr}>
                         <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
@@ -98,7 +146,16 @@ const AddAccount = ({ handleClose }) => {
                             }
                             label="Password"
                         />
+                        <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
+                    <TextField
+                        label="Email"
+                        variant='outlined'
+                        sx={{ width: '100%' }}
+                        onChange={handleChange('email')}
+                        helperText={emailErr}
+                        error={emailErr}
+                    />
                     <div className='stack-right'>
                         <Button
                             variant="contained"

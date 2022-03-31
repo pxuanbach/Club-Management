@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import AddClub from './AddClub';
 import { styled, Box } from "@mui/system";
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
-import ENDPT from '../../Helper';
+import {ENDPT} from '../../helper/Helper';
+import { Link, Redirect } from 'react-router-dom'
+import {UserContext} from '../../UserContext'
 
 let socket;
 
@@ -32,20 +34,13 @@ const Backdrop = styled("div")`
   -webkit-tap-highlight-color: transparent;
 `;
 
-const clb = {
-  _id: 1,
-  name: 'ABC',
-  img_url: '',
-  description: 'haha',
-}
-
 const Home = () => {
+  const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [clubs, setClubs] = useState([])
 
   useEffect(() => {
     socket = io(ENDPT);
-    //socket.emit('join', { username: values.username, password: values.password})
     return () => {
       socket.emit('disconnect');
       socket.off();
@@ -65,7 +60,9 @@ const Home = () => {
     })
   }, [clubs])
 
-
+  if (!user) {
+    return <Redirect to='/login'/>
+  }
   return (
     <div>
       <StyledModal
@@ -101,7 +98,9 @@ const Home = () => {
         </div>
         <div className='div-card-team'>
           {clubs && clubs.map(club => (
-            <ClubItem club={club} />
+            <Link to={'/club/' + club._id + '/' + club.name}>
+              <ClubItem club={club} />
+            </Link>
           ))}
         </div>
       
