@@ -41,7 +41,6 @@ const Home = () => {
 
   useEffect(() => {
     socket = io(ENDPT);
-    //socket.emit('join', { username: values.username, password: values.password})
     return () => {
       socket.emit('disconnect');
       socket.off();

@@ -10,10 +10,10 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Avatar from '@mui/material/Avatar';
 import FormHelperText from '@mui/material/FormHelperText';
-import './Mng.css'
+import '../Mng.css'
 import io from 'socket.io-client'
-import { ENDPT, my_API } from '../../helper/Helper'
-import { UploadImageUser } from '../../helper/UploadImage'
+import { ENDPT, my_API } from '../../../helper/Helper'
+import { UploadImageUser } from '../../../helper/UploadImage'
 
 let socket;
 

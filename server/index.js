@@ -20,6 +20,7 @@ const mongoDB = "mongodb+srv://pxuanbach:094864Bach@cluster0.axgxb.mongodb.net/c
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('connected'))
     .catch(err => console.log(err))
 const PORT = process.env.PORT || 5000
+const { addUser, removeUser, getUser } = require('./helper');
 const Club = require('./models/Club')
 const User = require('./models/User');
 
@@ -72,10 +73,31 @@ io.on('connection', (socket) => {
         //console.log('output-clubs: ', result)
         socket.emit('output-clubs', ConvertClubs(result))
     })
-    User.find({username: {$nin: ['admin', 'admin0']}}).then(result => {
-        
+    User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
+
         socket.emit('output-users', ConvertUsers(result))
         //console.log(result)
+    })
+
+    //join chat room, club chat room
+    socket.on('join', ({ name, room_id, user_id }) => {
+        const { error, user } = addUser({
+            socket_id: socket.id,
+            name,
+            user_id,
+            room_id
+        })
+        socket.join(room_id);
+        if (error) {
+            console.log('join error', error)
+        } else {
+            console.log('join user', user)
+        }
+    })
+    socket.on('get-club', ({club_id}) => {
+        Club.findOne({_id: club_id}).then(result => {
+            io.emit ('output-club', result)
+        })
     })
 
     socket.on('create-club', (name, img_url, description, callback) => {
@@ -97,17 +119,17 @@ io.on('connection', (socket) => {
             console.log(result)
             callback();
         })
-    }) 
+    })
 
     socket.on('account-created', (user_id, img_url) => {
         //console.log('user id', user_id)
         //console.log('img url', img_url)
-        User.findById(user_id, function(err, doc) {
+        User.findById(user_id, function (err, doc) {
             if (err) return;
             doc.img_url = img_url;
             doc.save();
         })
-        User.find({username: {$nin: ['admin', 'admin0']}}).then(result => {
+        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
             io.emit('output-users', ConvertUsers(result))
         })
     })

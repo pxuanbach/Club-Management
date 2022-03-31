@@ -1,5 +1,5 @@
 import { Switch, Route, useParams } from 'react-router-dom';
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { UserContext } from "../../UserContext";
 import Activity from "../leader-club/Activity"
 import Calendar from "../leader-club/calendar/Calendar"
@@ -8,12 +8,11 @@ import Message from "../leader-club/Message"
 import Fund from "../leader-club/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
 import './Club.css'
-const Club = () => {
-  const { club_id } = useParams();
 
-  useEffect(() => {
-    console.log(club_id)
-  }, [])
+let socket;
+
+const Club = () => {
+  const { club_id, club_name } = useParams();
 
   return (
     <div className='club'>
@@ -22,10 +21,10 @@ const Club = () => {
       </div>
       <div className="div-right-club">
         <Switch >
-          <Route path={`/club/${club_id}/activity`}>
+          <Route path={`/club/${club_id}/${club_name}/activity`}>
             <Activity />
           </Route>
-          <Route path={`/club/${club_id}/calendar`}>
+          <Route path={`/club/${club_id}/${club_name}/calendar`}>
             <Calendar />
           </Route>
         </Switch>
