@@ -1,19 +1,18 @@
-import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
-import React, { useState, useEffect } from "react";
+import { Switch, Route, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
 import { UserContext } from "../../UserContext";
 import Activity from "../leader-club/Activity"
-import Calendartab from "../leader-club/calendar/Calendar"
+import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/Member"
 import Message from "../leader-club/Message"
 import Fund from "../leader-club/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
 import './Club.css'
+
+let socket;
+
 const Club = () => {
-  const { path } = useRouteMatch();
-  //const { type } = useParams();
-  useEffect(() => {
-    console.log(path)
-  }, [])
+  const { club_id, club_name } = useParams();
 
   return (
     <div className='club'>
@@ -22,14 +21,11 @@ const Club = () => {
       </div>
       <div className="div-right-club">
         <Switch >
-          <Route path={`${path}/activity`}>
+          <Route path={`/club/${club_id}/${club_name}/activity`}>
             <Activity />
           </Route>
-          <Route path={`${path}/calendar`}>
-            <Calendartab />
-          </Route>
-          <Route path={`${path}/message`}>
-            <Message />
+          <Route path={`/club/${club_id}/${club_name}/calendar`}>
+            <Calendar />
           </Route>
         </Switch>
       </div>

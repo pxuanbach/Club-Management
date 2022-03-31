@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
@@ -7,7 +7,13 @@ import Tooltip from '@mui/material/Tooltip';
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from '@mui/material/styles';
 import AddClub from '../home/AddClub'
+import io from 'socket.io-client'
 import './Mng.css';
+import {ENDPT} from '../../helper/Helper';
+import {UserContext} from '../../UserContext'
+import { Redirect } from 'react-router-dom'
+
+let socket;
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -58,12 +64,11 @@ const handleDelte = (event, param) => {
 
 const columns = [
   {
-    field: 'id',
+    field: '_id',
     headerName: 'ID',
-    width: 70,
     headerAlign: 'center',
     align: 'center',
-    flex: 0.3,
+    flex: 0.5,
     disableColumnMenu: true,
   },
   {
@@ -82,7 +87,7 @@ const columns = [
   { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
   { field: 'description', headerName: 'Mô tả', flex: 1.5 },
   { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
-  { field: 'members', headerName: "Thành viên", type: 'number', flex: 0.5 },
+  { field: 'members_num', headerName: "Thành viên", type: 'number', flex: 0.5 },
   { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
   {
     field: 'btn-edit',
@@ -110,11 +115,11 @@ const columns = [
     sortable: false,
     renderCell: (value) => {
       return (
-        <Tooltip title={value.row.isblock ? "Gỡ chặn" : "Chặn"} placement="right-start">
+        <Tooltip title={value.row.isblocked ? "Gỡ chặn" : "Chặn"} placement="right-start">
           <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
             handleBlock(event, value.row)
           }}>
-            <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
+            <i class={value.row.isblocked ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
               style={{ fontSize: 20 }}></i>
           </Button>
         </Tooltip>
@@ -143,122 +148,11 @@ const columns = [
   }
 ];
 
-const rows = [
-  {
-    id: "1",
-    img_url: "https://i.pinimg.com/564x/26/0e/13/260e13ad0a24c196d2bc97c8ac0249ca.jpg",
-    name: "CLB Xuân Tình Nguyện",
-    description: "Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân Yêu thương mùa xuân",
-    fund: 2500000,
-    members: 89,
-    leader: "Lê Công Huân",
-    isblock: false
-  },
-  {
-    id: "2",
-    img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
-    name: "CLB Data Science",
-    description: "Logic is...",
-    fund: 1400000,
-    members: 20,
-    leader: "Nguyễn Cung",
-    isblock: false
-  },
-  {
-    id: "3",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 19,
-    leader: "Ninh Diêu",
-    isblock: false
-  },
-  {
-    id: "4",
-    img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
-    name: "CLB Data Science",
-    description: "Logic is...",
-    fund: 1400000,
-    members: 101,
-    leader: "Trần Bình An",
-    isblock: true
-  },
-  {
-    id: "5",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 5,
-    leader: "Vũ Ngọc Tân",
-    isblock: false
-  },
-  {
-    id: "6",
-    img_url: "https://i.pinimg.com/236x/02/34/ab/0234ab5b126388ee79234f7abfc0fe37.jpg",
-    name: "CLB Data Science",
-    description: "Logic is...",
-    fund: 1400000,
-    members: 8,
-    leader: "Phạm Tuấn Kiệt",
-    isblock: false
-  },
-  {
-    id: "7",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Nguyễn Tiến Đạt",
-    isblock: true
-  },
-  {
-    id: "8",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-  {
-    id: "9",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-  {
-    id: "10",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-  {
-    id: "11",
-    img_url: "https://i.pinimg.com/236x/8f/c2/15/8fc215d887334f3701fa27d7e65e0e7b.jpg",
-    name: "CLB Google Dev",
-    description: "Dev là developer",
-    fund: 500000,
-    members: 11,
-    leader: "Công Vinh",
-    isblock: true
-  },
-];
-
 const ManageClub = () => {
+  const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [search, setSearch] = useState()
+  const [clubs, setClubs] = useState([])
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -268,9 +162,38 @@ const ManageClub = () => {
     console.log(search)
   }
 
+  const handleGetRowId = (e) => {
+    return e.uniId
+  }
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    //socket.emit('join', { username: values.username, password: values.password})
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [ENDPT])
+
+  useEffect(() => {
+    socket.on('output-clubs', clbs => {
+      setClubs(clbs)
+      console.log('clubs', clubs)
+    })
+  }, [])
+
+  useEffect(() => {
+    socket.on('club-created', clb => {
+      setClubs([...clubs, clb])
+    })
+  }, [clubs])
+
+  if (!user) {
+    return <Redirect to='/login'/>
+  }
   return (
     <div className='container'>
-       <StyledModal
+      <StyledModal
         aria-labelledby="unstyled-modal-title"
         aria-describedby="unstyled-modal-description"
         open={showFormAddClub}
@@ -279,20 +202,20 @@ const ManageClub = () => {
         }}
         BackdropComponent={Backdrop}
       >
-        <AddClub setShowFormAddClub={setShowFormAddClub}/>
+        <AddClub setShowFormAddClub={setShowFormAddClub} />
       </StyledModal>
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
         <div className='header__stack'>
           <div className='stack-left'>
-              <CustomTextField
-                id="search-field"
-                label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
-                variant="standard"
-                value={search}
-                onChange={handleChangeSearchField}
-                size='small'
-              />
+            <CustomTextField
+              id="search-field"
+              label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
+              variant="standard"
+              value={search}
+              onChange={handleChangeSearchField}
+              size='small'
+            />
 
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
@@ -311,7 +234,7 @@ const ManageClub = () => {
               variant="contained"
               disableElevation
               startIcon={<i class="fa-solid fa-plus"></i>}
-              onClick={() => {setShowFormAddClub(true)}}>
+              onClick={() => { setShowFormAddClub(true) }}>
               Tạo Câu lạc bộ mới
             </Button>
             <Button
@@ -333,13 +256,13 @@ const ManageClub = () => {
       </div>
       <div className='mng__body'>
         <DataGrid
-          rows={rows}
+          getRowId={(r) => r._id}
+          rows={clubs}
           columns={columns}
           autoHeight
-          pageSize={8}
+          pageSize={7}
         />
       </div>
-
     </div>
   )
 }

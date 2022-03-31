@@ -59,14 +59,14 @@ const ClubItem = ({club}) => {
                     ))}
                 </Menu>
             </div>
-            <a href='/club' style={{ textDecoration: 'none' }}>
+            <a style={{ textDecoration: 'none' }}>
                 <div className='image-team'>
                     <Avatar sx={{width: 110, height: 110}} src={club.img_url}/>
                 </div>
                 <div className='name-team'>
                     {club.name}
                 </div>
-                <div className='div-activity'>{club.description}</div>
+                <div className='div-activity'></div>
             </a>
         </div>
     )

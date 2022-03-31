@@ -3,17 +3,16 @@ import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import io from 'socket.io-client';
-import ENDPT from '../../Helper'
+import {UploadImageClub} from '../../helper/UploadImage';
+import {ENDPT} from '../../helper/Helper'
 
 let socket;
 
 const AddClub = ({ setShowFormAddClub }) => {
-    const ENDPT = 'localhost:5000'
     const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
         name: '',
-        img_url: '',
         description: '',
     });
 
@@ -27,11 +26,12 @@ const AddClub = ({ setShowFormAddClub }) => {
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(values)
-        if (values.name && values.description) {
-            socket.emit('create-club', values.name, values.img_url, values.description, onExitClick)
+        if (values.name) {
+            let img_url = await UploadImageClub(avatarImage);
+            socket.emit('create-club', values.name, img_url, values.description, onExitClick)
         }
     }
 
