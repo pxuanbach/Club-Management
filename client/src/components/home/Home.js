@@ -82,7 +82,7 @@ const Home = () => {
 
       <div className='div-header'>
         <div className='div-search'>
-          <input
+          <input 
             type="text"
             placeholder="Tìm kiếm câu lạc bộ"
 
@@ -91,7 +91,6 @@ const Home = () => {
 
         </div>
       </div>
-
       <div className='div-body'>
         <div className='header-body'>
           <div className='header-title'> Câu lạc bộ của bạn</div>
@@ -105,7 +104,7 @@ const Home = () => {
             <ClubItem club={club} />
           ))}
         </div>
-
+      
       </div>
 
     </div>

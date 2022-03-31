@@ -98,10 +98,10 @@ const AddClub = ({ setShowFormAddClub }) => {
             </div>
             <div className="div-todo">
                 <button onClick={onExitClick} className='btn-exit'>
-                    Cancel
+                    Hủy
                 </button>
                 <button onClick={handleSubmit} className='btn-next'>
-                    Next
+                    Lưu
                 </button>
             </div>
         </div>

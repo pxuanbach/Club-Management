@@ -38,7 +38,7 @@ const NavbarClub = () => {
                     <Tooltip title="Thành viên" placement="left-start">
                         <a href="/club/member">
                             <i class="fa-solid fa-user-group"></i>
-                            Thành viên
+                            Quản lý CLB
                         </a>
                     </Tooltip>
                     <Tooltip title="Lịch hoạt động" placement="left-start">

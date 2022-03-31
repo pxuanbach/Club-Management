@@ -1,0 +1,20 @@
+.nav-member{
+    width: 100%;
+    height: 10%;
+    /* background-color: #f2f2f2; */
+    animation: onShow 1s linear;
+    
+    
+  }
+  .list-btn-navmember{
+    display: flex;
+    margin-left: 10px;
+    
+    
+  }
+  .list-btn-navmember a{
+    color: #1B264D;
+    font-size: 18px;
+    padding: 20px;
+    text-decoration: none; 
+  }

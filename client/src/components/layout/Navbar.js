@@ -3,7 +3,7 @@ import { UserContext } from '../../UserContext'
 import './Navbar.css'
 import SignedInMenu from './SignedInMenu'
 import SignedOutMenu from './SignedOutMenu'
-
+import logo_web from "../../assets/logoweb.png";
 const Navbar = () => {
     const {user, setUser} = useContext(UserContext);
 
@@ -15,7 +15,9 @@ const Navbar = () => {
     return (
         <nav>
             <div className="nav-wrapper">
-                <a href="#" className="brand-logo">Logo</a>
+                <a href="#" className="brand-logo">
+                    <img src={logo_web} className="logo-web" />
+                </a>
                 <SignedInMenu logout={logout}/>
             </div>
         </nav>

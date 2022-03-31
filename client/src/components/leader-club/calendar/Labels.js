@@ -8,7 +8,7 @@ export default function Labels() {
       <p className="text-gray-500 font-bold mt-10">Label</p>
       {labels.map(({ label: lbl, checked }, idx) => (
         <label key={idx} className="items-center mt-3 block">
-          <input
+          <input 
             type="checkbox"
             checked={checked}
             onChange={() =>

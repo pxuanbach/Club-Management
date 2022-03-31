@@ -1,9 +1,9 @@
 import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import { UserContext } from "../../UserContext";
-import Activity from "../leader-club/Activity"
+import Activity from "../leader-club/activity/Activity"
 import Calendartab from "../leader-club/calendar/Calendar"
-import Member from "../leader-club/Member"
+import Member from "../leader-club/member/Member"
 import Message from "../leader-club/Message"
 import Fund from "../leader-club/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
@@ -30,6 +30,9 @@ const Club = () => {
           </Route>
           <Route path={`${path}/message`}>
             <Message />
+          </Route>
+          <Route path={`${path}/member`}>
+            <Member />
           </Route>
         </Switch>
       </div>
