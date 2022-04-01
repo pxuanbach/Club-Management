@@ -134,6 +134,16 @@ io.on('connection', (socket) => {
         })
     })
 
+    socket.on('block-unblock', (user_id) => {
+        User.findById(user_id, function (err, doc) {
+            if (err) return;
+            doc.isblocked = !doc.isblocked;
+            doc.save();
+        })
+        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
+            io.emit('blocked-unblocked', ConvertUsers(result))
+        })
+    })
     socket.on('disconnect', () => {
         //
     })

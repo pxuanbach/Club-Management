@@ -99,7 +99,7 @@ const Home = () => {
         </div>
         <div className='div-card-team'>
           {clubs && clubs.map(club => (
-            <Link to={'/club/' + club._id + '/' + club.name}>
+            <Link key={club._id} to={'/club/' + club._id + '/' + club.name}>
               <ClubItem club={club} />
             </Link>
           ))}
