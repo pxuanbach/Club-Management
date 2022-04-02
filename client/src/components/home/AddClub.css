@@ -1,14 +1,8 @@
-.div-add{
-    width: 700px;
-    height: 570px;
-    background-color:#ffffffff;
-}
+
 .title{
     width: 630px;
     color: #1B264D;
     font-weight: 700;
-    margin-top: 30px;
-    margin-left: 40px;
     font-size: 20px;
 }
 .title > p{
@@ -22,24 +16,18 @@
 .info{
     display: flex;
     margin-top: 10px;
-    
 }
 .div-left{
-    margin-top: 16px;
+    display: flex;
+    justify-content: flex-start;
 }
 .div-right{
-    margin-left: 30px;
+    width: 100%;
     margin-top: 10px;
 }
 .div-team-name{
     display: flex;
     flex-direction: column;
-    
-}
-.label{
-    color: #1B264D;
-    font-size: 15px;
-  
 }
 
 .input-name{
@@ -76,7 +64,6 @@
     object-position: center;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
 }
 .modal-avatar input{
     display: none;
@@ -95,80 +82,22 @@
     flex-direction: column;
     margin-top: 20px;
 }
-.div-team-search>i{
-    position: fixed;
-    margin-left: 630px;
-    margin-top: 37px;
-    color: #1B264D;
-    font-size: 1.1rem;
-    cursor: pointer;
+.display-members{
+    display: flex;
+    justify-content: flex-start;
 }
-.label-search{
-    margin-left: 40px;
-    color: #1B264D;
-    font-size: 15px;
-}
-.input-search{
-    width: 620px;
-    height: 40px;
-    border: none;
-    margin: 0 auto;
-    border: 1px solid #c7c2c2;
-    padding-left: 10px;
-    margin-top: 5px;
-    border-radius: 5px;
-    outline: none;
-}
-.input-search:hover{
-    border-bottom: 2px solid #1B264D;
-
-}
-
 .avatagroup{
-    margin-top: 10px;
-    /* margin-right: 35px; */
-    width: 200px;
-    
+    margin: 10px 0;
 }
 
 .div-todo{
     width: 100%;
     display: flex;
-    
-    
+    justify-content: flex-end;
 }
-.btn-next {
-    width: 100px;
-    height: 40px;
-    border: none;
-    border-radius: 5px;
-    align-items: flex-end;   
-    margin: 15px;
-    margin-top: 0;
-    cursor: pointer;
-    transition-duration: 0.4s;
-    font-weight: 500px;
-    border: 1px solid #b4b0b0;
-    background-color: #ffffffff;
+.div-todo button{
+    margin-right: 10px;
 }
-.btn-next:hover{
-    background-color: #1B264D; 
-    color: white;
-}
-.btn-exit {
-    width: 100px;
-    height: 40px;
-    border: none;
-    border-radius: 5px;
-    /* margin-top: 15px; */
-    margin-left: 450px;
-    cursor: pointer;
-    transition-duration: 0.4s;
-    font-weight: 500px;
-    border: 1px solid #b4b0b0;
-    background-color: #ffffffff;
-}
-.btn-exit:hover{
-    background-color: #1B264D; 
-    color: white;
+.div-todo button:last-child{
+    margin-right: 0px;
 }

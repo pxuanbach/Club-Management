@@ -46,7 +46,11 @@ userSchema.pre('save', async function(next) {
 })
 userSchema.statics.login = async function(username, password) {
     const user = await this.findOne({username});
+    
     if (user) {
+        if (user.isblocked) {
+            throw Error('Tài khoản đã bị chặn')
+        }
         const isAuthenticated = await bcrypt.compare(password, user.password);
         if (isAuthenticated) {
             return user;

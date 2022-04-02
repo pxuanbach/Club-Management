@@ -4,7 +4,8 @@ import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import ModalUnstyled from "@mui/core/ModalUnstyled";
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
 import { styled } from '@mui/material/styles';
 import AddClub from '../home/AddClub'
 import io from 'socket.io-client'
@@ -24,28 +25,17 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const StyledModal = styled(ModalUnstyled)`
-  position: fixed;
-  z-index: 1300;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Backdrop = styled("div")`
-  z-index: -1;
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  -webkit-tap-highlight-color: transparent;
-`;
+const style = {
+  position: 'absolute',
+  top: '45%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 700,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+};
 
 const handleEdit = (event, param) => {
   event.stopPropagation();
@@ -193,17 +183,18 @@ const ManageClub = () => {
   }
   return (
     <div className='container'>
-      <StyledModal
-        aria-labelledby="unstyled-modal-title"
-        aria-describedby="unstyled-modal-description"
+      <Modal
         open={showFormAddClub}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
         onClose={() => {
           setShowFormAddClub(false);
         }}
-        BackdropComponent={Backdrop}
       >
-        <AddClub setShowFormAddClub={setShowFormAddClub} />
-      </StyledModal>
+        <Box sx={style}>
+          <AddClub setShowFormAddClub={setShowFormAddClub}/>
+        </Box>
+      </Modal>
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
         <div className='header__stack'>

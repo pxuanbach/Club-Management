@@ -110,6 +110,7 @@ const AddAccount = ({ handleClose }) => {
                 </div>
                 <form className='modal-form'>
                     <TextField
+                        size="small"
                         label="Họ và tên"
                         variant='outlined'
                         sx={{ width: '100%' }}
@@ -118,6 +119,7 @@ const AddAccount = ({ handleClose }) => {
                         error={nameErr}
                     />
                     <TextField
+                        size="small"
                         label="Tài khoản"
                         variant='outlined'
                         sx={{ width: '100%' }}
@@ -126,8 +128,9 @@ const AddAccount = ({ handleClose }) => {
                         error={usernameErr}
                     />
                     <FormControl sx={{ width: '100%' }} variant="outlined" error={passwordErr}>
-                        <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-password" size="small">Mật khẩu</InputLabel>
                         <OutlinedInput
+                            size="small"
                             id="outlined-adornment-password"
                             type={showPassword ? 'text' : 'password'}
                             value={values.password}
@@ -149,6 +152,7 @@ const AddAccount = ({ handleClose }) => {
                         <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
                     <TextField
+                    size="small"
                         label="Email"
                         variant='outlined'
                         sx={{ width: '100%' }}

@@ -29,6 +29,14 @@ const alertError = (err) => {
         errors.password = 'Mật khẩu sai';
         return errors;
     }
+    if (err.message === 'Tài khoản không tồn tại') {
+        errors.username = 'Tài khoản không tồn tại';
+        return errors;
+    }
+    if (err.message === 'Tài khoản đã bị chặn') {
+        errors.username = 'Tài khoản đã bị chặn';
+        return errors;
+    }
     if (err.message.includes('user validation failed')) {
         Object.values(err.errors).forEach(({ properties }) => {
             errors[properties.path] = properties.message

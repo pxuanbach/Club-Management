@@ -2,9 +2,14 @@ import React, { useState, useEffect, useRef } from 'react'
 import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import io from 'socket.io-client';
-import {UploadImageClub} from '../../helper/UploadImage';
-import {ENDPT} from '../../helper/Helper'
+import { UploadImageClub } from '../../helper/UploadImage';
+import { ENDPT } from '../../helper/Helper'
 
 let socket;
 
@@ -63,46 +68,75 @@ const AddClub = ({ setShowFormAddClub }) => {
                                 sx={{ width: 150, height: 150 }}
                                 onClick={() => { inputAvatarImage.current.click() }}
                                 src={avatarImage ? URL.createObjectURL(avatarImage)
-                                : ''}>
-                                    Ảnh đại diện
+                                    : ''}>
+                                Ảnh đại diện
                             </Avatar>
                         </div>
                     </div>
                     <div className='div-right'>
                         <div className='div-team-name'>
-                            <label className='label'>Tên câu lạc bộ</label>
-                            <input className='input-name'
+                            <TextField id="club-name"
                                 value={values.name}
-                                onChange={handleChange('name')}></input>
+                                onChange={handleChange('name')}
+                                label="Tên câu lạc bộ"
+                                variant="outlined"
+                                margin="dense"
+                                fullWidth
+                                size="small" />
                         </div>
                         <div className='div-description'>
-                            <label className='label'>Mô tả</label>
-                            <textarea className='desciption'
-                                cols="100" rows="4"
-                                placeholder="Vui lòng nhập tại đây..."
+                            <TextField id="club-description"
                                 value={values.description}
-                                onChange={handleChange('description')}></textarea>
+                                onChange={handleChange('description')}
+                                label="Mô tả câu lạc bộ"
+                                variant="outlined"
+                                multiline
+                                rows={4}
+                                margin="dense"
+                                fullWidth
+                                size="small" />
                         </div>
                     </div>
                 </div>
                 <div className='div-team-search'>
-                    <label className='label-search'>Thêm thành viên</label>
-                    <i class="fa-solid fa-user-plus"></i>
-                    <input className='input-search' placeholder="Nhập tên thành viên..."></input>
-                    <AvatarGroup className='avatagroup' total={24}>
+                    <TextField
+                        id="add-members"
+                        variant="outlined"
+                        label="Thêm thành viên"
+                        size="small"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton style={{ color: '#1B264D' }}>
+                                        <PersonAddIcon />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                </div>
+                <div className='display-members'>
+                    <AvatarGroup className='avatagroup'>
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
                         <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
                         <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
+                        <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
                     </AvatarGroup>
                 </div>
             </div>
             <div className="div-todo">
-                <button onClick={onExitClick} className='btn-exit'>
-                    Cancel
-                </button>
-                <button onClick={handleSubmit} className='btn-next'>
-                    Next
-                </button>
+                <Button
+                    onClick={handleSubmit}
+                    variant="contained"
+                    disableElevation>
+                    Lưu
+                </Button>
+                <Button
+                    onClick={onExitClick}
+                    variant="outlined"
+                    disableElevation>
+                    Hủy
+                </Button>
             </div>
         </div>
     )
