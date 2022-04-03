@@ -14,7 +14,9 @@ import { ENDPT } from '../../../helper/Helper'
 let socket;
 
 const AddClub = ({ setShowFormAdd }) => {
+    const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
+    const [avatarHeight, setAvatarHeight] = useState(150);
     const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
         name: '',
@@ -53,6 +55,10 @@ const AddClub = ({ setShowFormAdd }) => {
         }
     }, [ENDPT])
 
+    useEffect(() => {
+        setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
+    }, [avatarRef])
+
     return (
         <div className='div-add'>
             <div className='div-info'>
@@ -64,8 +70,8 @@ const AddClub = ({ setShowFormAdd }) => {
                     <div className='div-left'>
                         <div className='modal-avatar'>
                             <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
-                            <Avatar className='avatar'
-                                sx={{ width: 150, height: 150 }}
+                            <Avatar className='avatar' ref={avatarRef}
+                                sx={{height: avatarHeight}}
                                 onClick={() => { inputAvatarImage.current.click() }}
                                 src={avatarImage ? URL.createObjectURL(avatarImage)
                                     : ''}>

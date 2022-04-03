@@ -18,6 +18,9 @@ import { UploadImageUser } from '../../../helper/UploadImage'
 let socket;
 
 const AddAccount = ({ handleClose }) => {
+    const [avatarHeight, setAvatarHeight] = useState(150);
+    const avatarRef = useRef();
+    
     const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [showPassword, setShowPassword] = useState(false);
@@ -92,21 +95,27 @@ const AddAccount = ({ handleClose }) => {
         }
     }, [ENDPT])
 
+    useEffect(() => {
+        setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
+    }, [avatarRef])
+
     return (
         <div>
             <h2 id="modal-modal-title">
                 Thêm tài khoản mới
             </h2>
             <div id="modal-modal-description">
-                <div className='modal-avatar'>
-                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
-                    <Avatar className='avatar'
-                        sx={{ width: 200, height: 200 }}
-                        onClick={() => { inputAvatarImage.current.click() }}
-                        src={avatarImage ? URL.createObjectURL(avatarImage)
-                            : ''}>
-                        Ảnh đại diện
-                    </Avatar>
+                <div className='div-left'>
+                    <div className='modal-avatar'>
+                        <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
+                        <Avatar className='avatar' ref={avatarRef}
+                            sx={{ height: avatarHeight}}
+                            onClick={() => { inputAvatarImage.current.click() }}
+                            src={avatarImage ? URL.createObjectURL(avatarImage)
+                                : ''}>
+                            Ảnh đại diện
+                        </Avatar>
+                    </div>
                 </div>
                 <form className='modal-form'>
                     <TextField
@@ -152,7 +161,7 @@ const AddAccount = ({ handleClose }) => {
                         <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
                     <TextField
-                    size="small"
+                        size="small"
                         label="Email"
                         variant='outlined'
                         sx={{ width: '100%' }}

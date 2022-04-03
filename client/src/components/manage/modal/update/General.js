@@ -14,17 +14,19 @@ const GeneralUpdate = () => {
 
     return (
         <div className='general__body'>
-            <div style={{flex: 1}}>
+            <div style={{flex: 0.3}}>
                 <div className='modal-avatar'>
                     <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
                     <Avatar className='avatar'
-                        sx={{ width: 150, height: 150 }}
                         onClick={() => { inputAvatarImage.current.click() }}
                         src={avatarImage ? URL.createObjectURL(avatarImage)
                             : ''}>
                         Ảnh đại diện
                     </Avatar>
                 </div>
+            </div>
+            <div style={{flex: 0.7}}>
+
             </div>
         </div>
     )
