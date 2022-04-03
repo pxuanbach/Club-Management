@@ -8,12 +8,12 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import io from 'socket.io-client';
-import { UploadImageClub } from '../../helper/UploadImage';
-import { ENDPT } from '../../helper/Helper'
+import { UploadImageClub } from '../../../helper/UploadImage';
+import { ENDPT } from '../../../helper/Helper'
 
 let socket;
 
-const AddClub = ({ setShowFormAddClub }) => {
+const AddClub = ({ setShowFormAdd }) => {
     const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [values, setValues] = useState({
@@ -41,7 +41,7 @@ const AddClub = ({ setShowFormAddClub }) => {
     }
 
     const onExitClick = () => {
-        setShowFormAddClub(false);
+        setShowFormAdd(false);
     };
 
     useEffect(() => {

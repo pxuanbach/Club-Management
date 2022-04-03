@@ -7,11 +7,12 @@ import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { styled } from '@mui/material/styles';
-import AddClub from '../home/AddClub'
+import AddClub from './modal/AddClub'
+import UpdateClub from './modal/UpdateClub'
 import io from 'socket.io-client'
 import './Mng.css';
-import {ENDPT} from '../../helper/Helper';
-import {UserContext} from '../../UserContext'
+import { ENDPT } from '../../helper/Helper';
+import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 
 let socket;
@@ -34,113 +35,14 @@ const style = {
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
-  p: 4,
+  p: 3,
 };
-
-const handleEdit = (event, param) => {
-  event.stopPropagation();
-  console.log('click edit', param);
-}
-
-const handleBlock = (event, param) => {
-  event.stopPropagation();
-  //param.isblock = !param.isblock
-}
-
-const handleDelte = (event, param) => {
-  event.stopPropagation();
-
-}
-
-const columns = [
-  {
-    field: '_id',
-    headerName: 'ID',
-    headerAlign: 'center',
-    align: 'center',
-    flex: 0.5,
-    disableColumnMenu: true,
-  },
-  {
-    field: 'img_url',
-    headerName: 'Hình đại diện',
-    disableColumnMenu: true,
-    sortable: false,
-    align: 'center',
-    flex: 0.6,
-    renderCell: (value) => {
-      return (
-        <Avatar src={value.row.img_url} />
-      )
-    }
-  },
-  { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
-  { field: 'description', headerName: 'Mô tả', flex: 1.5 },
-  { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
-  { field: 'members_num', headerName: "Thành viên", type: 'number', flex: 0.5 },
-  { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
-  {
-    field: 'btn-edit',
-    headerName: '',
-    align: 'center',
-    flex: 0.4,
-    disableColumnMenu: true,
-    sortable: false,
-    renderCell: (value) => {
-      return (
-        <Tooltip title="Chỉnh sửa" placement="right-start">
-          <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-            handleEdit(event, value.row)
-          }}><i class="fa-solid fa-pen-to-square" style={{ fontSize: 20 }}></i></Button>
-        </Tooltip>
-      )
-    }
-  },
-  {
-    field: 'btn-block',
-    headerName: '',
-    align: 'center',
-    flex: 0.4,
-    disableColumnMenu: true,
-    sortable: false,
-    renderCell: (value) => {
-      return (
-        <Tooltip title={value.row.isblocked ? "Gỡ chặn" : "Chặn"} placement="right-start">
-          <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-            handleBlock(event, value.row)
-          }}>
-            <i class={value.row.isblocked ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
-              style={{ fontSize: 20 }}></i>
-          </Button>
-        </Tooltip>
-      )
-    }
-  },
-  {
-    field: 'btn-delete',
-    headerName: '',
-    align: 'center',
-    flex: 0.4,
-    disableColumnMenu: true,
-    sortable: false,
-    renderCell: (value) => {
-      return (
-        <Tooltip title="Xóa" placement="right-start">
-          <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-            handleDelte(event, value.row)
-          }}>
-            <i class="fa-solid fa-trash-can"
-              style={{ fontSize: 20 }}></i>
-          </Button>
-        </Tooltip>
-      )
-    }
-  }
-];
 
 const ManageClub = () => {
   const { user, setUser } = useContext(UserContext);
-  const [showFormAddClub, setShowFormAddClub] = useState(false);
+  const [clubSelected, setClubSelected] = useState()
+  const [showFormAdd, setShowFormAdd] = useState(false);
+  const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [search, setSearch] = useState()
   const [clubs, setClubs] = useState([])
 
@@ -150,10 +52,6 @@ const ManageClub = () => {
 
   const handleSearch = (e) => {
     console.log(search)
-  }
-
-  const handleGetRowId = (e) => {
-    return e.uniId
   }
 
   useEffect(() => {
@@ -178,21 +76,137 @@ const ManageClub = () => {
     })
   }, [clubs])
 
+  const handleUpdate = (event, param) => {
+    event.stopPropagation();
+    setShowFormUpdate(true)
+  }
+
+  const handleBlock = (event, param) => {
+    event.stopPropagation();
+    //param.isblock = !param.isblock
+  }
+
+  const handleDelte = (event, param) => {
+    event.stopPropagation();
+
+  }
+
+  const columns = [
+    {
+      field: '_id',
+      headerName: 'ID',
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.5,
+      disableColumnMenu: true,
+    },
+    {
+      field: 'img_url',
+      headerName: 'Hình đại diện',
+      disableColumnMenu: true,
+      sortable: false,
+      align: 'center',
+      flex: 0.6,
+      renderCell: (value) => {
+        return (
+          <Avatar src={value.row.img_url} />
+        )
+      }
+    },
+    { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
+    { field: 'description', headerName: 'Mô tả', flex: 1.5 },
+    { field: 'leader', headerName: "Trưởng CLB", flex: 1 },
+    { field: 'members_num', headerName: "Thành viên", type: 'number', flex: 0.5 },
+    { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
+    {
+      field: 'btn-update',
+      headerName: '',
+      align: 'center',
+      flex: 0.4,
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (value) => {
+        return (
+          <Tooltip title="Cập nhật" placement="right-start">
+            <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
+              handleUpdate(event, value.row)
+            }}><i class="fa-solid fa-pen-to-square" style={{ fontSize: 20 }}></i></Button>
+          </Tooltip>
+        )
+      }
+    },
+    {
+      field: 'btn-block',
+      headerName: '',
+      align: 'center',
+      flex: 0.4,
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (value) => {
+        return (
+          <Tooltip title={value.row.isblocked ? "Gỡ chặn" : "Chặn"} placement="right-start">
+            <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
+              handleBlock(event, value.row)
+            }}>
+              <i class={value.row.isblocked ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
+                style={{ fontSize: 20 }}></i>
+            </Button>
+          </Tooltip>
+        )
+      }
+    },
+    {
+      field: 'btn-delete',
+      headerName: '',
+      align: 'center',
+      flex: 0.4,
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (value) => {
+        return (
+          <Tooltip title="Xóa" placement="right-start">
+            <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
+              handleDelte(event, value.row)
+            }}>
+              <i class="fa-solid fa-trash-can"
+                style={{ fontSize: 20 }}></i>
+            </Button>
+          </Tooltip>
+        )
+      }
+    }
+  ];
+
   if (!user) {
-    return <Redirect to='/login'/>
+    return <Redirect to='/login' />
   }
   return (
     <div className='container'>
       <Modal
-        open={showFormAddClub}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        open={showFormAdd}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
         onClose={() => {
-          setShowFormAddClub(false);
+          setShowFormAdd(false);
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAddClub={setShowFormAddClub}/>
+          <AddClub setShowFormAdd={setShowFormAdd} />
+        </Box>
+      </Modal>
+      <Modal
+        open={showFormUpdate}
+        aria-labelledby="modal-update-title"
+        aria-describedby="modal-update-description"
+        onClose={() => {
+          setShowFormUpdate(false);
+        }}
+      >
+        <Box sx={style}>
+          <UpdateClub 
+            club={clubSelected}
+            setShowFormUpdate={setShowFormUpdate} 
+          />
         </Box>
       </Modal>
       <div className='mng__header'>
@@ -225,7 +239,7 @@ const ManageClub = () => {
               variant="contained"
               disableElevation
               startIcon={<i class="fa-solid fa-plus"></i>}
-              onClick={() => { setShowFormAddClub(true) }}>
+              onClick={() => { setShowFormAdd(true) }}>
               Tạo Câu lạc bộ mới
             </Button>
             <Button

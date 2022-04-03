@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import AddClub from './AddClub';
+import AddClub from '../manage/modal/AddClub';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import io from 'socket.io-client'

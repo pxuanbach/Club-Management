@@ -4,6 +4,7 @@
   
 }
 .nav-club{
+  min-width: 210px;
   width: 17vw;
   height: 100vh;
   background-color: #f2f2f2;
