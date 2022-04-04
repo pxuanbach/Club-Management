@@ -71,7 +71,7 @@ const ManageAccount = () => {
   
   const handleBlockOrUnblock = (event, param) => {
     event.stopPropagation();
-    socket.emit('block-unblock', param._id)
+    socket.emit('block-unblock-account', param._id)
     const updateUsers = users.map((elm) => {
       if (elm._id === param._id) {
         return {

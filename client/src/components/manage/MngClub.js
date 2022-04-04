@@ -78,6 +78,7 @@ const ManageClub = () => {
 
   const handleUpdate = (event, param) => {
     event.stopPropagation();
+    setClubSelected(param);
     setShowFormUpdate(true)
   }
 

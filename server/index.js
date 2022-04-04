@@ -126,22 +126,22 @@ io.on('connection', (socket) => {
         //console.log('img url', img_url)
         User.findById(user_id, function (err, doc) {
             if (err) return;
-            doc.img_url = img_url;
-            doc.save();
+            if (img_url) {
+                doc.img_url = img_url;
+                doc.save();
+            }
+            
         })
         User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
             io.emit('output-users', ConvertUsers(result))
         })
     })
 
-    socket.on('block-unblock', (user_id) => {
+    socket.on('block-unblock-account', (user_id) => {
         User.findById(user_id, function (err, doc) {
             if (err) return;
             doc.isblocked = !doc.isblocked;
             doc.save();
-        })
-        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
-            io.emit('blocked-unblocked', ConvertUsers(result))
         })
     })
     socket.on('disconnect', () => {

@@ -41,7 +41,9 @@ const userSchema = new mongoose.Schema({
 })
 userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt();
+    console.log('no hash', this.password)
     this.password = await bcrypt.hash(this.password, salt);
+    console.log('hash pass', this.password)
     next();
 })
 userSchema.statics.login = async function(username, password) {
@@ -51,11 +53,13 @@ userSchema.statics.login = async function(username, password) {
         if (user.isblocked) {
             throw Error('Tài khoản đã bị chặn')
         }
-        const isAuthenticated = await bcrypt.compare(password, user.password);
-        if (isAuthenticated) {
+        let isAuth = await bcrypt.compare(password, user.password);
+        if (isAuth) {
             return user;
         }
+        console.log(password, user.password, isAuth)
         throw Error('Mật khẩu sai');
+        
     } else {
         throw Error('Tài khoản không tồn tại');
     }

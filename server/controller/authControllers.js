@@ -82,7 +82,11 @@ module.exports.verifyuser = (req, res, next) => {
                 console.log(err.message)
             } else {
                 let user = await User.findById(decodedToken.id);
-                res.json(user);
+                if (user.isblocked) {
+                    res.json({error: 'Tài khoản đã bị khóa'});
+                } else {
+                    res.json(user);
+                }
                 next();
             }
         })

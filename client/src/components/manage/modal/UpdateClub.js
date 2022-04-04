@@ -32,26 +32,29 @@ TabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-const UpdateClub = ({ setShowFormUpdate }) => {
-    const [value, setValue] = useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
+const UpdateClub = ({ setShowFormUpdate, club }) => {
+    const [tabValue, setTabValue] = useState(0);
+    
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
     };
 
     return (
         <div>
             <Tabs
-                value={value}
-                onChange={handleChange}
+                value={tabValue}
+                onChange={handleTabChange}
             >
                 <Tab value={0} label="Thông tin chung"/>
                 <Tab value={1} label="Thành viên" />
             </Tabs>
-            <TabPanel value={value} index={0}>
-                <General/>
+            <TabPanel value={tabValue} index={0}>
+                <General 
+                    setShowFormUpdate={setShowFormUpdate}
+                    club={club}
+                />
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={tabValue} index={1}>
                 <Members/>
             </TabPanel>
         </div>

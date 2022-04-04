@@ -69,14 +69,14 @@ const AddAccount = ({ handleClose }) => {
                 headers: { 'Content-Type': 'application/json' }
             })
             const data = await res.json();
-            console.log(data)
+            console.log('signup response', data)
             if (data.errors) {
                 setUsernameErr(data.errors.username)
                 setPasswordErr(data.errors.password);
                 setNameErr(data.errors.name);
                 setEmailErr(data.errors.email);
             } else {
-                let img_url = await UploadImageUser(avatarImage);
+                let img_url = await UploadImageUser(avatarImage).catch(err => console.log(err));
 
                 socket.emit('account-created', data.user._id, img_url);
                 handleClose();
