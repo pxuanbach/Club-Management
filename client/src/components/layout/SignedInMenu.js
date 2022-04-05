@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { Link } from 'react-router-dom'
+import Avatar from '@mui/material/Avatar';
 import { UserContext } from '../../UserContext'
 
 const SignedInMenu = ({ logout }) => {
@@ -31,7 +32,7 @@ const SignedInMenu = ({ logout }) => {
             <div className='avatar-logout'>
                 <Tooltip title="Thông tin cá nhân" placement="right-start">
                     <Link to="/info">
-                        <img src='https://scontent.fdad3-5.fna.fbcdn.net/v/t1.6435-1/121718895_1047521952348781_6922509068478097633_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-5&_nc_sid=7206a8&_nc_ohc=Hi5lTnlkQEcAX9ciG7O&_nc_ht=scontent.fdad3-5.fna&oh=00_AT84zqtouqFXHyi-J_f37uHemnKitT79Cr3UccpPHBxe3A&oe=624F1F3A'></img>
+                        <Avatar src={user.img_url}/>
                     </Link>
                 </Tooltip>
                 <Tooltip title="Đăng xuất" placement='right-start'>

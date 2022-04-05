@@ -20,7 +20,6 @@ let socket;
 const AddAccount = ({ handleClose }) => {
     const [avatarHeight, setAvatarHeight] = useState(150);
     const avatarRef = useRef();
-    
     const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +29,7 @@ const AddAccount = ({ handleClose }) => {
         password: '',
         email: '',
     });
+    const [isSuccess, setIsSuccess] = useState(false)
     const [nameErr, setNameErr] = useState('');
     const [usernameErr, setUsernameErr] = useState('');
     const [passwordErr, setPasswordErr] = useState('');
@@ -56,6 +56,7 @@ const AddAccount = ({ handleClose }) => {
         setNameErr('');
         setEmailErr('');
         try {
+            setIsSuccess(true);
             const res = await fetch(my_API + 'signup', {
                 method: 'POST',
                 credentials: 'include',
@@ -75,6 +76,7 @@ const AddAccount = ({ handleClose }) => {
                 setPasswordErr(data.errors.password);
                 setNameErr(data.errors.name);
                 setEmailErr(data.errors.email);
+                setIsSuccess(false);
             } else {
                 let img_url = await UploadImageUser(avatarImage).catch(err => console.log(err));
 
@@ -170,13 +172,13 @@ const AddAccount = ({ handleClose }) => {
                         error={emailErr}
                     />
                     <div className='stack-right'>
-                        <Button
+                        <Button disabled={isSuccess}
                             variant="contained"
                             disableElevation
                             onClick={handleSave}>
                             Lưu
                         </Button>
-                        <Button
+                        <Button disabled={isSuccess}
                             variant="outlined"
                             disableElevation
                             onClick={handleClose}>

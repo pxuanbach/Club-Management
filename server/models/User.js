@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const {isEmail} = require('validator');
 const bcrypt = require('bcrypt');
+const SALT_WORK_FACTOR = 10
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -39,13 +40,28 @@ const userSchema = new mongoose.Schema({
         ref: 'club'
     }]
 })
-userSchema.pre('save', async function(next) {
-    const salt = await bcrypt.genSalt();
-    console.log('no hash', this.password)
-    this.password = await bcrypt.hash(this.password, salt);
-    console.log('hash pass', this.password)
-    next();
-})
+
+userSchema.pre('save', function(next) {
+    var user = this;
+
+    // only hash the password if it has been modified (or is new)
+    if (!user.isModified('password')) return next();
+
+    // generate a salt
+    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+        if (err) return next(err);
+        console.log('no hash', user.password)
+        // hash the password using our new salt
+        bcrypt.hash(user.password, salt, function(err, hash) {
+            if (err) return next(err);
+            // override the cleartext password with the hashed one
+            user.password = hash;
+            console.log('hash', user.password)
+            next();
+        });
+    });
+});
+
 userSchema.statics.login = async function(username, password) {
     const user = await this.findOne({username});
     
