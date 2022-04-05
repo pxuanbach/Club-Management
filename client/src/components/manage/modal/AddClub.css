@@ -90,7 +90,8 @@
 .div-team-search{
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    width: 100%;
+    margin: 20px 0px;
 }
 .display-members{
     display: flex;
@@ -110,4 +111,27 @@
 }
 .div-todo button:last-child{
     margin-right: 0px;
+}
+
+.user-selected{
+    border-radius: 15px;
+    padding: 10px;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-color);
+}
+.user-selected .selected-info{
+    margin-left: 6px;
+    display: flex;
+    flex-direction: column;
+}
+.selected-info span:first-child{
+    font-weight: bold;
+    font-size: 17px;
+    color: var(--primary-color);
+}
+.selected-info span:last-child{
+    font-size: 14px;
+    color: var(--primary-color);
 }

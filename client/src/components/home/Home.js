@@ -63,7 +63,7 @@ const Home = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAddClub={setShowFormAddClub}/>
+          <AddClub setShowFormAdd={setShowFormAddClub}/>
         </Box>
       </Modal>
 
@@ -82,10 +82,11 @@ const Home = () => {
       <div className='div-body'>
         <div className='header-body'>
           <div className='header-title'> Câu lạc bộ của bạn</div>
-          <div className='div-btnadd'>
+          {user.username.includes('admin') ? 
+          (<div className='div-btnadd'>
             <button onClick={() => setShowFormAddClub(true)} className='btnAdd' >Tạo câu lạc bộ</button>
             <i class="fa-solid fa-plus"></i>
-          </div>
+          </div>) : null}
         </div>
         <div className='div-card-team'>
           {clubs && clubs.map(club => (

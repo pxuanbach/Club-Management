@@ -83,7 +83,8 @@ module.exports.verifyuser = (req, res, next) => {
             } else {
                 let user = await User.findById(decodedToken.id);
                 if (user.isblocked) {
-                    res.json({error: 'Tài khoản đã bị khóa'});
+                    console.log('blocked')
+                    res.cookie('jwt', "", { maxAge: 1 })
                 } else {
                     res.json(user);
                 }

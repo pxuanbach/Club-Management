@@ -11,6 +11,14 @@ const clubSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    leader: {
+        type: String,
+        require: true
+    },
+    treasurer: {
+        type: String,
+        require: true,
+    },
     isblocked: {
         type: Boolean,
         default: false

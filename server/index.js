@@ -94,13 +94,13 @@ io.on('connection', (socket) => {
             console.log('join user', user)
         }
     })
-    socket.on('get-club', ({club_id}) => {
-        Club.findOne({_id: club_id}).then(result => {
-            io.emit ('output-club', result)
+    socket.on('get-club', ({ club_id }) => {
+        Club.findOne({ _id: club_id }).then(result => {
+            io.emit('output-club', result)
         })
     })
 
-    socket.on('create-club', (name, img_url, description, callback) => {
+    socket.on('create-club', (name, img_url, description, leader_id, callback) => {
         const club = new Club({ name, img_url, description });
         club.save().then(result => {
             let newClub = {};
@@ -130,7 +130,7 @@ io.on('connection', (socket) => {
                 doc.img_url = img_url;
                 doc.save();
             }
-            
+
         })
         User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
             io.emit('output-users', ConvertUsers(result))
@@ -142,6 +142,23 @@ io.on('connection', (socket) => {
             if (err) return;
             doc.isblocked = !doc.isblocked;
             doc.save();
+        })
+    })
+
+    socket.on('search-user', (search_value) => {
+        //console.log('search value: ', search_value)
+        User.find({ username: { $nin: ['admin', 'admin0']}}).then(result => {
+            let users = []
+            result.forEach((user) => {
+                if (user.username.includes(search_value)) {
+                    users.push(user);
+                } else if (user.name.includes(search_value)) {
+                    users.push(user);
+                } else if (user.email.includes(search_value)) {
+                    users.push(user)
+                }
+            })
+            io.emit('output-search-user', users)
         })
     })
     socket.on('disconnect', () => {

@@ -3,10 +3,8 @@ import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Autocomplete from '@mui/material/Autocomplete';
 import io from 'socket.io-client';
 import { UploadImageClub } from '../../../helper/UploadImage';
 import { ENDPT } from '../../../helper/Helper'
@@ -22,6 +20,9 @@ const AddClub = ({ setShowFormAdd }) => {
         name: '',
         description: '',
     });
+    const [openAutoComplete, setOpenAutoComplete] = useState(false)
+    const [users, setUsers] = useState([])
+    const [leaderSelected, setLeaderSelected] = useState()
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -38,8 +39,13 @@ const AddClub = ({ setShowFormAdd }) => {
         console.log(values)
         if (values.name) {
             let img_url = await UploadImageClub(avatarImage);
-            socket.emit('create-club', values.name, img_url, values.description, onExitClick)
+            socket.emit('create-club', values.name, img_url, values.description, leaderSelected._id, onExitClick)
         }
+    }
+
+    const handleSearchMembers = event => {
+        event.preventDefault();
+        socket.emit('search-user', event.target.value)
     }
 
     const onExitClick = () => {
@@ -59,6 +65,13 @@ const AddClub = ({ setShowFormAdd }) => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
     }, [avatarRef])
 
+    useEffect(() => {
+        socket.on('output-search-user', result => {
+            setUsers(result)
+            //console.log(result)
+        })
+    }, [users])
+
     return (
         <div className='div-add'>
             <div className='div-info'>
@@ -71,7 +84,7 @@ const AddClub = ({ setShowFormAdd }) => {
                         <div className='modal-avatar'>
                             <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
                             <Avatar className='avatar' ref={avatarRef}
-                                sx={{height: avatarHeight}}
+                                sx={{ height: avatarHeight }}
                                 onClick={() => { inputAvatarImage.current.click() }}
                                 src={avatarImage ? URL.createObjectURL(avatarImage)
                                     : ''}>
@@ -105,29 +118,37 @@ const AddClub = ({ setShowFormAdd }) => {
                     </div>
                 </div>
                 <div className='div-team-search'>
-                    <TextField
-                        id="add-members"
-                        variant="outlined"
-                        label="Thêm thành viên"
-                        size="small"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton style={{ color: '#1B264D' }}>
-                                        <PersonAddIcon />
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
+                    <Autocomplete id='search-members'
+                        fullWidth
+                        open={openAutoComplete}
+                        onOpen={() => {
+                            setOpenAutoComplete(true);
                         }}
-                    />
+                        onClose={() => {
+                            setOpenAutoComplete(false);
+                        }}
+                        onChange={(event, value) => setLeaderSelected(value)}
+                        options={users}
+                        getOptionLabel={(option) => option.username}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                onChange={handleSearchMembers}
+                                id="add-members"
+                                variant="outlined"
+                                label="Trưởng câu lạc bộ"
+                                size="small"
+                            />
+                        )} />
                 </div>
-                <div className='display-members'>
-                    <AvatarGroup className='avatagroup'>
-                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                        <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-                        <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
-                        <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-                    </AvatarGroup>
+                <div>
+                    {leaderSelected && <div className='user-selected'>
+                            <Avatar src={leaderSelected.img_url}/>
+                            <div className='selected-info'>
+                                <span>{leaderSelected.name}</span>
+                                <span>{leaderSelected.email}</span>
+                            </div>
+                        </div>}
                 </div>
             </div>
             <div className="div-todo">
