@@ -20,52 +20,10 @@ const mongoDB = "mongodb+srv://pxuanbach:094864Bach@cluster0.axgxb.mongodb.net/c
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('connected'))
     .catch(err => console.log(err))
 const PORT = process.env.PORT || 5000
-const { addUser, removeUser, getUser } = require('./helper');
+const { addUser, removeUser, getUser } = require('./helper/UserHelper');
+const { ConvertClubs, ConvertUsers } = require('./helper/ConvertDataHelper')
 const Club = require('./models/Club')
 const User = require('./models/User');
-
-function ConvertClubs(data) {
-    let clubs = []
-
-    data.forEach(elm => {
-        let club = {}
-
-        club._id = elm._id;
-        club.name = elm.name;
-        club.img_url = elm.img_url;
-        club.description = elm.description;
-        club.isblocked = elm.isblocked;
-        club.fund = elm.fund;
-
-        //Relation field
-        club.leader = '';
-        club.members_num = 0;
-
-        clubs.push(club);
-    })
-
-    return clubs;
-}
-
-function ConvertUsers(data) {
-    let users = []
-
-    data.forEach(elm => {
-        let user = {}
-
-        user._id = elm._id;
-        user.name = elm.name;
-        user.username = elm.username;
-        user.img_url = elm.img_url;
-        user.email = elm.email;
-        user.isblocked = elm.isblocked;
-        user.groups_num = elm.groups.length;
-
-        users.push(user)
-    });
-
-    return users;
-}
 
 io.on('connection', (socket) => {
     console.log(socket.id)
@@ -100,9 +58,10 @@ io.on('connection', (socket) => {
         })
     })
 
-    socket.on('create-club', (name, img_url, description, leader_id, callback) => {
-        const club = new Club({ name, img_url, description });
+    socket.on('create-club', (name, img_url, description, leader, treasurer, callback) => {
+        const club = new Club({ name, img_url, description, leader, treasurer });
         club.save().then(result => {
+            
             let newClub = {};
             newClub._id = club._id;
             newClub.name = club.name;
@@ -110,9 +69,10 @@ io.on('connection', (socket) => {
             newClub.description = club.description;
             newClub.isblocked = club.isblocked;
             newClub.fund = club.fund;
+            newClub.leader = club.leader.name;
+            newClub.treasurer = club.treasurer.name;
 
             //Relation field
-            newClub.leader = '';
             newClub.members_num = 0;
 
             io.emit('club-created', newClub)
@@ -147,7 +107,7 @@ io.on('connection', (socket) => {
 
     socket.on('search-user', (search_value) => {
         //console.log('search value: ', search_value)
-        User.find({ username: { $nin: ['admin', 'admin0']}}).then(result => {
+        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
             let users = []
             result.forEach((user) => {
                 if (user.username.includes(search_value)) {

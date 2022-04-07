@@ -2,7 +2,12 @@ import React, { useRef, useState, useEffect } from 'react'
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import io from 'socket.io-client'
 import './General.css'
+import { ENDPT } from '../../../../helper/Helper';
+import { UploadImageClub } from '../../../../helper/UploadImage'
+
+let socket;
 
 const GeneralUpdate = ({ setShowFormUpdate, club }) => {
     const avatarRef = useRef();
@@ -24,10 +29,23 @@ const GeneralUpdate = ({ setShowFormUpdate, club }) => {
         }
     };
 
-    const handleSubmit = event => {
+    const handleSubmit = async event => {
         event.preventDefault();
-        console.log(values)
+        let img_url = '';
+        if (avatarImage) {
+            img_url = await UploadImageClub(avatarImage);
+        }
+        socket.emit('update-club', club._id, values.name, values.description, img_url)
+
     }
+
+    useEffect(() => {
+        socket = io(ENDPT);
+        return () => {
+          socket.emit('disconnect');
+          socket.off();
+        }
+      }, [ENDPT])
 
     useEffect(() => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
