@@ -6,6 +6,7 @@ const clubSchema = new mongoose.Schema({
         require: true
     },
     img_url: String,
+    cloudinary_id: String,
     description: String,
     fund: {
         type: Number,

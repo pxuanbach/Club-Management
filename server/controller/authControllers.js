@@ -46,9 +46,9 @@ const alertError = (err) => {
 }
 
 module.exports.signup = async (req, res) => {
-    const { username, password, img_url, name, email } = req.body;
+    const { username, password, img_url, cloudinary_id, name, email } = req.body;
     try {
-        const user = await User.create({ username, password, img_url, name, email });
+        const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
         res.status(201).json({user});
     } catch (error) {
         let errors = alertError(error);

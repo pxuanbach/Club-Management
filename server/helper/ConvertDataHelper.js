@@ -9,6 +9,7 @@ function ConvertClubs(data) {
         club._id = elm._id;
         club.name = elm.name;
         club.img_url = elm.img_url;
+        club.cloudinary_id = elm.cloudinary_id;
         club.description = elm.description;
         club.isblocked = elm.isblocked;
         club.fund = elm.fund;
@@ -33,6 +34,7 @@ function ConvertUsers(data) {
         user.name = elm.name;
         user.username = elm.username;
         user.img_url = elm.img_url;
+        user.cloudinary_id = elm.cloudinary_id;
         user.email = elm.email;
         user.isblocked = elm.isblocked;
         user.groups_num = elm.groups.length;

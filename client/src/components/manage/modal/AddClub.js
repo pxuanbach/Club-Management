@@ -38,13 +38,14 @@ const AddClub = ({ setShowFormAdd }) => {
         event.preventDefault();
         console.log(values)
         if (values.name) {
-            let img_url = '';
+            let img_upload_data = {};
             if (avatarImage) {
-                img_url = await UploadImageClub(avatarImage);
+                img_upload_data = await UploadImageClub(avatarImage);
             }
             socket.emit('create-club', 
                 values.name, 
-                img_url, 
+                img_upload_data.secure_url,
+                img_upload_data.public_id,
                 values.description, 
                 leaderSelected, 
                 treasurerSelected, 

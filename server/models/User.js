@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
         minlength: [6, 'Mật khẩu ít hơn 6 ký tự'],
     },
     img_url: String,
+    cloudinary_id: String,
     name: {
         type: String,
         required: [true, 'Tên đang trống'],

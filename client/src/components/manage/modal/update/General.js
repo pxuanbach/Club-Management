@@ -35,7 +35,11 @@ const GeneralUpdate = ({ setShowFormUpdate, club }) => {
         if (avatarImage) {
             img_url = await UploadImageClub(avatarImage);
         }
-        socket.emit('update-club', club._id, values.name, values.description, img_url)
+        socket.emit('update-club-info', 
+            club._id, 
+            values.name, 
+            values.description, 
+            img_url) //cur_cloud_id
 
     }
 

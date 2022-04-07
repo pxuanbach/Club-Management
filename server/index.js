@@ -15,10 +15,20 @@ app.use(authRoutes);
 const http = require('http').createServer(app);
 const mongoose = require('mongoose')
 const socketio = require('socket.io')
-const io = socketio(http)
-const mongoDB = "mongodb+srv://pxuanbach:094864Bach@cluster0.axgxb.mongodb.net/club-database?retryWrites=true&w=majority"
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('connected'))
+const io = socketio(http);
+const dotenv = require('dotenv');
+dotenv.config();
+
+//Connect DB
+mongoose
+    .connect(process.env.MONGODB_URI, { 
+        useNewUrlParser: true, 
+        useUnifiedTopology: true 
+    })
+    .then(() => console.log('connected'))
     .catch(err => console.log(err))
+
+
 const PORT = process.env.PORT || 5000
 const { addUser, removeUser, getUser } = require('./helper/UserHelper');
 const { ConvertClubs, ConvertUsers } = require('./helper/ConvertDataHelper')
@@ -58,14 +68,15 @@ io.on('connection', (socket) => {
         })
     })
 
-    socket.on('create-club', (name, img_url, description, leader, treasurer, callback) => {
-        const club = new Club({ name, img_url, description, leader, treasurer });
+    socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
+        const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
         club.save().then(result => {
             
             let newClub = {};
             newClub._id = club._id;
             newClub.name = club.name;
             newClub.img_url = club.img_url;
+            newClub.cloudinary_id = club.cloudinary_id;
             newClub.description = club.description;
             newClub.isblocked = club.isblocked;
             newClub.fund = club.fund;
@@ -81,13 +92,23 @@ io.on('connection', (socket) => {
         })
     })
 
-    socket.on('account-created', (user_id, img_url) => {
+    socket.on('update-club-info', (club_id, name, description, new_img_url, current_img_url) => {
+        Club.findById(club_id, function (err, doc) {
+            if (err) return;
+            if (new_img_url !== '') {
+
+            }
+        })
+    })
+
+    socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
         //console.log('user id', user_id)
         //console.log('img url', img_url)
         User.findById(user_id, function (err, doc) {
             if (err) return;
             if (img_url) {
                 doc.img_url = img_url;
+                doc.cloudinary_id = cloudinary_id;
                 doc.save();
             }
 
@@ -95,6 +116,7 @@ io.on('connection', (socket) => {
         User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
             io.emit('output-users', ConvertUsers(result))
         })
+        callback();
     })
 
     socket.on('block-unblock-account', (user_id) => {
