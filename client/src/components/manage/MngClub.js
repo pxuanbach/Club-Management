@@ -74,6 +74,22 @@ const ManageClub = () => {
     socket.on('club-created', clb => {
       setClubs([...clubs, clb])
     })
+    socket.on('club-updated', clb => {
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === clb._id) {
+          return {
+            ...elm,
+            name: clb.name,
+            description: clb.description,
+            img_url: clb.img_url,
+            cloudinary_id: clb.cloudinary_id,
+          }
+        }
+        return elm;
+      });
+  
+      setClubs(updateClubs)
+    })
   }, [clubs])
 
   const handleUpdate = (event, param) => {

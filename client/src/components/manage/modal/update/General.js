@@ -18,6 +18,7 @@ const GeneralUpdate = ({ setShowFormUpdate, club }) => {
         name: club.name,
         description: club.description,
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -31,16 +32,21 @@ const GeneralUpdate = ({ setShowFormUpdate, club }) => {
 
     const handleSubmit = async event => {
         event.preventDefault();
-        let img_url = '';
+        setIsLoading(true);
+        let img_upload_data;
         if (avatarImage) {
-            img_url = await UploadImageClub(avatarImage);
+            img_upload_data = await UploadImageClub(avatarImage);
         }
+        console.log(img_upload_data)
+        //console.log('values', values)
         socket.emit('update-club-info', 
             club._id, 
             values.name, 
             values.description, 
-            img_url) //cur_cloud_id
-
+            img_upload_data?.secure_url, 
+            img_upload_data?.public_id,
+            club.cloudinary_id, //cur_cloud_id
+            () => setIsLoading(false)) 
     }
 
     useEffect(() => {
@@ -96,13 +102,13 @@ const GeneralUpdate = ({ setShowFormUpdate, club }) => {
                 </div>
                 <div style={{padding: 10}}></div>
                 <div className="div-todo">
-                    <Button
+                    <Button disabled={isLoading}
                         onClick={handleSubmit}
                         variant="contained"
                         disableElevation>
                         Lưu
                     </Button>
-                    <Button
+                    <Button disabled={isLoading}
                         onClick={() => setShowFormUpdate(false)}
                         variant="outlined"
                         disableElevation>

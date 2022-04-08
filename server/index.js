@@ -21,9 +21,9 @@ dotenv.config();
 
 //Connect DB
 mongoose
-    .connect(process.env.MONGODB_URI, { 
-        useNewUrlParser: true, 
-        useUnifiedTopology: true 
+    .connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
     })
     .then(() => console.log('connected'))
     .catch(err => console.log(err))
@@ -32,6 +32,7 @@ mongoose
 const PORT = process.env.PORT || 5000
 const { addUser, removeUser, getUser } = require('./helper/UserHelper');
 const { ConvertClubs, ConvertUsers } = require('./helper/ConvertDataHelper')
+const cloudinary = require('./helper/Cloudinary')
 const Club = require('./models/Club')
 const User = require('./models/User');
 
@@ -71,7 +72,6 @@ io.on('connection', (socket) => {
     socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
         const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
         club.save().then(result => {
-            
             let newClub = {};
             newClub._id = club._id;
             newClub.name = club.name;
@@ -84,7 +84,7 @@ io.on('connection', (socket) => {
             newClub.treasurer = club.treasurer.name;
 
             //Relation field
-            newClub.members_num = 0;
+            newClub.members_num = 2; //+ ...
 
             io.emit('club-created', newClub)
             console.log(result)
@@ -92,14 +92,49 @@ io.on('connection', (socket) => {
         })
     })
 
-    socket.on('update-club-info', (club_id, name, description, new_img_url, current_img_url) => {
+    socket.on('update-club-info', (club_id, name, description, new_img_url, new_cloud_id, cur_cloud_id, callback) => {
+        console.log('club want to update: ', club_id)
         Club.findById(club_id, function (err, doc) {
-            if (err) return;
-            if (new_img_url !== '') {
+                if (err) {
+                    console.log(err)
+                    return;
+                }
 
+                doc.name = name;
+                doc.description = description;
+
+                if (new_img_url) {
+                    cloudinary.uploader.destroy(cur_cloud_id, function (result) {
+                        console.log(result);
+                    })
+                    doc.img_url = new_img_url;
+                    doc.cloudinary_id = new_cloud_id;
+                }
+
+                doc.save().then(club => {
+                    let updatedClub = {};
+                    updatedClub._id = club._id;
+                    updatedClub.name = club.name;
+                    updatedClub.img_url = club.img_url;
+                    updatedClub.cloudinary_id = club.cloudinary_id;
+                    updatedClub.description = club.description;
+                    updatedClub.isblocked = club.isblocked;
+                    updatedClub.fund = club.fund;
+                    updatedClub.leader = club.leader.name;
+                    updatedClub.treasurer = club.treasurer.name;
+        
+                    //Relation field
+                    updatedClub.members_num = 2; //+ ...
+        
+                    io.emit('club-updated', updatedClub)
+                    console.log(club)
+                    callback();
+                })
             }
-        })
+        )
+        callback();
     })
+        
 
     socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
         //console.log('user id', user_id)
