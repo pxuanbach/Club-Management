@@ -8,16 +8,16 @@ const corsOptions = {
     credentials: true,
     optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(cookieParser());
-app.use(authRoutes);
 const http = require('http').createServer(app);
 const mongoose = require('mongoose')
 const socketio = require('socket.io')
 const io = socketio(http);
 const dotenv = require('dotenv');
 dotenv.config();
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
+app.use(authRoutes);
 
 //Connect DB
 mongoose
@@ -31,23 +31,15 @@ mongoose
 
 const PORT = process.env.PORT || 5000
 const { addUser, removeUser, getUser } = require('./helper/UserHelper');
-const { ConvertClubs, ConvertUsers } = require('./helper/ConvertDataHelper')
-const cloudinary = require('./helper/Cloudinary')
 const Club = require('./models/Club')
 const User = require('./models/User');
 
 io.on('connection', (socket) => {
     console.log(socket.id)
-    Club.find().then(result => {
-        //console.log('output-clubs: ', result)
-        socket.emit('output-clubs', ConvertClubs(result))
-    })
-    User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
-
-        socket.emit('output-users', ConvertUsers(result))
-        //console.log(result)
-    })
-
+    require('./controller/clubControllers')(socket, io);
+    require('./controller/userControllers')(socket, io);
+    
+    
     //join chat room, club chat room
     socket.on('join', ({ name, room_id, user_id }) => {
         const { error, user } = addUser({
@@ -62,122 +54,8 @@ io.on('connection', (socket) => {
         } else {
             console.log('join user', user)
         }
-    })
-    socket.on('get-club', ({ club_id }) => {
-        Club.findOne({ _id: club_id }).then(result => {
-            io.emit('output-club', result)
-        })
-    })
+    }) 
 
-    socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
-        const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
-        club.save().then(result => {
-            let newClub = {};
-            newClub._id = club._id;
-            newClub.name = club.name;
-            newClub.img_url = club.img_url;
-            newClub.cloudinary_id = club.cloudinary_id;
-            newClub.description = club.description;
-            newClub.isblocked = club.isblocked;
-            newClub.fund = club.fund;
-            newClub.leader = club.leader.name;
-            newClub.treasurer = club.treasurer.name;
-
-            //Relation field
-            newClub.members_num = 2; //+ ...
-
-            io.emit('club-created', newClub)
-            console.log(result)
-            callback();
-        })
-    })
-
-    socket.on('update-club-info', (club_id, name, description, new_img_url, new_cloud_id, cur_cloud_id, callback) => {
-        console.log('club want to update: ', club_id)
-        Club.findById(club_id, function (err, doc) {
-                if (err) {
-                    console.log(err)
-                    return;
-                }
-
-                doc.name = name;
-                doc.description = description;
-
-                if (new_img_url) {
-                    cloudinary.uploader.destroy(cur_cloud_id, function (result) {
-                        console.log(result);
-                    })
-                    doc.img_url = new_img_url;
-                    doc.cloudinary_id = new_cloud_id;
-                }
-
-                doc.save().then(club => {
-                    let updatedClub = {};
-                    updatedClub._id = club._id;
-                    updatedClub.name = club.name;
-                    updatedClub.img_url = club.img_url;
-                    updatedClub.cloudinary_id = club.cloudinary_id;
-                    updatedClub.description = club.description;
-                    updatedClub.isblocked = club.isblocked;
-                    updatedClub.fund = club.fund;
-                    updatedClub.leader = club.leader.name;
-                    updatedClub.treasurer = club.treasurer.name;
-        
-                    //Relation field
-                    updatedClub.members_num = 2; //+ ...
-        
-                    io.emit('club-updated', updatedClub)
-                    console.log(club)
-                    callback();
-                })
-            }
-        )
-        callback();
-    })
-        
-
-    socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
-        //console.log('user id', user_id)
-        //console.log('img url', img_url)
-        User.findById(user_id, function (err, doc) {
-            if (err) return;
-            if (img_url) {
-                doc.img_url = img_url;
-                doc.cloudinary_id = cloudinary_id;
-                doc.save();
-            }
-
-        })
-        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
-            io.emit('output-users', ConvertUsers(result))
-        })
-        callback();
-    })
-
-    socket.on('block-unblock-account', (user_id) => {
-        User.findById(user_id, function (err, doc) {
-            if (err) return;
-            doc.isblocked = !doc.isblocked;
-            doc.save();
-        })
-    })
-
-    socket.on('search-user', (search_value) => {
-        //console.log('search value: ', search_value)
-        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
-            let users = []
-            result.forEach((user) => {
-                if (user.username.includes(search_value)) {
-                    users.push(user);
-                } else if (user.name.includes(search_value)) {
-                    users.push(user);
-                } else if (user.email.includes(search_value)) {
-                    users.push(user)
-                }
-            })
-            io.emit('output-search-user', users)
-        })
-    })
     socket.on('disconnect', () => {
         //
     })
