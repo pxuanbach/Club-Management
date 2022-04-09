@@ -78,7 +78,8 @@ const AddAccount = ({ handleClose }) => {
                 setEmailErr(data.errors.email);
                 setIsSuccess(false);
             } else {
-                let img_upload_data = await UploadImageUser(avatarImage).catch(err => console.log(err));
+                let img_upload_data = await UploadImageUser(avatarImage)
+                    .catch(err => console.log(err));
 
                 socket.emit('account-created', 
                     data.user._id, 

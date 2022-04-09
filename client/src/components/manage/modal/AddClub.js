@@ -20,9 +20,12 @@ const AddClub = ({ setShowFormAdd }) => {
         name: '',
         description: '',
     });
-
-    const [leaderSelected, setLeaderSelected] = useState()
-    const [treasurerSelected, setTreasurerSelected] = useState()
+    const [nameErr, setNameErr] = useState('');
+    const [leaderSelected, setLeaderSelected] = useState();
+    const [leaderErr, setLeaderErr] = useState('');
+    const [treasurerSelected, setTreasurerSelected] = useState();
+    const [treasurerErr, setTreasurerErr] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -34,23 +37,62 @@ const AddClub = ({ setShowFormAdd }) => {
         }
     };
 
+    const validateSubmit = () => {
+        let isError = false;
+        setNameErr('')
+        setIsLoading(true);
+
+        if (!values.name) {
+            setNameErr('Tên câu lạc bộ đang trống')
+            isError = true;
+        } 
+
+        if (!leaderSelected) {
+            setLeaderErr('Chưa chọn trưởng câu lạc bộ')
+            isError = true;
+        }
+
+        if (!treasurerSelected) {
+            setTreasurerErr('Chưa chọn thủ quỹ')
+            isError = true;
+        }
+
+        return isError;
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(values)
-        if (values.name) {
-            let img_upload_data = {};
-            if (avatarImage) {
-                img_upload_data = await UploadImageClub(avatarImage);
-            }
-            socket.emit('create-club', 
-                values.name, 
-                img_upload_data.secure_url,
-                img_upload_data.public_id,
-                values.description, 
-                leaderSelected, 
-                treasurerSelected, 
-                onExitClick)
+        
+        if (validateSubmit()) {
+            setIsLoading(false);
+            return;
         }
+
+        //send request to server
+        let img_upload_data = {};
+        if (avatarImage) {
+            img_upload_data = await UploadImageClub(avatarImage)
+                .catch(err => console.log(err));;
+        }
+        socket.emit('create-club',
+            values.name,
+            img_upload_data.secure_url,
+            img_upload_data.public_id,
+            values.description,
+            leaderSelected,
+            treasurerSelected,
+            resetState)
+    }
+
+    const resetState = () => {
+        setValues({
+            name: '',
+            description: '',
+        })
+        setAvatarImage(null)
+        setLeaderSelected(null)
+        setTreasurerSelected(null)
+        setIsLoading(false)
     }
 
     const onExitClick = () => {
@@ -99,6 +141,8 @@ const AddClub = ({ setShowFormAdd }) => {
                                 variant="outlined"
                                 margin="dense"
                                 fullWidth
+                                error={nameErr}
+                                helperText={nameErr}
                                 size="small" />
                         </div>
                         <div className='div-description'>
@@ -117,10 +161,14 @@ const AddClub = ({ setShowFormAdd }) => {
                 </div>
                 <div className='div-search-member'>
                     <AddMember title='Trưởng câu lạc bộ'
+                        errorText={leaderErr}
+                        setErrorText={setLeaderErr}
                         memberSelected={leaderSelected}
                         setMemberSelected={setLeaderSelected}
                     />
                     <AddMember title='Thủ quỹ'
+                        errorText={treasurerErr}
+                        setErrorText={setTreasurerErr}
                         memberSelected={treasurerSelected}
                         setMemberSelected={setTreasurerSelected}
                     />
@@ -129,13 +177,13 @@ const AddClub = ({ setShowFormAdd }) => {
 
             </div>
             <div className="div-todo">
-                <Button
+                <Button disabled={isLoading}
                     onClick={handleSubmit}
                     variant="contained"
                     disableElevation>
                     Lưu
                 </Button>
-                <Button
+                <Button disabled={isLoading}
                     onClick={onExitClick}
                     variant="outlined"
                     disableElevation>

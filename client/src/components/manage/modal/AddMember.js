@@ -8,7 +8,13 @@ import './AddMember.css'
 
 let socket
 
-const AddMember = ({ title, memberSelected, setMemberSelected, }) => {
+const AddMember = ({
+    title,
+    memberSelected,
+    setMemberSelected,
+    errorText,
+    setErrorText
+}) => {
     const [openAutoComplete, setOpenAutoComplete] = useState(false);
     const [users, setUsers] = useState([])
 
@@ -32,10 +38,13 @@ const AddMember = ({ title, memberSelected, setMemberSelected, }) => {
         })
     }, [users])
 
+    if (memberSelected) {
+        setErrorText('')
+    }
     return (
         <div className='add-member'>
             <Autocomplete id='search-members'
-                fullWidth
+                fullWidth 
                 open={openAutoComplete}
                 onOpen={() => {
                     setOpenAutoComplete(true);
@@ -43,21 +52,24 @@ const AddMember = ({ title, memberSelected, setMemberSelected, }) => {
                 onClose={() => {
                     setOpenAutoComplete(false);
                 }}
-                onChange={(event, value) => setMemberSelected(value)}
+                onChange={(event, value) => {
+                    setMemberSelected(value)
+                }}
+                noOptionsText='Không tìm thấy'
                 options={users}
                 getOptionLabel={(option) => option.username}
                 renderInput={(params) => (
-                    <TextField
-                        {...params}
+                    <TextField {...params}
                         onChange={handleSearchMembers}
                         id="add-members"
                         variant="outlined"
                         label={title}
                         size="small"
+                        error={errorText}
+                        helperText={errorText}
                     />
                 )}
             />
-
             {memberSelected && <div className='member-selected'>
                 <Avatar src={memberSelected.img_url} />
                 <div className='selected-info'>
