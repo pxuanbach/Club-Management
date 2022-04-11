@@ -8,8 +8,8 @@ const UploadImageClub = async (file) => {
     formData.append('upload_preset', upload_preset)
 
     let res = await Axios.post(cloudinary_API, formData);
-
-    return res.data.secure_url;
+    //console.log(res.data)
+    return res.data;
 }
 
 const UploadImageUser = async (file) => {
@@ -20,7 +20,7 @@ const UploadImageUser = async (file) => {
 
     let res = await Axios.post(cloudinary_API, formData);
 
-    return res.data.secure_url;
+    return res.data;
 }
 
 export {

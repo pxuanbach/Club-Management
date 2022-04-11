@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
-import AddClub from './AddClub';
-import { styled, Box } from "@mui/system";
-import ModalUnstyled from "@mui/core/ModalUnstyled";
+import AddClub from '../manage/modal/AddClub';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import Snackbar from '@mui/material/Snackbar';
 import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
@@ -11,32 +12,22 @@ import {UserContext} from '../../UserContext'
 
 let socket;
 
-const StyledModal = styled(ModalUnstyled)`
-  position: fixed;
-  z-index: 1300;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Backdrop = styled("div")`
-  z-index: -1;
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  -webkit-tap-highlight-color: transparent;
-`;
+const style = {
+  position: 'absolute',
+  top: '45%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 700,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+};
 
 const Home = () => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [clubs, setClubs] = useState([])
 
   useEffect(() => {
@@ -65,17 +56,25 @@ const Home = () => {
   }
   return (
     <div>
-      <StyledModal
-        aria-labelledby="unstyled-modal-title"
-        aria-describedby="unstyled-modal-description"
+      <Modal
         open={showFormAddClub}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
         onClose={() => {
           setShowFormAddClub(false);
         }}
-        BackdropComponent={Backdrop}
       >
-        <AddClub setShowFormAddClub={setShowFormAddClub} />
-      </StyledModal>
+        <Box sx={style}>
+          <AddClub setShowFormAdd={setShowFormAddClub}/>
+        </Box>
+      </Modal>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        message="Câu lạc bộ này đã bị chặn"
+      />
 
       <div className='div-header'>
         <div className='div-search'>
@@ -91,15 +90,20 @@ const Home = () => {
       <div className='div-body'>
         <div className='header-body'>
           <div className='header-title'> Câu lạc bộ của bạn</div>
-          <div className='div-btnadd'>
+          {user.username.includes('admin') ? 
+          (<div className='div-btnadd'>
             <button onClick={() => setShowFormAddClub(true)} className='btnAdd' >Tạo câu lạc bộ</button>
             <i class="fa-solid fa-plus"></i>
-          </div>
+          </div>) : null}
         </div>
         <div className='div-card-team'>
           {clubs && clubs.map(club => (
-            <Link to={'/club/' + club._id + '/' + club.name}>
-              <ClubItem club={club} />
+            <Link key={club._id} 
+              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name}
+              onClick={() => {
+                setOpenSnackbar(true)
+              }}>
+              <ClubItem club={club}/>
             </Link>
           ))}
         </div>

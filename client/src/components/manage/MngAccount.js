@@ -9,7 +9,6 @@ import Modal from '@mui/material/Modal';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './modal/AddAccount';
-import UpdateAccount from './modal/UpdateAccount';
 import io from 'socket.io-client'
 import { ENDPT } from '../../helper/Helper';
 import {UserContext} from '../../UserContext'
@@ -41,9 +40,7 @@ let socket;
 const ManageAccount = () => {
   const { user, setUser } = useContext(UserContext);
   const [openModalAdd, setOpenModalAdd] = useState(false);
-  const [openModalUpdate, setOpenModalUpdate] = useState(false);
   const [search, setSearch] = useState();
-  const [selectedAccount, setSelectedAccount] = useState();
   const [users, setUsers] = useState([]);
 
   const handleChangeSearchField = (e) => {
@@ -56,8 +53,6 @@ const ManageAccount = () => {
 
   const handleOpenAdd = () => setOpenModalAdd(true);
   const handleCloseAdd = () => setOpenModalAdd(false);
-  const handleOpenUpdate = () => setOpenModalUpdate(true);
-  const handleCloseUpdate = () => setOpenModalUpdate(false);
 
   useEffect(() => {
     socket = io(ENDPT);
@@ -73,17 +68,21 @@ const ManageAccount = () => {
       //console.log('users', users)
     })
   }, [])
-
-  const handleUpdate = (event, param) => {
-    event.stopPropagation();
-    //console.log(param)
-    setSelectedAccount(param)
-    handleOpenUpdate();
-  }
   
-  const handleBlock = (event, param) => {
+  const handleBlockOrUnblock = (event, param) => {
     event.stopPropagation();
-    //param.isblock = !param.isblock
+    socket.emit('block-unblock-account', param._id)
+    const updateUsers = users.map((elm) => {
+      if (elm._id === param._id) {
+        return {
+          ...elm,
+          isblocked: !param.isblocked
+        }
+      }
+      return elm;
+    });
+
+    setUsers(updateUsers)
   }
   
   const columns = [
@@ -114,23 +113,6 @@ const ManageAccount = () => {
     { field: 'email', headerName: 'Email', flex: 1.5 },
     { field: 'groups_num', headerName: 'Số nhóm tham gia', flex: 1 , sortable: false},
     {
-      field: 'btn-update',
-      headerName: '',
-      align: 'center',
-      flex: 0.4,
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (value) => {
-        return (
-          <Tooltip title="Chỉnh sửa" placement="right-start">
-            <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-              handleUpdate(event, value.row)
-            }}><i class="fa-solid fa-pen-to-square" style={{ fontSize: 20 }}></i></Button>
-          </Tooltip>
-        )
-      }
-    },
-    {
       field: 'btn-block',
       headerName: '',
       align: 'center',
@@ -139,11 +121,12 @@ const ManageAccount = () => {
       sortable: false,
       renderCell: (value) => {
         return (
-          <Tooltip title={value.row.isblock ? "Gỡ chặn" : "Chặn"} placement="right-start">
+          <Tooltip title={value.row.isblocked ? "Gỡ chặn" : "Chặn"} placement="right-start">
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-              handleBlock(event, value.row)
+              handleBlockOrUnblock(event, value.row)
+              //console.log('block?', value.row.isblocked)
             }}>
-              <i class={value.row.isblock ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
+              <i class={value.row.isblocked ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
                 style={{ fontSize: 20 }}></i>
             </Button>
           </Tooltip>
@@ -157,16 +140,6 @@ const ManageAccount = () => {
   }
   return (
     <div className='container'>
-      <Modal
-        open={openModalUpdate}
-        onClose={handleCloseUpdate}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <UpdateAccount handleClose={handleCloseUpdate} account={selectedAccount}/>
-        </Box>
-      </Modal>
       <Modal
         open={openModalAdd}
         onClose={handleCloseAdd}

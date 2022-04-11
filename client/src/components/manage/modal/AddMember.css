@@ -1,0 +1,26 @@
+.add-member{
+    width: 100%;
+}
+.member-selected{
+    margin-top: 10px;
+    border-radius: 15px;
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-color);
+}
+.member-selected .selected-info{
+    margin-left: 6px;
+    display: flex;
+    flex-direction: column;
+}
+.selected-info span:first-child{
+    font-weight: bold;
+    font-size: 17px;
+    color: var(--primary-color);
+}
+.selected-info span:last-child{
+    font-size: 14px;
+    color: var(--primary-color);
+}

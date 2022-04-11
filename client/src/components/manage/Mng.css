@@ -47,29 +47,9 @@
 }
 #modal-modal-description{
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 0 25px;
-}
-.modal-avatar{
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    overflow: hidden;
-    object-fit: cover;
-    object-position: center;
-}
-.modal-avatar input{
-    display: none;
-}
-
-.modal-avatar .avatar{
-    cursor: pointer;
-}
-.modal-avatar .avatar:hover{
-    background-color: var(--primary-color);
 }
 .modal-form{
+    flex: 0.7;
     min-width: 320px;
     display: grid;
     gap: 20px;   
