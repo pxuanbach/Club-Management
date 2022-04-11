@@ -22,8 +22,8 @@ function App() {
           headers: { 'Content-Type': 'application/json' }
         });
         const data = await res.json();
-        setUser(data);
         console.log(data)
+        setUser(data);
       } catch (error) {
         console.log(error)
       }

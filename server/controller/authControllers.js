@@ -29,6 +29,14 @@ const alertError = (err) => {
         errors.password = 'Mật khẩu sai';
         return errors;
     }
+    if (err.message === 'Tài khoản không tồn tại') {
+        errors.username = 'Tài khoản không tồn tại';
+        return errors;
+    }
+    if (err.message === 'Tài khoản đã bị chặn') {
+        errors.username = 'Tài khoản đã bị chặn';
+        return errors;
+    }
     if (err.message.includes('user validation failed')) {
         Object.values(err.errors).forEach(({ properties }) => {
             errors[properties.path] = properties.message
@@ -38,9 +46,9 @@ const alertError = (err) => {
 }
 
 module.exports.signup = async (req, res) => {
-    const { username, password, img_url, name, email } = req.body;
+    const { username, password, img_url, cloudinary_id, name, email } = req.body;
     try {
-        const user = await User.create({ username, password, img_url, name, email });
+        const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
         res.status(201).json({user});
     } catch (error) {
         let errors = alertError(error);
@@ -49,6 +57,7 @@ module.exports.signup = async (req, res) => {
     }
     res.send()
 }
+
 module.exports.login = async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -73,7 +82,12 @@ module.exports.verifyuser = (req, res, next) => {
                 console.log(err.message)
             } else {
                 let user = await User.findById(decodedToken.id);
-                res.json(user);
+                if (user.isblocked) {
+                    console.log('blocked')
+                    res.cookie('jwt', "", { maxAge: 1 })
+                } else {
+                    res.json(user);
+                }
                 next();
             }
         })

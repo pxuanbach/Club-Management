@@ -28,6 +28,7 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log(username, password)
         setUsernameErr('')
         setPasswordErr('')
         try {

@@ -18,6 +18,8 @@ import { UploadImageUser } from '../../../helper/UploadImage'
 let socket;
 
 const AddAccount = ({ handleClose }) => {
+    const [avatarHeight, setAvatarHeight] = useState(150);
+    const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
     const [avatarImage, setAvatarImage] = useState();
     const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +29,7 @@ const AddAccount = ({ handleClose }) => {
         password: '',
         email: '',
     });
+    const [isSuccess, setIsSuccess] = useState(false)
     const [nameErr, setNameErr] = useState('');
     const [usernameErr, setUsernameErr] = useState('');
     const [passwordErr, setPasswordErr] = useState('');
@@ -53,6 +56,7 @@ const AddAccount = ({ handleClose }) => {
         setNameErr('');
         setEmailErr('');
         try {
+            setIsSuccess(true);
             const res = await fetch(my_API + 'signup', {
                 method: 'POST',
                 credentials: 'include',
@@ -66,17 +70,22 @@ const AddAccount = ({ handleClose }) => {
                 headers: { 'Content-Type': 'application/json' }
             })
             const data = await res.json();
-            console.log(data)
+            console.log('signup response', data)
             if (data.errors) {
                 setUsernameErr(data.errors.username)
                 setPasswordErr(data.errors.password);
                 setNameErr(data.errors.name);
                 setEmailErr(data.errors.email);
+                setIsSuccess(false);
             } else {
-                let img_url = await UploadImageUser(avatarImage);
+                let img_upload_data = await UploadImageUser(avatarImage)
+                    .catch(err => console.log(err));
 
-                socket.emit('account-created', data.user._id, img_url);
-                handleClose();
+                socket.emit('account-created', 
+                    data.user._id, 
+                    img_upload_data.secure_url,
+                    img_upload_data.public_id, 
+                    handleClose);
             }
 
         } catch (error) {
@@ -92,24 +101,31 @@ const AddAccount = ({ handleClose }) => {
         }
     }, [ENDPT])
 
+    useEffect(() => {
+        setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
+    }, [avatarRef])
+
     return (
         <div>
             <h2 id="modal-modal-title">
                 Thêm tài khoản mới
             </h2>
             <div id="modal-modal-description">
-                <div className='modal-avatar'>
-                    <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
-                    <Avatar className='avatar'
-                        sx={{ width: 200, height: 200 }}
-                        onClick={() => { inputAvatarImage.current.click() }}
-                        src={avatarImage ? URL.createObjectURL(avatarImage)
-                            : ''}>
-                        Ảnh đại diện
-                    </Avatar>
+                <div className='div-left'>
+                    <div className='modal-avatar'>
+                        <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
+                        <Avatar className='avatar' ref={avatarRef}
+                            sx={{ height: avatarHeight}}
+                            onClick={() => { inputAvatarImage.current.click() }}
+                            src={avatarImage ? URL.createObjectURL(avatarImage)
+                                : ''}>
+                            Ảnh đại diện
+                        </Avatar>
+                    </div>
                 </div>
                 <form className='modal-form'>
                     <TextField
+                        size="small"
                         label="Họ và tên"
                         variant='outlined'
                         sx={{ width: '100%' }}
@@ -118,6 +134,7 @@ const AddAccount = ({ handleClose }) => {
                         error={nameErr}
                     />
                     <TextField
+                        size="small"
                         label="Tài khoản"
                         variant='outlined'
                         sx={{ width: '100%' }}
@@ -126,8 +143,9 @@ const AddAccount = ({ handleClose }) => {
                         error={usernameErr}
                     />
                     <FormControl sx={{ width: '100%' }} variant="outlined" error={passwordErr}>
-                        <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-password" size="small">Mật khẩu</InputLabel>
                         <OutlinedInput
+                            size="small"
                             id="outlined-adornment-password"
                             type={showPassword ? 'text' : 'password'}
                             value={values.password}
@@ -149,6 +167,7 @@ const AddAccount = ({ handleClose }) => {
                         <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
                     <TextField
+                        size="small"
                         label="Email"
                         variant='outlined'
                         sx={{ width: '100%' }}
@@ -157,13 +176,13 @@ const AddAccount = ({ handleClose }) => {
                         error={emailErr}
                     />
                     <div className='stack-right'>
-                        <Button
+                        <Button disabled={isSuccess}
                             variant="contained"
                             disableElevation
                             onClick={handleSave}>
                             Lưu
                         </Button>
-                        <Button
+                        <Button disabled={isSuccess}
                             variant="outlined"
                             disableElevation
                             onClick={handleClose}>

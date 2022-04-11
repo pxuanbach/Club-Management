@@ -1,0 +1,117 @@
+
+.title{
+    width: 630px;
+    color: #1B264D;
+    font-weight: 700;
+    font-size: 20px;
+}
+.title > p{
+    font-weight: normal;
+    font-size: 15px;
+    margin-top: 10px;
+  
+    
+
+}
+.info{
+    display: flex;
+    margin-top: 10px;
+}
+.div-left{
+    flex: 0.3;
+    display: flex;
+    justify-content: flex-start;
+}
+.div-right{
+    flex: 0.7;
+    width: 100%;
+    margin-top: 10px;
+}
+.div-team-name{
+    display: flex;
+    flex-direction: column;
+}
+
+.input-name{
+    width: 440px;
+    height: 40px;
+    border: none;
+    margin: 0 auto;
+    border: 1px solid #c7c2c2;
+    padding-left: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+.div-description{
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+}
+.desciption{
+    width: 440px;
+    border: none;
+    border: 1px solid #c7c2c2;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+.modal-avatar{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 20px 20px 20px 0px;
+    
+}
+.modal-avatar::before{
+    content: '';
+    display: block;
+
+}
+.modal-avatar input{
+    display: none;
+}
+
+.modal-avatar .avatar{
+    width: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center;
+    cursor: pointer;
+}
+.modal-avatar .avatar:hover{
+    background-color: var(--primary-color);
+}
+
+.div-search-member{
+    display: flex;
+    width: 100%;
+    margin: 20px 0px;
+}
+.div-search-member div:first-child{
+    margin-right: 20px;
+}
+.display-members{
+    display: flex;
+    justify-content: flex-start;
+}
+.avatagroup{
+    margin: 10px 0;
+}
+
+.div-todo{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+.div-todo button{
+    margin-right: 10px;
+}
+.div-todo button:last-child{
+    margin-right: 0px;
+}
+
