@@ -9,6 +9,7 @@ import Modal from '@mui/material/Modal';
 import { styled } from '@mui/material/styles';
 import AddClub from './modal/AddClub'
 import UpdateClub from './modal/UpdateClub'
+import DeleteClub from './modal/DeleteClub';
 import io from 'socket.io-client'
 import './Mng.css';
 import { ENDPT } from '../../helper/Helper';
@@ -41,6 +42,7 @@ const style = {
 const ManageClub = () => {
   const { user, setUser } = useContext(UserContext);
   const [clubSelected, setClubSelected] = useState()
+  const [openDialog, setOpenDialog] = useState(false);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [search, setSearch] = useState()
@@ -87,8 +89,15 @@ const ManageClub = () => {
         }
         return elm;
       });
-  
+
       setClubs(updateClubs)
+    })
+    socket.on('club-deleted', clb => {
+      var deleteClubs = clubs.filter(function(value, index, arr) {
+        return value._id !== clb._id;
+      })
+
+      setClubs(deleteClubs)
     })
   }, [clubs])
 
@@ -105,7 +114,8 @@ const ManageClub = () => {
 
   const handleDelte = (event, param) => {
     event.stopPropagation();
-
+    setClubSelected(param);
+    setOpenDialog(true)
   }
 
   const columns = [
@@ -220,12 +230,18 @@ const ManageClub = () => {
         }}
       >
         <Box sx={style}>
-          <UpdateClub 
+          <UpdateClub
             club={clubSelected}
-            setShowFormUpdate={setShowFormUpdate} 
+            setShowFormUpdate={setShowFormUpdate}
           />
         </Box>
       </Modal>
+      <DeleteClub 
+        open={openDialog}
+        setOpen={setOpenDialog}
+        club={clubSelected}
+        socket={socket}
+      />
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
         <div className='header__stack'>

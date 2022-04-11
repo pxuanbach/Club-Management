@@ -79,4 +79,19 @@ module.exports = function (socket, io) {
         )
         callback();
     })
+
+    socket.on('delete-club', (club_id, cloudinary_id, callback) => {
+        console.log('club want to delete: ', club_id)
+        Club.findByIdAndDelete(club_id, function(err, doc) {
+            if (err) console.log(err)
+            else {
+                cloudinary.uploader.destroy(cloudinary_id, function (result) {
+                    console.log(result);
+                })
+                console.log('Delete club:', doc)
+                io.emit('club-deleted', doc)
+            }
+        })
+        callback();
+    })
 }
