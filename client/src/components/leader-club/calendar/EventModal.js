@@ -79,7 +79,7 @@ export default function EventModal() {
         <div className="p-3">
           <div className="grid grid-cols-1/5 items-end gap-y-7">
             <div></div>
-            <input
+            <input 
               type="text"
               name="title"
               placeholder="Add title"

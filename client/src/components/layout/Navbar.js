@@ -3,6 +3,7 @@ import { UserContext } from '../../UserContext'
 import './Navbar.css'
 import SignedInMenu from './SignedInMenu'
 import SignedOutMenu from './SignedOutMenu'
+import logo_web from "../../assets/logoweb.png";
 import { my_API } from '../../helper/Helper'
 
 const Navbar = () => {
@@ -25,7 +26,9 @@ const Navbar = () => {
     return (
         <nav>
             <div className="nav-wrapper">
-                <a href="/" className="brand-logo">Logo</a>
+                <a href="#" className="brand-logo">
+                    <img src={logo_web} className="logo-web" />
+                </a>
                 {menu}
             </div>
         </nav>
