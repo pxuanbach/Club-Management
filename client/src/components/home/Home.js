@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import AddClub from '../manage/modal/AddClub';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
+import Snackbar from '@mui/material/Snackbar';
 import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
@@ -26,6 +27,7 @@ const style = {
 const Home = () => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [clubs, setClubs] = useState([])
 
   useEffect(() => {
@@ -66,6 +68,13 @@ const Home = () => {
           <AddClub setShowFormAdd={setShowFormAddClub}/>
         </Box>
       </Modal>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        message="Câu lạc bộ này đã bị chặn"
+      />
 
       <div className='div-header'>
         <div className='div-search'>
@@ -90,8 +99,12 @@ const Home = () => {
         </div>
         <div className='div-card-team'>
           {clubs && clubs.map(club => (
-            <Link key={club._id} to={'/club/' + club._id + '/' + club.name}>
-              <ClubItem club={club} />
+            <Link key={club._id} 
+              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name}
+              onClick={() => {
+                setOpenSnackbar(true)
+              }}>
+              <ClubItem club={club}/>
             </Link>
           ))}
         </div>

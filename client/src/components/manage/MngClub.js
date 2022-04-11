@@ -107,9 +107,20 @@ const ManageClub = () => {
     setShowFormUpdate(true)
   }
 
-  const handleBlock = (event, param) => {
+  const handleBlockOrUnblock = (event, param) => {
     event.stopPropagation();
-    //param.isblock = !param.isblock
+    socket.emit('block-unblock-club', param._id)
+    const updateClubs = clubs.map((elm) => {
+      if (elm._id === param._id) {
+        return {
+          ...elm,
+          isblocked: !param.isblocked
+        }
+      }
+      return elm;
+    });
+
+    setClubs(updateClubs)
   }
 
   const handleDelte = (event, param) => {
@@ -173,7 +184,7 @@ const ManageClub = () => {
         return (
           <Tooltip title={value.row.isblocked ? "Gỡ chặn" : "Chặn"} placement="right-start">
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-              handleBlock(event, value.row)
+              handleBlockOrUnblock(event, value.row)
             }}>
               <i class={value.row.isblocked ? "fa-solid fa-lock" : "fa-solid fa-lock-open"}
                 style={{ fontSize: 20 }}></i>

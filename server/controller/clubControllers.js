@@ -1,4 +1,4 @@
-const { ConvertClubs } = require('../helper/ConvertDataHelper')
+const { ConvertClub, ConvertClubs } = require('../helper/ConvertDataHelper')
 const Club = require('../models/Club')
 const cloudinary = require('../helper/Cloudinary')
 
@@ -17,19 +17,7 @@ module.exports = function (socket, io) {
     socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
         const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
         club.save().then(result => {
-            let newClub = {};
-            newClub._id = club._id;
-            newClub.name = club.name;
-            newClub.img_url = club.img_url;
-            newClub.cloudinary_id = club.cloudinary_id;
-            newClub.description = club.description;
-            newClub.isblocked = club.isblocked;
-            newClub.fund = club.fund;
-            newClub.leader = club.leader.name;
-            newClub.treasurer = club.treasurer.name;
-
-            //Relation field
-            newClub.members_num = 2; //+ ...
+            let newClub = ConvertClub(result);
 
             io.emit('club-created', newClub)
             console.log(result)
@@ -56,28 +44,24 @@ module.exports = function (socket, io) {
                 doc.cloudinary_id = new_cloud_id;
             }
 
-            doc.save().then(club => {
-                let updatedClub = {};
-                updatedClub._id = club._id;
-                updatedClub.name = club.name;
-                updatedClub.img_url = club.img_url;
-                updatedClub.cloudinary_id = club.cloudinary_id;
-                updatedClub.description = club.description;
-                updatedClub.isblocked = club.isblocked;
-                updatedClub.fund = club.fund;
-                updatedClub.leader = club.leader.name;
-                updatedClub.treasurer = club.treasurer.name;
-
-                //Relation field
-                updatedClub.members_num = 2; //+ ...
+            doc.save().then(result => {
+                let updatedClub = ConvertClub(result)
 
                 io.emit('club-updated', updatedClub)
-                console.log(club)
+                console.log(result)
                 callback();
             })
         }
         )
         callback();
+    })
+
+    socket.on('block-unblock-club', (club_id) => {
+        Club.findById(club_id, function (err, doc) {
+            if (err) return;
+            doc.isblocked = !doc.isblocked;
+            doc.save();
+        })
     })
 
     socket.on('delete-club', (club_id, cloudinary_id, callback) => {
