@@ -1,0 +1,104 @@
+.div-extand{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+.edit-chat{
+    display: flex;
+    width: 95%;
+    height: 50px;
+    color: #1B264D;
+    font-size: 18px;
+    font-weight: 600;
+    padding-left: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-family: "Calibri", "Roboto", sans-serif;
+    
+    
+}
+.edit-chat:hover{
+    background-color: #c4c4c4;
+}
+.icon-expand{
+    position: absolute;
+    right: 1.8%
+}
+#expand_less{
+    display: none;
+}
+#expand_less1{
+    display: none;
+}
+
+/* #extend-option{
+
+} */
+.div-option{
+    display: none;
+    
+
+}
+.div-option-extend{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.option{
+    display: flex;
+    width: 95%;
+    height: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    align-items: center;
+    padding-left: 15px;
+    border-radius: 10px;
+    color: #1B264D;
+    cursor: pointer;
+    font-family: "Calibri", "Roboto", sans-serif;
+    
+}
+.option:hover{
+    background-color: #c4c4c4;
+}
+.edit-icon{
+    margin-right: 10px;
+}
+
+
+.avt-people{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #c4c4c4;
+    margin-right: 10px;
+}
+.div-option2{
+    display: none;
+}
+.div-option-extend2{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.option2{
+    display: flex;
+    width: 95%;
+    height: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    align-items: center;
+    padding-left: 10px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    color: #1B264D;
+    cursor: pointer;
+    font-family: "Calibri", "Roboto", sans-serif;
+    
+}
+
