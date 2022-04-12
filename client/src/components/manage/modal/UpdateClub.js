@@ -55,7 +55,9 @@ const UpdateClub = ({ setShowFormUpdate, club }) => {
                 />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                <Members/>
+                <Members 
+                    club={club}
+                />
             </TabPanel>
         </div>
     )

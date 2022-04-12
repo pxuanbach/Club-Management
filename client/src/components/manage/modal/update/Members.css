@@ -1,0 +1,21 @@
+.members__head{
+    width: 100%;
+    display: flex;
+}
+.members__head .members__card:last-child{
+    margin-left: 30px;
+}
+.members__card {
+    width: 100%;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.members__search{
+    display: flex;
+    align-items: flex-end;
+}
+.members__search h2{
+    margin-bottom: 4px;
+    margin-right: 20px;
+}

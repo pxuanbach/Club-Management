@@ -8,8 +8,14 @@ function ConvertClub(data) {
     club.description = data.description;
     club.isblocked = data.isblocked;
     club.fund = data.fund;
-    club.leader = data.leader.name;
-    club.treasurer = data.treasurer.name;
+    club.leader = {
+        _id: data.leader._id,
+        name: data.leader.name,
+    };
+    club.treasurer = {
+        _id: data.treasurer._id,
+        name: data.treasurer.name,
+    };
     //Relation field
     club.members_num = 2; // + ...
 
@@ -29,8 +35,14 @@ function ConvertClubs(data) {
         club.description = elm.description;
         club.isblocked = elm.isblocked;
         club.fund = elm.fund;
-        club.leader = elm.leader.name;
-        club.treasurer = elm.treasurer.name;
+        club.leader = {
+            _id: elm.leader._id,
+            name: elm.leader.name,
+        };
+        club.treasurer = {
+            _id: elm.treasurer._id,
+            name: elm.treasurer.name,
+        };
         //Relation field
         club.members_num = 2; // + ...
 
@@ -53,7 +65,7 @@ function ConvertUsers(data) {
         user.cloudinary_id = elm.cloudinary_id;
         user.email = elm.email;
         user.isblocked = elm.isblocked;
-        user.groups_num = elm.groups.length;
+        //user.groups_num = elm.clubs.length;
 
         users.push(user)
     });

@@ -36,9 +36,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    groups: [{
+    clubs: [{
         type: String,
-        ref: 'club'
+        ref: 'Club'
     }]
 })
 

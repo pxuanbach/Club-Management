@@ -10,7 +10,7 @@ module.exports = function (socket, io) {
 
     socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
         //console.log('user id', user_id)
-        //console.log('img url', img_url)
+
         User.findById(user_id, function (err, doc) {
             if (err) return;
             if (img_url) {
@@ -49,5 +49,16 @@ module.exports = function (socket, io) {
             })
             io.emit('output-search-user', users)
         })
+    })
+
+    socket.on('get-user', (user_id, type) => {
+        User.findById(user_id).then(result => {
+            if (type === 'leader')
+                io.emit('output-leader', result)
+            else if (type === 'treasurer')
+                io.emit('output-treasurer', result)
+        })
+        
+        
     })
 }
