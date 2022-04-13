@@ -7,7 +7,6 @@ import ClearIcon from '@mui/icons-material/Clear';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { ENDPT } from '../../../../helper/Helper';
-import { UploadImageClub } from '../../../../helper/UploadImage'
 
 let socket;
 
@@ -67,20 +66,20 @@ const Members = ({ club }) => {
       disableColumnMenu: true,
       sortable: false,
       align: 'center',
-      flex: 0.6,
+      flex: 0.5,
       renderCell: (value) => {
         return (
           <Avatar src={value.row.img_url} />
         )
       }
     },
-    { field: 'name', headerName: 'Tên', flex: 1.5 },
+    { field: 'name', headerName: 'Tên', flex: 1.2 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
     {
       field: 'btn-club-leader',
       headerName: '',
       align: 'center',
-      flex: 0.4,
+      flex: 0.3,
       disableColumnMenu: true,
       sortable: false,
       renderCell: (value) => {
@@ -99,7 +98,7 @@ const Members = ({ club }) => {
       field: 'btn-club-treasurer',
       headerName: '',
       align: 'center',
-      flex: 0.4,
+      flex: 0.3,
       disableColumnMenu: true,
       sortable: false,
       renderCell: (value) => {
@@ -118,7 +117,7 @@ const Members = ({ club }) => {
       field: 'btn-remove',
       headerName: '',
       align: 'center',
-      flex: 0.4,
+      flex: 0.3,
       disableColumnMenu: true,
       sortable: false,
       renderCell: (value) => {
@@ -167,7 +166,7 @@ const Members = ({ club }) => {
           rows={users}
           columns={columns}
           autoHeight
-          pageSize={5}
+          pageSize={4}
         />
       </div>
     </div>

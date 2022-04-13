@@ -4,11 +4,11 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import io from 'socket.io-client'
 import { ENDPT } from '../../../helper/Helper';
-import './AddMember.css'
+import './FindMember.css'
 
 let socket
 
-const AddMember = ({
+const FindMember = ({
     title,
     memberSelected,
     setMemberSelected,
@@ -81,4 +81,4 @@ const AddMember = ({
     )
 }
 
-export default AddMember
+export default FindMember

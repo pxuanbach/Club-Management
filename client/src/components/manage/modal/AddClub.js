@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete';
 import io from 'socket.io-client';
-import AddMember from './AddMember'
+import FindMember from './FindMember'
 import { UploadImageClub } from '../../../helper/UploadImage';
 import { ENDPT } from '../../../helper/Helper'
 
@@ -160,13 +160,13 @@ const AddClub = ({ setShowFormAdd }) => {
                     </div>
                 </div>
                 <div className='div-search-member'>
-                    <AddMember title='Trưởng câu lạc bộ'
+                    <FindMember title='Trưởng câu lạc bộ'
                         errorText={leaderErr}
                         setErrorText={setLeaderErr}
                         memberSelected={leaderSelected}
                         setMemberSelected={setLeaderSelected}
                     />
-                    <AddMember title='Thủ quỹ'
+                    <FindMember title='Thủ quỹ'
                         errorText={treasurerErr}
                         setErrorText={setTreasurerErr}
                         memberSelected={treasurerSelected}

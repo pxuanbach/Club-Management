@@ -52,6 +52,21 @@ function ConvertClubs(data) {
     return clubs;
 }
 
+function ConvertUser(data) {
+    let user = {}
+
+    user._id = data._id;
+    user.name = data.name;
+    user.username = data.username;
+    user.img_url = data.img_url;
+    user.cloudinary_id = data.cloudinary_id;
+    user.email = data.email;
+    user.isblocked = data.isblocked;
+    //user.groups_num = elm.clubs.length;
+
+    return user;
+}
+
 function ConvertUsers(data) {
     let users = []
 
@@ -73,4 +88,4 @@ function ConvertUsers(data) {
     return users;
 }
 
-module.exports = { ConvertClub, ConvertClubs, ConvertUsers }
+module.exports = { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers }

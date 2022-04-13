@@ -67,7 +67,10 @@ const ManageAccount = () => {
       setUsers(users)
       //console.log('users', users)
     })
-  }, [])
+    socket.on('new-user', newUser => {
+      setUsers([...users, newUser])
+    })
+  }, [users])
   
   const handleBlockOrUnblock = (event, param) => {
     event.stopPropagation();
@@ -109,9 +112,9 @@ const ManageAccount = () => {
       }
     },
     { field: 'username', headerName: 'Tài khoản', flex: 0.7 },
-    { field: 'name', headerName: 'Tên người dùng', flex: 1 },
+    { field: 'name', headerName: 'Tên người dùng', flex: 1.5 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
-    { field: 'groups_num', headerName: 'Số nhóm tham gia', flex: 1 , sortable: false},
+    { field: 'groups_num', headerName: 'Số nhóm tham gia', flex: 0.8 , sortable: false},
     {
       field: 'btn-block',
       headerName: '',

@@ -5,6 +5,8 @@ import Box from '@mui/material/Box';
 import PropTypes from 'prop-types';
 import General from './update/General'
 import Members from './update/Members'
+import AddMember from './update/AddMember'
+import {ENDPT} from '../../../helper/Helper'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -47,6 +49,7 @@ const UpdateClub = ({ setShowFormUpdate, club }) => {
             >
                 <Tab value={0} label="Thông tin chung"/>
                 <Tab value={1} label="Thành viên" />
+                <Tab value={2} label="Thêm thành viên" />
             </Tabs>
             <TabPanel value={tabValue} index={0}>
                 <General 
@@ -56,6 +59,11 @@ const UpdateClub = ({ setShowFormUpdate, club }) => {
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
                 <Members 
+                    club={club}
+                />
+            </TabPanel>
+            <TabPanel value={tabValue} index={2}>
+                <AddMember 
                     club={club}
                 />
             </TabPanel>
