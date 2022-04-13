@@ -8,7 +8,7 @@ import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { ENDPT } from '../../../../helper/Helper';
 
-let socket;
+let socket
 
 const Members = ({ club }) => {
   const [leader, setLeader] = useState()
@@ -16,11 +16,11 @@ const Members = ({ club }) => {
   const [users, setUsers] = useState([])
 
   const handlePromotedToLeader = (event, param) => {
-    
+    console.log('leader')
   }
 
   const handlePromotedToTreasurer = (event, param) => {
-
+    console.log('treasurer')
   }
 
   const handleRemoveFromClub = (event, param) => {
@@ -45,11 +45,13 @@ const Members = ({ club }) => {
     socket.on('output-treasurer', res => {
       setTreasurer(res)
     })
+  }, [leader, treasurer])
+
+  useEffect(() => {
     socket.on('output-users', users => {
       setUsers(users)
-      //console.log('users', users)
     })
-  }, [])
+  }, [users])
 
   const columns = [
     {
@@ -88,7 +90,7 @@ const Members = ({ club }) => {
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
               handlePromotedToLeader(event, value.row)
             }}>
-              <KeyboardDoubleArrowUpIcon/>
+              <KeyboardDoubleArrowUpIcon />
             </Button>
           </Tooltip>
         )
@@ -107,7 +109,7 @@ const Members = ({ club }) => {
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
               handlePromotedToTreasurer(event, value.row)
             }}>
-              <CurrencyExchangeIcon/>
+              <CurrencyExchangeIcon />
             </Button>
           </Tooltip>
         )
@@ -126,7 +128,7 @@ const Members = ({ club }) => {
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
               handleRemoveFromClub(event, value.row)
             }}>
-              <ClearIcon/>
+              <ClearIcon />
             </Button>
           </Tooltip>
         )
@@ -158,7 +160,7 @@ const Members = ({ club }) => {
           </div>
         </div>
       </div>
-      <Divider sx={{marginBottom: 2}}/>
+      <Divider sx={{ marginBottom: 2 }} />
       <div className='members__body'>
         <h2>Thành viên</h2>
         <DataGrid

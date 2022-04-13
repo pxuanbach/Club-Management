@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
-import Avatar from '@mui/material/Avatar';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import {Avatar, TextField, Button, Tooltip, Box, Modal} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './modal/AddAccount';

@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
+import React, { useState, useEffect } from 'react'
+import { Box, Tab, Tabs } from '@mui/material';
+import io from 'socket.io-client'
 import PropTypes from 'prop-types';
 import General from './update/General'
 import Members from './update/Members'
 import AddMember from './update/AddMember'
-import {ENDPT} from '../../../helper/Helper'
+import { ENDPT } from '../../../helper/Helper'
+
+let socket;
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -20,7 +21,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box sx={{ p: 2}}>
+                <Box sx={{ p: 2 }}>
                     {children}
                 </Box>
             )}
@@ -36,10 +37,18 @@ TabPanel.propTypes = {
 
 const UpdateClub = ({ setShowFormUpdate, club }) => {
     const [tabValue, setTabValue] = useState(0);
-    
+
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
+
+    useEffect(() => {
+        socket = io(ENDPT);
+        return () => {
+            socket.emit('disconnect');
+            socket.off();
+        }
+    }, [ENDPT])
 
     return (
         <div>
@@ -47,23 +56,24 @@ const UpdateClub = ({ setShowFormUpdate, club }) => {
                 value={tabValue}
                 onChange={handleTabChange}
             >
-                <Tab value={0} label="Thông tin chung"/>
+                <Tab value={0} label="Thông tin chung" />
                 <Tab value={1} label="Thành viên" />
                 <Tab value={2} label="Thêm thành viên" />
             </Tabs>
             <TabPanel value={tabValue} index={0}>
-                <General 
+                <General
                     setShowFormUpdate={setShowFormUpdate}
                     club={club}
+                    socket={socket}
                 />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                <Members 
+                <Members
                     club={club}
                 />
             </TabPanel>
             <TabPanel value={tabValue} index={2}>
-                <AddMember 
+                <AddMember
                     club={club}
                 />
             </TabPanel>
