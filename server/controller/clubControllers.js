@@ -78,4 +78,12 @@ module.exports = function (socket, io) {
         })
         callback();
     })
+
+    socket.on('add-member', (club_id, user_id) => {
+        Club.findById(club_id, function (err, doc) {
+            if (err) return;
+            doc.members.push(user_id)
+            doc.save();
+        })
+    })
 }

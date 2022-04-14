@@ -56,7 +56,5 @@ module.exports = function (socket, io) {
             else if (type === 'treasurer')
                 io.emit('output-treasurer', result)
         })
-        
-        
     })
 }

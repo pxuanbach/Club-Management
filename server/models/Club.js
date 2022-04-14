@@ -23,7 +23,10 @@ const clubSchema = new mongoose.Schema({
     isblocked: {
         type: Boolean,
         default: false
-    }
+    },
+    members: [{
+        type: String,
+    }]
 })
 
 const Club = mongoose.model('club', clubSchema)

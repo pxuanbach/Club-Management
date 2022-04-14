@@ -17,7 +17,7 @@ function ConvertClub(data) {
         name: data.treasurer.name,
     };
     //Relation field
-    club.members_num = 2; // + ...
+    club.members_num = 2 + data.members.length; // + ...
 
     return club;
 }
@@ -44,7 +44,7 @@ function ConvertClubs(data) {
             name: elm.treasurer.name,
         };
         //Relation field
-        club.members_num = 2; // + ...
+        club.members_num = 2 + elm.members.length; // + ...
 
         clubs.push(club);
     })

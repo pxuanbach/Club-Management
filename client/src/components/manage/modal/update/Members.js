@@ -48,7 +48,8 @@ const Members = ({ club }) => {
   }, [leader, treasurer])
 
   useEffect(() => {
-    socket.on('output-users', users => {
+    socket.emit('get-members', club._id)
+    socket.on('output-members', users => {
       setUsers(users)
     })
   }, [users])
