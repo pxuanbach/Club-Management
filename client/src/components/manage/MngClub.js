@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import Avatar from '@mui/material/Avatar';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import {Avatar, TextField, Button, Tooltip, Box, Modal} from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import AddClub from './modal/AddClub'
 import UpdateClub from './modal/UpdateClub'
@@ -32,7 +29,7 @@ const style = {
   top: '45%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 700,
+  width: 750,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -55,52 +52,6 @@ const ManageClub = () => {
   const handleSearch = (e) => {
     console.log(search)
   }
-
-  useEffect(() => {
-    socket = io(ENDPT);
-    //socket.emit('join', { username: values.username, password: values.password})
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
-  }, [ENDPT])
-
-  useEffect(() => {
-    socket.emit('get-clubs', '', true)
-    socket.on('output-clubs', clbs => {
-      setClubs(clbs)
-      console.log('clubs', clubs)
-    })
-  }, [])
-
-  useEffect(() => {
-    socket.on('club-created', clb => {
-      setClubs([...clubs, clb])
-    })
-    socket.on('club-updated', clb => {
-      const updateClubs = clubs.map((elm) => {
-        if (elm._id === clb._id) {
-          return {
-            ...elm,
-            name: clb.name,
-            description: clb.description,
-            img_url: clb.img_url,
-            cloudinary_id: clb.cloudinary_id,
-          }
-        }
-        return elm;
-      });
-
-      setClubs(updateClubs)
-    })
-    socket.on('club-deleted', clb => {
-      var deleteClubs = clubs.filter(function(value, index, arr) {
-        return value._id !== clb._id;
-      })
-
-      setClubs(deleteClubs)
-    })
-  }, [clubs])
 
   const handleUpdate = (event, param) => {
     event.stopPropagation();
@@ -152,11 +103,11 @@ const ManageClub = () => {
         )
       }
     },
-    { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.5 },
-    { field: 'leader', headerName: "Trưởng CLB", flex: 1, valueGetter: (value) =>  value.row.leader.name},
-    { field: 'treasurer', headerName: "Thủ quỹ", flex: 1, valueGetter: (value) =>  value.row.treasurer.name },
+    { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.3 },
+    { field: 'leader', headerName: "Trưởng câu lạc bộ", flex: 1, valueGetter: (value) => value.row.leader.name },
+    { field: 'treasurer', headerName: "Thủ quỹ", flex: 1, valueGetter: (value) => value.row.treasurer.name },
     { field: 'members_num', headerName: "Thành viên", type: 'number', flex: 0.5 },
-    { field: 'fund', headerName: 'Quỹ', type: 'number', flex: 0.5 },
+    { field: 'fund', headerName: 'Quỹ (VND)', type: 'number', flex: 0.8 },
     {
       field: 'btn-update',
       headerName: '',
@@ -207,14 +158,59 @@ const ManageClub = () => {
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
               handleDelte(event, value.row)
             }}>
-              <i class="fa-solid fa-trash-can"
-                style={{ fontSize: 20 }}></i>
+              <ClearIcon/>
             </Button>
           </Tooltip>
         )
       }
     }
   ];
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    //socket.emit('join', { username: values.username, password: values.password})
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [ENDPT])
+
+  useEffect(() => {
+    socket.emit('get-clubs', '', true)
+    socket.on('output-clubs', clbs => {
+      setClubs(clbs)
+      console.log('clubs', clubs)
+    })
+  }, [])
+
+  useEffect(() => {
+    socket.on('club-created', clb => {
+      setClubs([...clubs, clb])
+    })
+    socket.on('club-updated', clb => {
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === clb._id) {
+          return {
+            ...elm,
+            name: clb.name,
+            description: clb.description,
+            img_url: clb.img_url,
+            cloudinary_id: clb.cloudinary_id,
+          }
+        }
+        return elm;
+      });
+
+      setClubs(updateClubs)
+    })
+    socket.on('club-deleted', clb => {
+      var deleteClubs = clubs.filter(function (value, index, arr) {
+        return value._id !== clb._id;
+      })
+
+      setClubs(deleteClubs)
+    })
+  }, [clubs])
 
   if (!user) {
     return <Redirect to='/login' />
@@ -248,7 +244,7 @@ const ManageClub = () => {
           />
         </Box>
       </Modal>
-      <DeleteClub 
+      <DeleteClub
         open={openDialog}
         setOpen={setOpenDialog}
         club={clubSelected}
@@ -273,7 +269,7 @@ const ManageClub = () => {
                 variant="text"
                 disableElevation
                 onClick={handleSearch}>
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <SearchIcon sx={{color: '#1B264D'}}/>
               </Button>
             </Tooltip>
           </div>

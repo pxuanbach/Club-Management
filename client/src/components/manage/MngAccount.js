@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import {Avatar, TextField, Button, Tooltip, Box, Modal} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './modal/AddAccount';
@@ -35,7 +36,9 @@ let socket;
 const ManageAccount = () => {
   const { user, setUser } = useContext(UserContext);
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [search, setSearch] = useState();
+  const [userSelected, setUserSelected] = useState();
   const [users, setUsers] = useState([]);
 
   const handleChangeSearchField = (e) => {
@@ -82,6 +85,12 @@ const ManageAccount = () => {
 
     setUsers(updateUsers)
   }
+
+  const handleDeleteUser = (event, param) => {
+    event.stopPropagation();
+    setUserSelected(param)
+    setOpenDialog(true)
+  }
   
   const columns = [
     {
@@ -109,7 +118,7 @@ const ManageAccount = () => {
     { field: 'username', headerName: 'Tài khoản', flex: 0.7 },
     { field: 'name', headerName: 'Tên người dùng', flex: 1.5 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
-    { field: 'groups_num', headerName: 'Số nhóm tham gia', flex: 0.8 , sortable: false},
+    { field: 'groups_num', headerName: 'Số nhóm tham gia', type: 'number', flex: 0.8 , sortable: false},
     {
       field: 'btn-block',
       headerName: '',
@@ -165,7 +174,7 @@ const ManageAccount = () => {
                 variant="text"
                 disableElevation
                 onClick={handleSearch}>
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <SearchIcon sx={{color: '#1B264D'}}/>
               </Button>
             </Tooltip>
           </div>

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../UserContext'
 import './Navbar-Club.css'
 import Tooltip from '@mui/material/Tooltip'
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import io from 'socket.io-client'
 import {ENDPT} from '../../helper/Helper'
@@ -11,9 +11,8 @@ let socket;
 
 const NavbarClub = () => {
     let { club_id, club_name } = useParams();
-
+    const history = useHistory();
     const { user, setUser } = useContext(UserContext);
-
     const [club, setClub] = useState();
 
     useEffect(() => {
@@ -34,9 +33,9 @@ const NavbarClub = () => {
         <nav>
             <div className="nav-club">
                 <div className='div-back'>
-                    <a href="/" className="btn-back">
+                    <Link onClick={history.goBack} className="btn-back">
                         <i class="fa-solid fa-angle-left"></i>
-                        All team</a>
+                        All team</Link>
                 </div>
                 <div className='div-clb'>
                     <Avatar className='logo-team' sx={{ width: 120, height: 120 }} src={club ? club.img_url : ''}></Avatar>
