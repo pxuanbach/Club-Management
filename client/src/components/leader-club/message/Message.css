@@ -12,7 +12,7 @@
 .header-mess{
     display: flex;
     width: 100%;
-    height: 9%;
+    height: 8.5%;
     border-bottom: 1px solid #b4b0b0;
     align-items: center;
     
@@ -40,14 +40,14 @@
 
 .body-mess{
     width: 100%;
-    height: 80%;
+    height: 82.5%;
     border-bottom: 1px solid #b4b0b0;
     background-color: #e7e3e3;
 
 }
 .div-chat{
     width: 100%;
-    height: 11%;
+    height: 9%;
     display: flex;
     align-items: center;
 }
@@ -101,61 +101,13 @@ body {
     background-color: #edeff2;
     font-family: "Calibri", "Roboto", sans-serif;
   }
-/*   
-  .chat_window {
-    position: absolute;
-    width: calc(100% - 20px);
-    max-width: 800px;
-    height: 500px;
-    border-radius: 10px;
-    background-color: #fff;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    background-color: #f8f8f8;
-    overflow: hidden;
-  }
-  
-  .top_menu {
-    background-color: #fff;
-    width: 100%;
-    padding: 20px 0 15px;
-    box-shadow: 0 1px 30px rgba(0, 0, 0, 0.1);
-  }
-  .top_menu .buttons {
-    margin: 3px 0 0 20px;
-    position: absolute;
-  }
-  .top_menu .buttons .button {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 10px;
-    position: relative;
-  }
-  .top_menu .buttons .button.close {
-    background-color: #f5886e;
-  }
-  .top_menu .buttons .button.minimize {
-    background-color: #fdbf68;
-  }
-  .top_menu .buttons .button.maximize {
-    background-color: #a3d063;
-  }
-  .top_menu .title {
-    text-align: center;
-    color: #bcbdc0;
-    font-size: 20px;
-  } */
   
   .messages {
     position: relative;
     list-style: none;
     padding: 25px 10px 0 10px;
     margin: 0;
-    max-height: 500px;
+    height: 100%;
     overflow: auto;
   }
   .messages .message {
@@ -168,10 +120,17 @@ body {
   .messages .message.left .avatar {
     background-color: #f5886e;
     float: left;
+    margin-top: 21px;
   }
   .messages .message.left .text_wrapper {
     background-color: #ffffff;
     margin-left: 10px;
+    
+  }
+  .messages .message.left .name-people {
+    margin-left: 65px;
+    margin-bottom: 3px;
+    
   }
   .messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
     right: 100%;
@@ -196,40 +155,33 @@ body {
   .messages .message.right .text {
     color: #ffffff;
   }
+  .messages .message.right .name-people {
+    display: none;
+    
+  }
   .messages .message.appeared {
     opacity: 1;
   }
   .messages .message .avatar {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: inline-block;
+    
+  }
+  .messages .message .name-people {
+      color: #1B264D; 
   }
   .messages .message .text_wrapper {
     display: inline-block;
-    padding: 15px;
-    border-radius: 27px;
-    width: calc(40%);
+    padding: 8px;
+    padding-left: 15px;
+    border-radius: 20px;
+    width: calc(30%);
     min-width: 100px;
     position: relative;
   }
-  /* .messages .message .text_wrapper::after, .messages .message .text_wrapper:before {
-    top: 13px;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-  } */
-  /* .messages .message .text_wrapper::after {
-    border-width: 13px;
-    margin-top: 0px;
-  }
-  .messages .message .text_wrapper::before {
-    border-width: 15px;
-    margin-top: -2px;
-  } */
+
   .messages .message .text_wrapper .text {
     font-size: 18px;  
     font-weight: 400;
@@ -240,13 +192,14 @@ body {
   .bottom_wrapper {
     position: relative;
     width: 100%;
-    background-color: #fff;
+    background-color: #f2f2f2;
     margin-left: 20px;
     display: flex;
+    border-radius: 25px;
   }
   .bottom_wrapper .message_input_wrapper {
     display: inline-block;
-    height: 50px;
+    height: 45px;
     border-radius: 25px;
     border: 1px solid #bcbdc0;
     width: calc(100% - 160px);
@@ -265,8 +218,8 @@ body {
     color: gray;
   }
   .bottom_wrapper .send_message {
-    width: 130px;
-    height: 50px;
+    width: 120px;
+    height: 45px;
     display: inline-block;
     border-radius: 50px;
     background-color: #1B264D;
@@ -286,7 +239,9 @@ body {
     font-size: 18px;
     font-weight: 500;
     display: inline-block;
-    line-height: 48px;
+    line-height: 42px;
+    
+    
   }
   
   .message_template {

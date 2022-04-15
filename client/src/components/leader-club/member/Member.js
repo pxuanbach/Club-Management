@@ -1,35 +1,3 @@
-// import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
-// import React, { useState, useEffect } from "react";
-// import TabGroup from './TabGroup';
-// import TabMember from './TabMember';
-// import NavbarMember from './Navbar-Member';
-// import "./Member.css"
-// const Member = () => {
-//   const { path } = useRouteMatch();
-//   //const { type } = useParams();
-//   useEffect(() => {
-//     console.log(path)
-//   }, [])
-//   return (
-//     <div className='div_member'>
-//       <div className='navheader'>
-//         <NavbarMember/>
-//       </div>
-//       <div className="div-body-member">
-//         <Switch >
-//           <Route path={`${path}/tabmember`}>
-//             <TabMember />
-//           </Route>
-//           <Route path={`${path}/tabgroup`}>
-//             <TabGroup />
-//           </Route>
-//         </Switch>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default Member
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
@@ -37,6 +5,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import "./Member.css"
+import TabMember from './TabMember';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -78,18 +47,28 @@ export default function BasicTabs() {
   };
 
   return (
-    <Box sx={{ width: '100%' , height:'100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+    <div>
+    <div className='div-header2'>
+      <div className='div-search'>
+        <input 
+          type="text"
+          placeholder="Tìm kiếm thành viên"
+
+        />
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+      </div>
+    </div>
+    <Box sx={{ width: '100%' , height:'100%', marginTop:'15px'}}>
+      <Box sx={{ borderBottom: 1 , borderColor: 'divider',color:'#1B264D'}} >
         <Tabs  value={value} onChange={handleChange} aria-label="basic tabs example" >
-          <Tab  label="Quản lý thành viên" {...a11yProps(0)} />
+          <Tab className='name-tab' label="Quản lý thành viên" {...a11yProps(0)} />
           <Tab  label="Quản lý nhóm" {...a11yProps(1)} />
           
         </Tabs>
       </Box>
-      <TabPanel  value={value} index={0}>
-          <div className="abc">
-             bc
-          </div>
+      <TabPanel   value={value} index={0}>
+        <TabMember></TabMember>
 
       </TabPanel>
       <TabPanel value={value} index={1}>
@@ -97,5 +76,6 @@ export default function BasicTabs() {
       </TabPanel>
 
     </Box>
+    </div>
   );
 }

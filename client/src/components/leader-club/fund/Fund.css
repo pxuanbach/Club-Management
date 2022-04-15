@@ -1,0 +1,115 @@
+.div-fund{
+    width: 100%;
+    height: 100%;
+}
+.title-header{
+    padding-top: 20px;
+    padding-left: 30px;
+    color: #1B264D;
+}
+.dashboard-overview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+  .dashboard-overview-row {
+    display: flex;
+    padding-top: 20px;
+    padding-bottom: 0;
+  }
+.status-card{
+    padding: 10px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    background-color: #ffff;
+    /* box-shadow: rgba(149,157,165,0.2) 0px 8px 24px; */
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: color 0.5s ease 0s;
+    margin-bottom: 30px;
+    box-shadow: 1px 2px 10px rgb(0 0 0 / 20%);
+}
+.status-card_icon{
+    width: 40%;
+    height: 100%;
+    font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+.status-card_info{
+    flex-grow: 1;
+    text-align: center;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    z-index: 1;
+    text-transform: capitalize;
+    margin: 5px;
+    width: 215px;
+    height: 85px;
+}
+.status-card_info > h4 {
+    
+    font-size: 1.2rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.status-card_info > h3 {
+    font-size: 1.6rem;
+    /* margin-bottom: 10px; */
+}
+.status-card::before{
+    content: '';
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; 
+    background-image: linear-gradient(
+        to top right,
+        #349eff,
+        #62b4ff
+    );
+    position: absolute;
+    left: -50%;
+    top: 50%;
+    transform: scale(0);
+    transition: transform 0.6s ease 0s;
+}
+.status-card:hover::before{
+    transform: scale(3);
+}
+.status-card:hover{
+    color: #ffff;
+}
+
+
+.div-title-search{
+    display: flex;
+    align-items: center;
+}
+.title-header2{
+    padding-left: 40px;
+    color: #1B264D;
+}
+.div-search-fund{
+    display: flex;
+    margin-left: 43%;
+}
+.table-paymentlist{
+    margin-left: 40px;
+}
+
+.btn-search2 i{
+    color: var(--primary-color);
+    font-size: 18px;
+    margin-bottom: 5px;
+    margin-right: 20px;
+}
+.btn-add-fund{
+    height: 45px;
+
+}

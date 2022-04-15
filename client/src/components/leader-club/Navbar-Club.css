@@ -1,9 +1,7 @@
 
-.nav {
-    /* position: absolute; */
-  
-}
+
 .nav-club{
+  position: fixed;
   min-width: 210px;
   width: 17vw;
   height: 100vh;
