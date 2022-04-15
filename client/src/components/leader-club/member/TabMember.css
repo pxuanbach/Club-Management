@@ -6,3 +6,6 @@
 .div-table-tabmember{
     margin-top: 10px;
 }
+.tabmember__head{
+    display: flex;
+}
