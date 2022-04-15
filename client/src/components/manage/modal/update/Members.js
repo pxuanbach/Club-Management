@@ -82,7 +82,7 @@ const Members = ({ club }) => {
       field: 'btn-club-leader',
       headerName: '',
       align: 'center',
-      flex: 0.3,
+      flex: 0.4,
       disableColumnMenu: true,
       sortable: false,
       renderCell: (value) => {
@@ -101,7 +101,7 @@ const Members = ({ club }) => {
       field: 'btn-club-treasurer',
       headerName: '',
       align: 'center',
-      flex: 0.3,
+      flex: 0.4,
       disableColumnMenu: true,
       sortable: false,
       renderCell: (value) => {
@@ -120,7 +120,7 @@ const Members = ({ club }) => {
       field: 'btn-remove',
       headerName: '',
       align: 'center',
-      flex: 0.3,
+      flex: 0.4,
       disableColumnMenu: true,
       sortable: false,
       renderCell: (value) => {
