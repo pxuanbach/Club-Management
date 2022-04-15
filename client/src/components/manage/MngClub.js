@@ -66,6 +66,7 @@ const ManageClub = () => {
   }, [ENDPT])
 
   useEffect(() => {
+    socket.emit('get-clubs', '', true)
     socket.on('output-clubs', clbs => {
       setClubs(clbs)
       console.log('clubs', clubs)

@@ -1,13 +1,18 @@
-const { ConvertClub, ConvertClubs } = require('../helper/ConvertDataHelper')
+const { ConvertClub, ConvertClubs, ConvertUsers } = require('../helper/ConvertDataHelper')
 const Club = require('../models/Club')
+const User = require('../models/User')
 const cloudinary = require('../helper/Cloudinary')
 
 module.exports = function (socket, io) {
-    Club.find().then(result => {
-        //console.log('output-clubs: ', result)
-        socket.emit('output-clubs', ConvertClubs(result))
+    socket.on('get-clubs', (user_id, isAdmin) => {
+        let query = isAdmin ? {} : {members: user_id}
+        Club.find(query).then(clubs => {
+            //console.log('output-clubs: ', clubs)
+            socket.emit('output-clubs', ConvertClubs(clubs))
+        })
+        
     })
-
+    
     socket.on('get-club', ({ club_id }) => {
         Club.findOne({ _id: club_id }).then(result => {
             io.emit('output-club', result)
@@ -17,9 +22,13 @@ module.exports = function (socket, io) {
     socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
         const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
         club.save().then(result => {
-            let newClub = ConvertClub(result);
-
-            io.emit('club-created', newClub)
+            User.find({_id: {$in: [leader._id, treasurer._id]}}).then(users => {
+                users.forEach(user => {
+                    user.clubs.push(result._id)
+                    user.save();
+                });
+            })
+            io.emit('club-created', ConvertClub(result))
             console.log(result)
             callback();
         })
@@ -73,16 +82,46 @@ module.exports = function (socket, io) {
                     console.log(result);
                 })
                 console.log('Delete club:', doc)
+                //delete some relation
+                //
+                //
                 io.emit('club-deleted', doc)
             }
         })
         callback();
     })
 
+    socket.on('get-members', club_id => {
+        Club.findById(club_id).then(club => {
+            User.find({_id: {$in: club.members}}).then(users => {
+                io.emit('output-members', ConvertUsers(users));
+            })
+        })
+    })
+
+    socket.on('get-users-not-members', club_id => {
+        Club.findById(club_id).then(club => {
+            User.find({ $and: [
+                { _id: { $nin: club.members } }, 
+                {_id: {$nin: [club.leader._id, club.treasurer._id]}},
+                { username: { $nin: ['admin', 'admin0'] } },
+            ] })
+            .then(users => {
+                io.emit('output-users-not-members', ConvertUsers(users))
+            })
+        })
+        
+    })
+
     socket.on('add-member', (club_id, user_id) => {
         Club.findById(club_id, function (err, doc) {
             if (err) return;
             doc.members.push(user_id)
+            doc.save();
+        })
+        User.findById(user_id, function (err, doc) {
+            if (err) return;
+            doc.clubs.push(club_id)
             doc.save();
         })
     })

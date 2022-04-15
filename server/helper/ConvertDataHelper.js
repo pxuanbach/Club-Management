@@ -62,7 +62,7 @@ function ConvertUser(data) {
     user.cloudinary_id = data.cloudinary_id;
     user.email = data.email;
     user.isblocked = data.isblocked;
-    //user.groups_num = elm.clubs.length;
+    user.groups_num = data.clubs.length;
 
     return user;
 }
@@ -80,7 +80,7 @@ function ConvertUsers(data) {
         user.cloudinary_id = elm.cloudinary_id;
         user.email = elm.email;
         user.isblocked = elm.isblocked;
-        //user.groups_num = elm.clubs.length;
+        user.groups_num = elm.clubs.length;
 
         users.push(user)
     });

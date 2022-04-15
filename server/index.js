@@ -31,9 +31,6 @@ mongoose
 
 const PORT = process.env.PORT || 5000
 const { addUser, removeUser, getUser } = require('./helper/UserHelper');
-const {ConvertUsers} = require('./helper/ConvertDataHelper')
-const Club = require('./models/Club')
-const User = require('./models/User');
 
 io.on('connection', (socket) => {
     console.log(socket.id)
@@ -56,28 +53,6 @@ io.on('connection', (socket) => {
             console.log('join user', user)
         }
     }) 
-
-    socket.on('get-members', club_id => {
-        Club.findById(club_id).then(club => {
-            User.find({_id: {$in: club.members}}).then(users => {
-                io.emit('output-members', ConvertUsers(users));
-            })
-        })
-    })
-
-    socket.on('get-users-not-members', club_id => {
-        Club.findById(club_id).then(club => {
-            User.find({ $and: [
-                { _id: { $nin: club.members } }, 
-                {_id: {$nin: [club.leader._id, club.treasurer._id]}},
-                { username: { $nin: ['admin', 'admin0'] } },
-            ] })
-            .then(users => {
-                io.emit('output-users-not-members', ConvertUsers(users))
-            })
-        })
-        
-    })
 
     socket.on('disconnect', () => {
         //

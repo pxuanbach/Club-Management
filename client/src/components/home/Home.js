@@ -39,6 +39,9 @@ const Home = () => {
   }, [ENDPT])
 
   useEffect(() => {
+    let isAdmin = user?.username.includes('admin');
+    socket.emit('get-clubs', user?._id, isAdmin)
+    
     socket.on('output-clubs', clbs => {
       setClubs(clbs)
       console.log('clubs', clubs)
