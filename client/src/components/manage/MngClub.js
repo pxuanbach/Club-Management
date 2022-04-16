@@ -3,6 +3,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import {Avatar, TextField, Button, Tooltip, Box, Modal} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import AddClub from './modal/AddClub'
 import UpdateClub from './modal/UpdateClub'
@@ -50,7 +51,15 @@ const ManageClub = () => {
   }
 
   const handleSearch = (e) => {
-    console.log(search)
+    e.preventDefault();
+    //console.log(search)
+    if (search)
+      socket.emit('search-club', search)
+  }
+
+  const handleRefresh = (e) => {
+    e.preventDefault();
+    socket.emit('get-clubs', '', true);
   }
 
   const handleUpdate = (event, param) => {
@@ -210,6 +219,9 @@ const ManageClub = () => {
 
       setClubs(deleteClubs)
     })
+    socket.on('club-searched', clbs => {
+      setClubs(clbs);
+    })
   }, [clubs])
 
   if (!user) {
@@ -270,6 +282,15 @@ const ManageClub = () => {
                 disableElevation
                 onClick={handleSearch}>
                 <SearchIcon sx={{color: '#1B264D'}}/>
+              </Button>
+            </Tooltip>
+            <Tooltip title='Làm mới' placement='right-start'>
+              <Button
+                className='btn-refresh'
+                variant="outlined"
+                disableElevation
+                onClick={handleRefresh}>
+                <RefreshIcon sx={{color: '#1B264D'}}/>
               </Button>
             </Tooltip>
           </div>

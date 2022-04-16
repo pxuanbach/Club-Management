@@ -5,24 +5,41 @@ const cloudinary = require('../helper/Cloudinary')
 
 module.exports = function (socket, io) {
     socket.on('get-clubs', (user_id, isAdmin) => {
-        let query = isAdmin ? {} : {members: user_id}
+        let query = isAdmin ? {} : { members: user_id }
         Club.find(query).then(clubs => {
             //console.log('output-clubs: ', clubs)
             socket.emit('output-clubs', ConvertClubs(clubs))
         })
-        
+
     })
-    
+
     socket.on('get-club', ({ club_id }) => {
         Club.findOne({ _id: club_id }).then(result => {
             io.emit('output-club', result)
         })
     })
 
+    socket.on('search-club', search => {
+        //create search index in mongoDB
+        Club.find().then(clubs => {
+            let clubArr = []
+            clubs.forEach(elm => {
+                if (elm.name.includes(search)) {
+                    clubArr.push(elm);
+                } else if (elm.leader.name.includes(search)) {
+                    clubArr.push(elm);
+                } else if (elm.treasurer.name.includes(search)) {
+                    clubArr.push(elm);
+                }
+            })
+            io.emit('club-searched', ConvertClubs(clubArr))
+        })
+    })
+
     socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
         const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
         club.save().then(result => {
-            User.find({_id: {$in: [leader._id, treasurer._id]}}).then(users => {
+            User.find({ _id: { $in: [leader._id, treasurer._id] } }).then(users => {
                 users.forEach(user => {
                     user.clubs.push(result._id)
                     user.save();
@@ -75,7 +92,7 @@ module.exports = function (socket, io) {
 
     socket.on('delete-club', (club_id, cloudinary_id, callback) => {
         console.log('club want to delete: ', club_id)
-        Club.findByIdAndDelete(club_id, function(err, doc) {
+        Club.findByIdAndDelete(club_id, function (err, doc) {
             if (err) console.log(err)
             else {
                 cloudinary.uploader.destroy(cloudinary_id, function (result) {
@@ -93,7 +110,7 @@ module.exports = function (socket, io) {
 
     socket.on('get-members', club_id => {
         Club.findById(club_id).then(club => {
-            User.find({_id: {$in: club.members}}).then(users => {
+            User.find({ _id: { $in: club.members } }).then(users => {
                 io.emit('output-members', ConvertUsers(users));
             })
         })
@@ -101,16 +118,18 @@ module.exports = function (socket, io) {
 
     socket.on('get-users-not-members', club_id => {
         Club.findById(club_id).then(club => {
-            User.find({ $and: [
-                { _id: { $nin: club.members } }, 
-                {_id: {$nin: [club.leader._id, club.treasurer._id]}},
-                { username: { $nin: ['admin', 'admin0'] } },
-            ] })
-            .then(users => {
-                io.emit('output-users-not-members', ConvertUsers(users))
+            User.find({
+                $and: [
+                    { _id: { $nin: club.members } },
+                    { _id: { $nin: [club.leader._id, club.treasurer._id] } },
+                    { username: { $nin: ['admin', 'admin0'] } },
+                ]
             })
+                .then(users => {
+                    io.emit('output-users-not-members', ConvertUsers(users))
+                })
         })
-        
+
     })
 
     socket.on('add-member', (club_id, user_id) => {
