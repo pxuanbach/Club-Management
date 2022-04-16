@@ -48,17 +48,6 @@ export default function BasicTabs() {
 
   return (
     <div>
-    <div className='div-header2'>
-      <div className='div-search'>
-        <input 
-          type="text"
-          placeholder="Tìm kiếm thành viên"
-
-        />
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-      </div>
-    </div>
     <Box sx={{ width: '100%' , height:'100%', marginTop:'15px'}}>
       <Box sx={{ borderBottom: 1 , borderColor: 'divider',color:'#1B264D'}} >
         <Tabs  value={value} onChange={handleChange} aria-label="basic tabs example" >

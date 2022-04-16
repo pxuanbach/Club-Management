@@ -6,6 +6,22 @@
 .div-table-tabmember{
     margin-top: 10px;
 }
-.tabmember__head{
+.members__head{
+    width: 95%;
     display: flex;
+    margin-left: 20px;
+    margin-top: 20px;
+    
+}
+.members__head .members__card:last-child{
+    margin-left: 20px;
+}
+.members__card {
+    width: 100%;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.members__body h2{
+    margin-bottom: 2px;
 }
