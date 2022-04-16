@@ -2,11 +2,14 @@ const { ConvertUser, ConvertUsers } = require('../helper/ConvertDataHelper')
 const User = require('../models/User')
 
 module.exports = function (socket, io) {
-    User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
+    socket.on('get-users', () => {
+        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
 
-        socket.emit('output-users', ConvertUsers(result))
-        //console.log(result)
+            socket.emit('output-users', ConvertUsers(result))
+            //console.log(result)
+        })
     })
+    
 
     socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
         //console.log('user id', user_id)

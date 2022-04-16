@@ -48,12 +48,12 @@ const ManageAccount = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    //console.log(search)
+    socket.emit('search-user', search)
   }
 
   const handleRefresh = (e) => {
     e.preventDefault();
-
+    socket.emit('get-users')
   }
 
   const handleOpenAdd = () => setOpenModalAdd(true);
@@ -68,12 +68,19 @@ const ManageAccount = () => {
   }, [ENDPT])
 
   useEffect(() => {
+    socket.emit('get-users')
     socket.on('output-users', users => {
       setUsers(users)
       //console.log('users', users)
     })
+  }, [])
+
+  useEffect(() => {
     socket.on('new-user', newUser => {
       setUsers([...users, newUser])
+    })
+    socket.on('output-search-user', users => {
+      setUsers(users)
     })
   }, [users])
 
