@@ -31,9 +31,15 @@ const AddClub = ({ setShowFormAdd }) => {
         setValues({ ...values, [prop]: event.target.value });
     };
 
+    function isFileImage(file) {
+        return file && file['type'].split('/')[0] === 'image';
+    }
+
     const handleImageChange = (event) => {
-        if (event.target.files && event.target.files[0]) {
+        if (isFileImage(event.target.files[0])) {
             setAvatarImage(event.target.files[0]);
+        } else {
+            alert('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...')
         }
     };
 
@@ -45,7 +51,7 @@ const AddClub = ({ setShowFormAdd }) => {
         if (!values.name) {
             setNameErr('Tên câu lạc bộ đang trống')
             isError = true;
-        } 
+        }
 
         if (!leaderSelected) {
             setLeaderErr('Chưa chọn trưởng câu lạc bộ')
@@ -62,7 +68,7 @@ const AddClub = ({ setShowFormAdd }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         if (validateSubmit()) {
             setIsLoading(false);
             return;

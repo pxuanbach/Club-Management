@@ -245,7 +245,8 @@ const ManageClub = () => {
         open={showFormUpdate}
         aria-labelledby="modal-update-title"
         aria-describedby="modal-update-description"
-        onClose={() => {
+        onClose={(e) => {
+          handleRefresh(e);
           setShowFormUpdate(false);
         }}
       >
@@ -285,7 +286,7 @@ const ManageClub = () => {
               </Button>
             </Tooltip>
             <Tooltip title='Làm mới' placement='right-start'>
-              <Button
+              <Button sx={{ borderColor: '#1B264D' }}
                 className='btn-refresh'
                 variant="outlined"
                 disableElevation
