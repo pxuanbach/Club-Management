@@ -24,7 +24,8 @@ const Members = ({ club }) => {
   }
 
   const handleRemoveFromClub = (event, param) => {
-
+    event.stopPropagation();
+    socket.emit('remove-user-from-club', club._id, param._id)
   }
 
   useEffect(() => {
@@ -51,6 +52,9 @@ const Members = ({ club }) => {
     socket.emit('get-members', club._id)
     socket.on('output-members', users => {
       setUsers(users)
+    })
+    socket.on('removed-user-from-club', user => {
+      setUsers(users.filter(u => u._id !== user._id))
     })
   }, [users])
 

@@ -1,4 +1,4 @@
-const { ConvertClub, ConvertClubs, ConvertUsers } = require('../helper/ConvertDataHelper')
+const { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers } = require('../helper/ConvertDataHelper')
 const Club = require('../models/Club')
 const User = require('../models/User')
 const cloudinary = require('../helper/Cloudinary')
@@ -142,6 +142,31 @@ module.exports = function (socket, io) {
             if (err) return;
             doc.clubs.push(club_id)
             doc.save();
+        })
+    })
+
+    socket.on('remove-user-from-club', (club_id, user_id, callback) => {
+        Club.findById(club_id, function (err, doc) {
+            if (err) return;
+
+            var newMembers = doc.members.filter(function(value, index, arr) {
+                return value != user_id;
+            })
+
+            doc.members = newMembers;
+            doc.save();
+
+            User.findById(user_id, function (err, doc) {
+                if (err) return;
+                var newClubs = doc.clubs.filter(function(value, index, arr) {
+                    return value != club_id;
+                })
+    
+                doc.clubs = newClubs;
+                doc.save().then(user => {
+                    io.emit('removed-user-from-club', ConvertUser(user))
+                })
+            })
         })
     })
 }
