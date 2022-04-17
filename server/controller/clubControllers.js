@@ -193,4 +193,29 @@ module.exports = function (socket, io) {
             })
         })
     })
+
+    socket.on('promote-to-treasurer', (club_id, cur_treasurer_id, new_treasurer_id) => {
+        Club.findById(club_id, function (err, doc) {
+            if (err) return;
+
+            //find new treasurer info
+            User.findById(new_treasurer_id).then(user => {
+                doc.treasurer = user;
+
+                //exchange new and current treasurer id
+                var newMembers = doc.members.filter(function (value, index, arr) {
+                    return value !== new_treasurer_id;
+                })
+                doc.members = newMembers;
+                //console.log('except new treasurer id:',doc.members)
+                console.log('current treasurer id: ', cur_treasurer_id)
+                doc.members.push(cur_treasurer_id);
+                console.log('add cur treasurer id:', doc.members)
+
+                doc.save().then(() => {
+                    io.emit('promoted-to-treasurer', user)
+                });
+            })
+        })
+    })
 }

@@ -24,7 +24,7 @@ const Members = ({ club }) => {
   const handlePromotedToTreasurer = (event, param) => {
     event.stopPropagation();
     //console.log('treasurer')
-    
+    socket.emit('promote-to-treasurer', club._id, treasurer._id, param._id)
   }
 
   const handleRemoveFromClub = (event, param) => {
@@ -52,6 +52,10 @@ const Members = ({ club }) => {
     })
     socket.on('promoted-to-leader', new_leader => {
       setLeader(new_leader)
+      socket.emit('get-members', club._id)
+    })
+    socket.on('promoted-to-treasurer', new_treasurer => {
+      setTreasurer(new_treasurer)
       socket.emit('get-members', club._id)
     })
   }, [])
