@@ -148,24 +148,48 @@ module.exports = function (socket, io) {
     socket.on('remove-user-from-club', (club_id, user_id, callback) => {
         Club.findById(club_id, function (err, doc) {
             if (err) return;
-
-            var newMembers = doc.members.filter(function(value, index, arr) {
+            var newMembers = doc.members.filter(function (value, index, arr) {
                 return value != user_id;
             })
-
             doc.members = newMembers;
             doc.save();
 
             User.findById(user_id, function (err, doc) {
                 if (err) return;
-                var newClubs = doc.clubs.filter(function(value, index, arr) {
+                var newClubs = doc.clubs.filter(function (value, index, arr) {
                     return value != club_id;
                 })
-    
                 doc.clubs = newClubs;
                 doc.save().then(user => {
                     io.emit('removed-user-from-club', ConvertUser(user))
                 })
+            })
+        })
+    })
+
+    socket.on('promote-to-leader', (club_id, cur_leader_id, new_leader_id) => {
+        Club.findById(club_id, function (err, doc) {
+            if (err) return;
+
+            //find new leader info
+            User.findById(new_leader_id).then(user => {
+                doc.leader = user;
+
+                //exchange new and current leader id
+                var newMembers = doc.members.filter(function (value, index, arr) {
+                    //console.log('new leader id: ', new_leader_id)
+                    return value !== new_leader_id;
+                })
+                //console.log('new member:', newMembers)
+                doc.members = newMembers;
+                //console.log('except new leader id:',doc.members)
+                console.log('current leader id: ', cur_leader_id)
+                doc.members.push(cur_leader_id);
+                console.log('add cur leader id:', doc.members)
+
+                doc.save().then(() => {
+                    io.emit('promoted-to-leader', user)
+                });
             })
         })
     })

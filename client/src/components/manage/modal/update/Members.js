@@ -16,11 +16,15 @@ const Members = ({ club }) => {
   const [users, setUsers] = useState([])
 
   const handlePromotedToLeader = (event, param) => {
-    console.log('leader')
+    event.stopPropagation();
+    //console.log('leader')
+    socket.emit('promote-to-leader', club._id, leader._id, param._id)
   }
 
   const handlePromotedToTreasurer = (event, param) => {
-    console.log('treasurer')
+    event.stopPropagation();
+    //console.log('treasurer')
+    
   }
 
   const handleRemoveFromClub = (event, param) => {
@@ -46,7 +50,11 @@ const Members = ({ club }) => {
     socket.on('output-treasurer', res => {
       setTreasurer(res)
     })
-  }, [leader, treasurer])
+    socket.on('promoted-to-leader', new_leader => {
+      setLeader(new_leader)
+      socket.emit('get-members', club._id)
+    })
+  }, [])
 
   useEffect(() => {
     socket.emit('get-members', club._id)
