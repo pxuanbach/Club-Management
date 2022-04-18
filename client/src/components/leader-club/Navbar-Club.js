@@ -30,7 +30,7 @@ const NavbarClub = () => {
 
     return (
 
-        <nav>
+        <nav className='div-left-nav'>
             <div className="nav-club">
                 <div className='div-back'>
                     <Link onClick={history.goBack} className="btn-back">

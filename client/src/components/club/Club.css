@@ -1,9 +1,9 @@
 .club{
     display: flex;
-   
+    height: 100%;
 }
 .div-right-club{
-    margin-left: 0px;
+    margin-left: 17.7vw;
     margin-top: 0px;
     width: 100%;
     height: 100vh;

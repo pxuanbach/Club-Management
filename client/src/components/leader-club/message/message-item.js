@@ -1,15 +1,15 @@
 import React from 'react';
 
-export default class App extends React.Component {
-    render () {
+const MessageItem = (props) => {
         return (
-            <li className={this.props.user? "message right appeared": "message left appeared"}>
+            <li className={props.user? "message right appeared": "message left appeared"}>
                 <div className="avatar"></div>
+                <div className='name-people'>Đạt</div>
                 <div className="text_wrapper">
-                    <div className="text">{this.props.message}</div>
+                    <div className="text">{props.message}</div>
                 </div>
                 
             </li>
         )
-    }
 }
+export default MessageItem
