@@ -1,14 +1,12 @@
 import React from 'react';
-import MessageItem from './message-item';
+import MessageItem from './Message-Item';
 
 
-const MessageList = (props) => {  
-        return (
-            <ul className="messages">
-                {props.messages.map(item =>
-                    <MessageItem key={item.id} user={item.userId === props.user? true: false} message={item.message}/>
-                )}
-            </ul>
-        )
+const MessageList = () => {
+    return (
+        <div className="messages">
+            <MessageItem user={null} message={null} />
+        </div>
+    )
 }
 export default MessageList;

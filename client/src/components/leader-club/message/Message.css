@@ -174,15 +174,15 @@ body {
   }
   .messages .message .text_wrapper {
     display: inline-block;
-    padding: 8px;
-    padding-left: 15px;
+    padding: 8px 15px;
     border-radius: 20px;
-    width: calc(30%);
     min-width: 100px;
+    max-width: 600px;
     position: relative;
+    word-wrap: break-word;
   }
 
-  .messages .message .text_wrapper .text {
+  .messages .message .text_wrapper .message_text {
     font-size: 18px;  
     font-weight: 400;
   }
@@ -206,7 +206,7 @@ body {
     position: relative;
     padding: 0 20px;
     align-items: center;
-    
+    background-color: #fff;
   }
   .bottom_wrapper .message_input_wrapper .message_input {
     border: none;

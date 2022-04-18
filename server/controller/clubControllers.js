@@ -1,6 +1,7 @@
 const { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers } = require('../helper/ConvertDataHelper')
 const Club = require('../models/Club')
 const User = require('../models/User')
+const ChatRoom = require('../models/ChatRoom')
 const cloudinary = require('../helper/Cloudinary')
 
 module.exports = function (socket, io) {
@@ -45,8 +46,9 @@ module.exports = function (socket, io) {
                     user.save();
                 });
             })
+            ChatRoom.create({room_id: result._id})
             io.emit('club-created', ConvertClub(result))
-            console.log(result)
+            //console.log(result)
             callback();
         })
     })
