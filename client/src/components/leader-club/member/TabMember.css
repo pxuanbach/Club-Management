@@ -1,3 +1,6 @@
+.div-tabmember{
+    margin-top: 70px;
+}
 .name-h4{
     color: #1B264D;
     margin-top: 20px;
@@ -10,7 +13,6 @@
     width: 95%;
     display: flex;
     margin-left: 20px;
-    margin-top: 20px;
     
 }
 .members__head .members__card:last-child{
@@ -24,4 +26,36 @@
 
 .members__body h2{
     margin-bottom: 2px;
+}
+
+.header-table-tabmember{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+.div-title-search{
+    display: flex;
+    align-items: center;
+}
+.title-header2{
+    padding-left: 40px;
+    color: #1B264D;
+}
+.div-search-tabmember{
+    display: flex;
+    margin-right: 40px;
+    
+}
+
+
+.btn-search3 i{
+    color: var(--primary-color);
+    font-size: 18px;
+    padding-right: 30px;
+    padding-top: 10px;
+}
+.btn-add-tabmember{
+    height: 45px;
+     
+
 }

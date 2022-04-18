@@ -89,18 +89,20 @@
 
 .div-title-search{
     display: flex;
-    align-items: center;
+    align-items: flex-end;
+    justify-content: space-between;
 }
 .title-header2{
-    padding-left: 40px;
     color: #1B264D;
+    padding-bottom: 5px;
 }
 .div-search-fund{
     display: flex;
-    margin-left: 43%;
+    margin-right: 55px;
 }
 .table-paymentlist{
     margin-left: 40px;
+    margin-top: 10px;
 }
 
 .btn-search2 i{

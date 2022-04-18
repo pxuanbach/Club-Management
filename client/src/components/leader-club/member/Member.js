@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import "./Member.css"
 import TabMember from './TabMember';
+import TabGroup from './TabGroup';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -47,23 +48,23 @@ export default function BasicTabs() {
   };
 
   return (
-    <div>
-    <Box sx={{ width: '100%' , height:'100%', marginTop:'15px'}}>
-      <Box sx={{ borderBottom: 1 , borderColor: 'divider',color:'#1B264D'}} >
-        <Tabs  value={value} onChange={handleChange} aria-label="basic tabs example" >
+    <div >
+    <Box sx={{ width: '100%' , height:'100%',}}>
+      <Box  className='header-member' sx={{ borderBottom: 'none' , borderColor: 'divider'}} >
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
           <Tab className='name-tab' label="Quản lý thành viên" {...a11yProps(0)} />
           <Tab  label="Quản lý nhóm" {...a11yProps(1)} />
-          
         </Tabs>
       </Box>
-      <TabPanel   value={value} index={0}>
+      <div>
+      <TabPanel className='body-member' value={value} index={0}>
         <TabMember></TabMember>
 
       </TabPanel>
-      <TabPanel value={value} index={1}>
-        Item Two
+      <TabPanel className='body-member' value={value} index={1}>
+        <TabGroup></TabGroup>
       </TabPanel>
-
+      </div>
     </Box>
     </div>
   );

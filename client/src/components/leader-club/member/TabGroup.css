@@ -1,0 +1,13 @@
+.div-tabgroup{
+    margin-top: 50px;
+}
+.div-search-tabgroup{
+    display: flex;
+    margin-left: 20px;
+    
+}
+.title-tabgroup{
+    color: #1B264D;
+    margin-top: 20px;
+    margin-left: 20px;
+}
