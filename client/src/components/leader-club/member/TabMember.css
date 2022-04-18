@@ -1,0 +1,61 @@
+.div-tabmember{
+    margin-top: 70px;
+}
+.name-h4{
+    color: #1B264D;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+.div-table-tabmember{
+    margin-top: 10px;
+}
+.members__head{
+    width: 95%;
+    display: flex;
+    margin-left: 20px;
+    
+}
+.members__head .members__card:last-child{
+    margin-left: 20px;
+}
+.members__card {
+    width: 100%;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.members__body h2{
+    margin-bottom: 2px;
+}
+
+.header-table-tabmember{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+.div-title-search{
+    display: flex;
+    align-items: center;
+}
+.title-header2{
+    padding-left: 40px;
+    color: #1B264D;
+}
+.div-search-tabmember{
+    display: flex;
+    margin-right: 40px;
+    
+}
+
+
+.btn-search3 i{
+    color: var(--primary-color);
+    font-size: 18px;
+    padding-right: 30px;
+    padding-top: 10px;
+}
+.btn-add-tabmember{
+    height: 45px;
+     
+
+}

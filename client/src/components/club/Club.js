@@ -5,7 +5,7 @@ import Activity from "../leader-club/activity/Activity"
 import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/member/Member"
 import Message from "../leader-club/message/Message"
-import Fund from "../leader-club/Fund"
+import Fund from "../leader-club/fund/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
 import './Club.css'
 
@@ -32,6 +32,9 @@ const Club = () => {
           </Route>
           <Route path={`/club/${club_id}/${club_name}/member`}>
             <Member />
+          </Route>
+          <Route path={`/club/${club_id}/${club_name}/fund`}>
+            <Fund />
           </Route>
         </Switch>
       </div>

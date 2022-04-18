@@ -1,13 +1,16 @@
 
-.abc{
-    height: 100%;
-    background-color: aqua;
+
+
+.header-member{
+    position: fixed;
+    background-color: #edeff2;
+    width: 100%;
+    padding-top: 10px;
+    z-index: 1000;
+    box-shadow: 1px 2px 10px rgb(0 0 0 / 25%);
+    
+    
 }
-.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected{
-    color:#1B264D ;
-    font-weight: 500;
-}
-.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected {
-    color:#1B264D ;
-    font-weight: 500;
+.css-1aquho2-MuiTabs-indicator{
+background-color: #1B264D;
 }
