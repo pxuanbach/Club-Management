@@ -30,7 +30,7 @@ const Message = ({ club_id }) => {
     event.preventDefault();
     if (message) {
       console.log(message)
-      socket.emit('sendMessage', 'text', message, club_id, () => setMessage(''))
+      socket.emit('sendMessage', user._id, 'text', message, club_id, () => setMessage(''))
     }
   }
 
@@ -58,6 +58,7 @@ const Message = ({ club_id }) => {
   useEffect(() => {
     socket.emit('get-messages-history', club_id)
     socket.on('output-messages', messages => {
+      console.log(messages)
       setMessages(messages)
     })
   }, [])

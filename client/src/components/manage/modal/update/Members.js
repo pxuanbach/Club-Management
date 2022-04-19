@@ -65,7 +65,7 @@ const Members = ({ club }) => {
     socket.on('output-members', users => {
       setUsers(users)
     })
-    socket.on('removed-user-from-club', user => {
+    socket.on('removed-user-from-club', (club_id, user) => {
       setUsers(users.filter(u => u._id !== user._id))
     })
   }, [users])

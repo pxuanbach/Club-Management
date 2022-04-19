@@ -17,46 +17,36 @@ module.exports = function (socket, io) {
         }
     })
 
-    socket.on('sendMessage', (type, content, room_id, callback) => {
-        const user = getUser(socket.id);
+    socket.on('sendMessage', (user_id, type, content, room_id, callback) => {
+        console.log(socket.id)
+        const user = getUser({user_id, room_id});
         console.log('send message user', user)
         const msgToStore = {
-            user_id: user.user_id,
+            author: user_id,
             type,
             content,
             room_id,
         }
         //console.log('message', msgToStore)
         const msg = new Message(msgToStore);
-        msg.save().then(result => {
-            User.findById(user.user_id).then(author => {
-                const msgObj = Object.assign({}, result._doc)
-                msgObj.name = author.name;
-                msgObj.img_url = author.img_url;
-                //console.log('sendmess', msgObj)
-                io.to(room_id).emit('message', msgObj);
-                callback();
+        msg.save().then(m => 
+            m.populate('author')
+            .execPopulate()
+            .then(result => {
+            //console.log('send mess', result)
+            io.to(room_id).emit('message', result);
+            callback();
             })
-        })
+        )
     })
 
     socket.on('get-messages-history', room_id => {
-        Message.find({ room_id }).sort({createdAt: 'asc'}).then(result => {
-            let messages = []
-            let l = result.length
-            for (let i = 0; i < l; i++) {
-                User.findById(result[i].user_id).then(user => {
-                    const msgObj = Object.assign({}, result[i]._doc)
-                    msgObj.name = user.name;
-                    msgObj.img_url = user.img_url;
-                    //console.log('msg', msgObj)
-                    messages.push(msgObj);
-                    if (i === l - 1) {
-                        //console.log(messages)
-                        socket.emit('output-messages', messages)
-                    }
-                })
-            }
+        Message.find({ room_id })
+        .populate('author')
+        .sort({createdAt: 1})
+        .then(result => {
+            //console.log(result)
+            socket.emit('output-messages', result)
         })
     })
 }

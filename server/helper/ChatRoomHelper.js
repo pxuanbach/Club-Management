@@ -17,6 +17,6 @@ const removeUser = (socket_id) => {
     }
 }
 
-const getUser = (socket_id) => users.find(user => user.socket_id === socket_id)
+const getUser = ({user_id, room_id}) => users.find(user => user.user_id === user_id && user.room_id === room_id)
 
 module.exports = { addUser, removeUser, getUser }

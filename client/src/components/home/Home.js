@@ -48,11 +48,22 @@ const Home = () => {
       setClubs(clbs)
       console.log('clubs', clubs)
     })
+    
   }, [])
 
   useEffect(() => {
     socket.on('club-created', clb => {
       setClubs([...clubs, clb])
+    })
+    socket.on('member-added', (user_id, clb) => {
+      if (user._id === user_id) {
+        setClubs([...clubs, clb])
+      }
+    })
+    socket.on('removed-user-from-club', (club_id, userRemoved) => {
+      if (user._id === userRemoved._id) {
+        setClubs(clubs.filter(club => club._id !== club_id))
+      }
     })
   }, [clubs])
 

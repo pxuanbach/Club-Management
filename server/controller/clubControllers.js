@@ -6,7 +6,7 @@ const cloudinary = require('../helper/Cloudinary')
 
 module.exports = function (socket, io) {
     socket.on('get-clubs', (user_id, isAdmin) => {
-        let query = isAdmin ? {} : {$or: [{ members: user_id }, {'leader._id': user_id}, {'treasurer.id': user_id}]}
+        let query = isAdmin ? {} : {$or: [{ members: user_id }, {'leader._id': user_id}, {'treasurer._id': user_id}]}
         Club.find(query).then(clubs => {
             //console.log('output-clubs: ', clubs)
             socket.emit('output-clubs', ConvertClubs(clubs))
@@ -138,7 +138,9 @@ module.exports = function (socket, io) {
         Club.findById(club_id, function (err, doc) {
             if (err) return;
             doc.members.push(user_id)
-            doc.save();
+            doc.save().then(result => {
+                io.emit('member-added', user_id, result)
+            })
         })
         User.findById(user_id, function (err, doc) {
             if (err) return;
@@ -163,7 +165,7 @@ module.exports = function (socket, io) {
                 })
                 doc.clubs = newClubs;
                 doc.save().then(user => {
-                    io.emit('removed-user-from-club', ConvertUser(user))
+                    io.emit('removed-user-from-club', club_id, ConvertUser(user))
                 })
             })
         })
