@@ -104,8 +104,6 @@ body {
   
   .messages {
     position: relative;
-    list-style: none;
-    padding: 25px 10px 0 10px;
     margin: 0;
     height: 100%;
     overflow: auto;
@@ -121,6 +119,7 @@ body {
     background-color: #f5886e;
     float: left;
     margin-top: 21px;
+    margin-left: 5px;
   }
   .messages .message.left .text_wrapper {
     background-color: #ffffff;
@@ -128,7 +127,7 @@ body {
     
   }
   .messages .message.left .name-people {
-    margin-left: 65px;
+    margin-left: 55px;
     margin-bottom: 3px;
     
   }
@@ -136,7 +135,7 @@ body {
     right: 100%;
     border-right-color: #ffffff;
   }
-  .messages .message.left .text {
+  .messages .message.left .message_text {
     color: #1B264D;
   }
   /* .messages .message.right .avatar {
@@ -145,6 +144,7 @@ body {
   } */
   .messages .message.right .text_wrapper {
     background-color: #1B264D;
+    margin-top: 5px;
     margin-right: 10px;
     float: right;
   }
@@ -152,7 +152,7 @@ body {
     left: 100%;
     border-left-color: #1B264D;
   }
-  .messages .message.right .text {
+  .messages .message.right .message_text {
     color: #ffffff;
   }
   .messages .message.right .name-people {

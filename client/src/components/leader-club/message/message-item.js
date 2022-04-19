@@ -2,21 +2,18 @@ import React from 'react';
 import { Avatar } from '@mui/material';
 
 const MessageItem = ({user, message}) => {
-
-    let isAppearch = user ? "message right appeared" : "message left appeared"
-
+    let isAppearch = user._id === message.user_id ? "message right appeared" : "message left appeared"
     return (
         <div className={isAppearch}>
             <div className="avatar">
-                <Avatar src='' />
+                {user._id === message.user_id ? <></> : <Avatar src={message.img_url} />}
             </div>
-            <div className='name-people'>Đạt</div>
+            <div className='name-people'>{message.name}</div>
             <div className="text_wrapper">
                 <span className="message_text">
-                    Ha ha
+                    {message.content}
                 </span>
             </div>
-
         </div>
     )
 }

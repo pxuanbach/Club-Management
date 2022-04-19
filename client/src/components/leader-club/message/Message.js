@@ -5,16 +5,15 @@ import MessageOption from './MessageOption'
 import Input from './Input';
 import _map from 'lodash/map';
 import io from 'socket.io-client';
-import {ENDPT} from '../../../helper/Helper'
-import {UserContext} from '../../../UserContext'
-import {useParams} from 'react-router-dom'
+import { ENDPT } from '../../../helper/Helper'
+import { UserContext } from '../../../UserContext'
 
 let socket
 
-const Message = () => {
-  const { club_id, club_name } = useParams();
+const Message = ({ club_id }) => {
+  const [message, setMessage] = useState();
   const [messages, setMessages] = useState([]);
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const showhideFunction = () => {
     var menuList = document.getElementById("extend");
@@ -27,10 +26,41 @@ const Message = () => {
     }
   }
 
+  const sendMessage = (event) => {
+    event.preventDefault();
+    if (message) {
+      console.log(message)
+      socket.emit('sendMessage', 'text', message, club_id, () => setMessage(''))
+    }
+  }
+
   useEffect(() => {
     socket = io(ENDPT);
-    socket.emit('join', { name: user.name, user_id: user._id, club_id })
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
   }, [ENDPT])
+
+  useEffect(() => {
+    socket.emit('join', {
+      user_id: user?._id,
+      room_id: club_id
+    })
+  }, [user])
+
+  useEffect(() => {
+    socket.on('message', message => {
+      setMessages([...messages, message])
+    })
+  }, [messages]);
+
+  useEffect(() => {
+    socket.emit('get-messages-history', club_id)
+    socket.on('output-messages', messages => {
+      setMessages(messages)
+    })
+  }, [])
 
   return (
     <div className='div-message-body'>
@@ -53,7 +83,11 @@ const Message = () => {
             <i class="fa-solid fa-microphone"></i>
           </div>
           <div className='div-text-chat'>
-            <Input sendMessage={() => {}} />
+            <Input
+              message={message}
+              setMessage={setMessage}
+              sendMessage={sendMessage}
+            />
           </div>
 
         </div>

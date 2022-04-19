@@ -6,7 +6,7 @@ const cloudinary = require('../helper/Cloudinary')
 
 module.exports = function (socket, io) {
     socket.on('get-clubs', (user_id, isAdmin) => {
-        let query = isAdmin ? {} : { members: user_id }
+        let query = isAdmin ? {} : {$or: [{ members: user_id }, {'leader._id': user_id}, {'treasurer.id': user_id}]}
         Club.find(query).then(clubs => {
             //console.log('output-clubs: ', clubs)
             socket.emit('output-clubs', ConvertClubs(clubs))

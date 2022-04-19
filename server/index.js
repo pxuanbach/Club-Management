@@ -30,22 +30,17 @@ mongoose
 
 
 const PORT = process.env.PORT || 5000
-const { addUser, removeUser, getUser } = require('./helper/ChatRoomHelper');
+const { removeUser } = require('./helper/ChatRoomHelper');
 
 io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/clubControllers')(socket, io);
     require('./controller/userControllers')(socket, io);
-    
-    
-    //join chat room, club chat room
-    socket.on('join', ({ name, user_id, room_id }) => {   
-        socket.join(room_id);
-
-    }) 
+    require('./controller/chatRoomControllers')(socket, io);
 
     socket.on('disconnect', () => {
-        //
+        const user = removeUser(socket.id);
+        console.log('A user disconnected', user)
     })
 })
 

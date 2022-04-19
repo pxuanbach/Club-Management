@@ -9,8 +9,6 @@ import Fund from "../leader-club/fund/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
 import './Club.css'
 
-let socket;
-
 const Club = () => {
   const { club_id, club_name } = useParams();
 
@@ -28,7 +26,7 @@ const Club = () => {
             <Calendar />
           </Route>
           <Route path={`/club/${club_id}/${club_name}/message`}>
-            <Message />
+            <Message club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/member`}>
             <Member />
