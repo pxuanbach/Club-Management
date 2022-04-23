@@ -40,7 +40,7 @@ const Message = ({ club_id }) => {
       socket.emit('disconnect');
       socket.off();
     }
-  }, [ENDPT])
+  }, [])
 
   useEffect(() => {
     socket.emit('join', {

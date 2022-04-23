@@ -1,6 +1,5 @@
 import { Switch, Route, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from "react";
-import { UserContext } from "../../UserContext";
 import Activity from "../leader-club/activity/Activity"
 import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/member/Member"
@@ -29,7 +28,7 @@ const Club = () => {
             <Message club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/member`}>
-            <Member />
+            <Member club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/fund`}>
             <Fund />

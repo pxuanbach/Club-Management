@@ -134,6 +134,19 @@ module.exports = function (socket, io) {
 
     })
 
+    socket.on('get-user', (club_id, type) => {
+        Club.findById(club_id).then(club => {
+            //console.log(club)
+            let query = type === 'leader' ? club.leader._id : club.treasurer._id;
+            User.findById(query).then(result => {
+                if (type === 'leader')
+                    io.emit('output-leader', ConvertUser(result))
+                else if (type === 'treasurer')
+                    io.emit('output-treasurer', ConvertUser(result))
+            })
+        }) 
+    })
+
     socket.on('add-member', (club_id, user_id) => {
         Club.findById(club_id, function (err, doc) {
             if (err) return;

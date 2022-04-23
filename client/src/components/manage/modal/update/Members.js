@@ -38,12 +38,12 @@ const Members = ({ club }) => {
       socket.emit('disconnect');
       socket.off();
     }
-  }, [ENDPT])
+  }, [])
 
   useEffect(() => {
     //console.log('leader', club.leader._id)
-    socket.emit('get-user', club.leader._id, 'leader')
-    socket.emit('get-user', club.treasurer._id, 'treasurer')
+    socket.emit('get-user', club._id, 'leader')
+    socket.emit('get-user', club._id, 'treasurer')
     socket.on('output-leader', res => {
       setLeader(res)
     })

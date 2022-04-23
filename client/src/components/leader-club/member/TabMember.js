@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { Avatar, Box, Button, Tooltip, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import ClearIcon from '@mui/icons-material/Clear';
+import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
+import io from 'socket.io-client'
+import { ENDPT } from '../../../helper/Helper';
+import {useParams} from 'react-router-dom'
 import './TabMember.css'
+
+let socket
+
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: '#1B264D',
@@ -12,6 +19,7 @@ const CustomTextField = styled(TextField)({
     borderBottomColor: '#1B264D',
   },
 });
+
 const style = {
   position: 'absolute',
   top: '45%',
@@ -24,41 +32,77 @@ const style = {
   p: 4,
 };
 
-const TabMember = () => {
+const TabMember = ({club_id}) => {
+  const [leader, setLeader] = useState()
+  const [treasurer, setTreasurer] = useState()
+  const [members, setMembers] = useState([])
 
   const handleRemoveFromClub = (event, param) => {
     event.stopPropagation();
-    //socket.emit('remove-user-from-club', club._id, param._id)
-  }
+    socket.emit('remove-user-from-club', club_id, param._id)
+  } 
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [])
+
+  useEffect(() => {
+    //console.log('club id', club_id)
+    socket.emit('get-user', club_id, 'leader')
+    socket.emit('get-user', club_id, 'treasurer')
+    socket.on('output-leader', res => {
+      setLeader(res)
+    })
+    socket.on('output-treasurer', res => {
+      setTreasurer(res)
+    })
+  }, [])
+
+  useEffect(() => {
+    socket.emit('get-members', club_id)
+    socket.on('output-members', users => {
+      setMembers(users)
+    })
+    
+    socket.on('removed-user-from-club', (club_id, user) => {
+      setMembers(members.filter(u => u._id !== user._id))
+    })
+  }, [members])
 
   const columns = [
-    { field: '_id', headerName: 'ID', width: 70,flex:0.5 },
-    { field: 'img_url',
-    headerName: 'Hình đại diện',
-    disableColumnMenu: true,
-    sortable: false,
-    align: 'center',
-    flex: 0.6,
-    renderCell: (value) => {
-      return (
-        <Avatar src={value.row.img_url} />
-      )
-    } },
+    { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
     {
-      field: 'name', 
+      field: 'img_url',
+      headerName: 'Hình đại diện',
+      disableColumnMenu: true,
+      sortable: false,
+      align: 'center',
+      flex: 0.6,
+      renderCell: (value) => {
+        return (
+          <Avatar src={value.row.img_url} />
+        )
+      }
+    },
+    {
+      field: 'name',
       headerName: 'Họ và tên',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
       width: 200,
-      flex:1
+      flex: 1
     },
-  
+
     {
       field: 'username',
       headerName: 'Mã sinh viên',
-      flex:0.7
+      flex: 0.7
     },
-    { field: 'email', headerName: 'Email', flex: 1.5},
+    { field: 'email', headerName: 'Email', flex: 1.5 },
     {
       field: 'btn-remove',
       headerName: '',
@@ -86,20 +130,20 @@ const TabMember = () => {
         <div className='members__card'>
           <h3>Trưởng câu lạc bộ</h3>
           <div className='member-selected'>
-            <Avatar  />
+            <Avatar src={leader?.img_url}/>
             <div className='selected-info'>
-              <span>{'Nguyễn Tiến Đạt'}</span>
-              <span>{'19521345@gm.uit.edu.vn'}</span>
+              <span>{leader?.name}</span>
+              <span>{leader?.email}</span>
             </div>
           </div>
         </div>
         <div className='members__card'>
           <h3>Thủ quỹ</h3>
           <div className='member-selected'>
-            <Avatar  />
+            <Avatar src={treasurer?.img_url}/>
             <div className='selected-info'>
-              <span>{'Phạm Xuân Bách'}</span>
-              <span>{'19521233@gm.uit.edu.vn'}</span>
+              <span>{treasurer?.name}</span>
+              <span>{treasurer?.email}</span>
             </div>
           </div>
         </div>
@@ -111,12 +155,10 @@ const TabMember = () => {
             <Box
               component="form"
               sx={{
-                '& > :not(style)': { m: 1, width: '30ch' },
+                '& > :not(style)': { width: '30ch' },
               }}
-              noValidate
-              autoComplete="off"
             >
-              <CustomTextField id="search-field-tabmember" label="Tìm kiếm thành viên " variant="standard"  />
+              <CustomTextField id="search-field-tabmember" label="Tìm kiếm thành viên " variant="standard" />
             </Box>
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
@@ -124,15 +166,22 @@ const TabMember = () => {
                 variant="text"
                 disableElevation
               >
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            <Button className='btn-add-tabmember' variant="contained"  style={{ background: '#1B264D',marginTop:'15px', fontWeight:'600' }} >Thêm thành viên</Button>
+            <Button
+              className='btn-add-tabmember'
+              variant="contained"
+              disableElevation
+              style={{ background: '#1B264D' }}>
+              Thêm thành viên
+            </Button>
           </div>
         </div>
-        <div style={{ height: 400, width: '95%',marginTop:'10px',marginLeft:'20px'  }}>
+        <div style={{ height: 400, width: '95%', marginTop: '10px', marginLeft: '20px' }}>
           <DataGrid
-            rows={null}
+            getRowId={(r) => r._id}
+            rows={members}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}

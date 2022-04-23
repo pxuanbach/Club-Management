@@ -51,13 +51,4 @@ module.exports = function (socket, io) {
             io.emit('output-search-user', users)
         })
     })
-
-    socket.on('get-user', (user_id, type) => {
-        User.findById(user_id).then(result => {
-            if (type === 'leader')
-                io.emit('output-leader', ConvertUser(result))
-            else if (type === 'treasurer')
-                io.emit('output-treasurer', ConvertUser(result))
-        })
-    })
 }
