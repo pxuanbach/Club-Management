@@ -9,7 +9,7 @@ module.exports = function (socket, io) {
             //console.log(result)
         })
     })
-    
+
 
     socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
         //console.log('user id', user_id)
@@ -37,18 +37,23 @@ module.exports = function (socket, io) {
 
     socket.on('search-user', (search_value) => {
         //console.log('search value: ', search_value)
-        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
-            let users = []
-            result.forEach((user) => {
-                if (user.username.includes(search_value)) {
-                    users.push(user);
-                } else if (user.name.includes(search_value)) {
-                    users.push(user);
-                } else if (user.email.includes(search_value)) {
-                    users.push(user)
+        User.find({
+            $and: [
+                {
+                    username: {
+                        $nin: ['admin', 'admin0']
+                    }
+                },
+                {
+                    $or: [
+                        { username: { $regex: search_value } },
+                        { name: { $regex: search_value } },
+                        { email: { $regex: search_value } }
+                    ]
                 }
-            })
-            io.emit('output-search-user', users)
+            ]
+        }).then(result => {
+            io.emit('output-search-user', ConvertUsers(result))
         })
     })
 }

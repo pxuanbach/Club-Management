@@ -6,7 +6,7 @@ const cloudinary = require('../helper/Cloudinary')
 
 module.exports = function (socket, io) {
     socket.on('get-clubs', (user_id, isAdmin) => {
-        let query = isAdmin ? {} : {$or: [{ members: user_id }, {'leader._id': user_id}, {'treasurer._id': user_id}]}
+        let query = isAdmin ? {} : { $or: [{ members: user_id }, { 'leader._id': user_id }, { 'treasurer._id': user_id }] }
         Club.find(query).then(clubs => {
             //console.log('output-clubs: ', clubs)
             socket.emit('output-clubs', ConvertClubs(clubs))
@@ -22,18 +22,14 @@ module.exports = function (socket, io) {
 
     socket.on('search-club', search => {
         //create search index in mongoDB
-        Club.find().then(clubs => {
-            let clubArr = []
-            clubs.forEach(elm => {
-                if (elm.name.includes(search)) {
-                    clubArr.push(elm);
-                } else if (elm.leader.name.includes(search)) {
-                    clubArr.push(elm);
-                } else if (elm.treasurer.name.includes(search)) {
-                    clubArr.push(elm);
-                }
-            })
-            io.emit('club-searched', ConvertClubs(clubArr))
+        Club.find({
+            '$or': [
+                { name: { $regex: search } },
+                { "leader.name": { $regex: search } },
+            ]
+        }).then(clubs => {
+            //console.log(clubs)
+            io.emit('club-searched', ConvertClubs(clubs))
         })
     })
 
@@ -46,7 +42,7 @@ module.exports = function (socket, io) {
                     user.save();
                 });
             })
-            ChatRoom.create({room_id: result._id})
+            ChatRoom.create({ room_id: result._id })
             io.emit('club-created', ConvertClub(result))
             //console.log(result)
             callback();
@@ -144,7 +140,7 @@ module.exports = function (socket, io) {
                 else if (type === 'treasurer')
                     io.emit('output-treasurer', ConvertUser(result))
             })
-        }) 
+        })
     })
 
     socket.on('add-member', (club_id, user_id) => {
@@ -239,7 +235,7 @@ module.exports = function (socket, io) {
 
 module.exports.verifyclub = async (req, res, next) => {
     const club_id = req.params.club_id
-    
+
     const club = await Club.findById(club_id)
     if (club) {
         console.log(club)
@@ -251,5 +247,5 @@ module.exports.verifyclub = async (req, res, next) => {
     } else {
         res.status(400).json({ club: 'none' })
     }
-    
+
 }

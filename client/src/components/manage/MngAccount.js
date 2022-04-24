@@ -182,6 +182,7 @@ const ManageAccount = () => {
               value={search}
               onChange={handleChangeSearchField}
               size='small'
+              onKeyPress={event => event.key === 'Enter' ? handleSearch(event) : null}
             />
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
