@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Avatar, Box, Button, Tooltip, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -6,7 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import io from 'socket.io-client'
 import { ENDPT } from '../../../helper/Helper';
-import {useParams} from 'react-router-dom'
+import {UserContext} from '../../../UserContext'
 import './TabMember.css'
 
 let socket
@@ -33,6 +33,7 @@ const style = {
 };
 
 const TabMember = ({club_id}) => {
+  const { user, setUser } = useContext(UserContext);
   const [leader, setLeader] = useState()
   const [treasurer, setTreasurer] = useState()
   const [members, setMembers] = useState([])
@@ -73,7 +74,7 @@ const TabMember = ({club_id}) => {
     })
   }, [members])
 
-  const columns = [
+  const leaderColumns = [
     { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
     {
       field: 'img_url',
@@ -103,7 +104,7 @@ const TabMember = ({club_id}) => {
       flex: 0.7
     },
     { field: 'email', headerName: 'Email', flex: 1.5 },
-    {
+    { 
       field: 'btn-remove',
       headerName: '',
       align: 'center',
@@ -122,6 +123,38 @@ const TabMember = ({club_id}) => {
         )
       }
     },
+  ];
+
+  const memberColumns = [
+    { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
+    {
+      field: 'img_url',
+      headerName: 'Hình đại diện',
+      disableColumnMenu: true,
+      sortable: false,
+      align: 'center',
+      flex: 0.6,
+      renderCell: (value) => {
+        return (
+          <Avatar src={value.row.img_url} />
+        )
+      }
+    },
+    {
+      field: 'name',
+      headerName: 'Họ và tên',
+      description: 'This column has a value getter and is not sortable.',
+      sortable: false,
+      width: 200,
+      flex: 1
+    },
+
+    {
+      field: 'username',
+      headerName: 'Mã sinh viên',
+      flex: 0.7
+    },
+    { field: 'email', headerName: 'Email', flex: 1.5 },
   ];
 
   return (
@@ -182,7 +215,9 @@ const TabMember = ({club_id}) => {
           <DataGrid
             getRowId={(r) => r._id}
             rows={members}
-            columns={columns}
+            columns={user?.username.includes('admin') 
+              || user?._id === leader?._id
+              ? leaderColumns : memberColumns}
             pageSize={5}
             rowsPerPageOptions={[5]}
           />

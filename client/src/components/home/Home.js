@@ -116,7 +116,7 @@ const Home = () => {
           {clubs && clubs.map(club => (
             <Link key={club._id} 
               style={{textDecoration: 'none'}}
-              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name}
+              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name + '/message'}
               onClick={() => {
                 setOpenSnackbar(true)
               }}>

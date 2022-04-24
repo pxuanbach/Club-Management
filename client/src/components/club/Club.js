@@ -6,15 +6,32 @@ import Member from "../leader-club/member/Member"
 import Message from "../leader-club/message/Message"
 import Fund from "../leader-club/fund/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
+import { my_API } from '../../helper/Helper';
 import './Club.css'
 
 const Club = () => {
   const { club_id, club_name } = useParams();
-
+  const [club, setClub] = useState();
+  useEffect(() => {
+    const verifyClub = async () => {
+      try {
+        const res = await fetch( my_API + `verifyclub/${club_id}`, {
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        console.log('club', data)
+        setClub(data);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    verifyClub();
+  }, [])
   return (
     <div className='club'>
       <div >
-      <NavbarClub/>
+      <NavbarClub club={club}/>
       </div>
       <div className="div-right-club">
         <Switch >

@@ -236,3 +236,20 @@ module.exports = function (socket, io) {
         })
     })
 }
+
+module.exports.verifyclub = async (req, res, next) => {
+    const club_id = req.params.club_id
+    
+    const club = await Club.findById(club_id)
+    if (club) {
+        console.log(club)
+        if (club.isblocked) {
+            res.status(400).json({ club: 'blocked' })
+        } else {
+            res.status(200).json(club)
+        }
+    } else {
+        res.status(400).json({ club: 'none' })
+    }
+    
+}
