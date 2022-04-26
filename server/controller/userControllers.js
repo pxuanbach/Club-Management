@@ -10,7 +10,6 @@ module.exports = function (socket, io) {
         })
     })
 
-
     socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
         //console.log('user id', user_id)
 

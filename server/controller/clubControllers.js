@@ -114,6 +114,26 @@ module.exports = function (socket, io) {
         })
     })
 
+    socket.on('search-member-in-club', (club_id, search) => {
+        Club.findById(club_id).then(club => {
+            User.find({
+                $and: [
+                    { _id: { $in: club.members } },
+                    {
+                        $or: [
+                            { username: { $regex: search } },
+                            { name: { $regex: search } },
+                            { email: { $regex: search } }
+                        ]
+                    }
+                ]
+            }).then(users => {
+                //console.log(users)
+                io.emit('searched-member-in-club', ConvertUsers(users));
+            })
+        })
+    })
+
     socket.on('get-users-not-members', club_id => {
         Club.findById(club_id).then(club => {
             User.find({

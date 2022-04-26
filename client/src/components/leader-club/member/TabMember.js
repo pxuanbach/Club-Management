@@ -6,7 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import io from 'socket.io-client'
 import { ENDPT } from '../../../helper/Helper';
-import {UserContext} from '../../../UserContext'
+import { UserContext } from '../../../UserContext'
 import './TabMember.css'
 
 let socket
@@ -32,8 +32,9 @@ const style = {
   p: 4,
 };
 
-const TabMember = ({club_id}) => {
+const TabMember = ({ club_id }) => {
   const { user, setUser } = useContext(UserContext);
+  const [search, setSearch] = useState()
   const [leader, setLeader] = useState()
   const [treasurer, setTreasurer] = useState()
   const [members, setMembers] = useState([])
@@ -41,7 +42,17 @@ const TabMember = ({club_id}) => {
   const handleRemoveFromClub = (event, param) => {
     event.stopPropagation();
     socket.emit('remove-user-from-club', club_id, param._id)
-  } 
+  }
+
+  const handleChangeSearch = (event) => {
+    setSearch(event.target.value)
+  }
+
+  const handleSearchMembers = (event) => {
+    event.preventDefault();
+    //console.log(search)
+    socket.emit('search-member-in-club', club_id, search)
+  }
 
   useEffect(() => {
     socket = io(ENDPT);
@@ -53,6 +64,11 @@ const TabMember = ({club_id}) => {
 
   useEffect(() => {
     //console.log('club id', club_id)
+    socket.emit('get-members', club_id)
+    socket.on('output-members', users => {
+      setMembers(users)
+    })
+
     socket.emit('get-user', club_id, 'leader')
     socket.emit('get-user', club_id, 'treasurer')
     socket.on('output-leader', res => {
@@ -64,11 +80,9 @@ const TabMember = ({club_id}) => {
   }, [])
 
   useEffect(() => {
-    socket.emit('get-members', club_id)
-    socket.on('output-members', users => {
+    socket.on('searched-member-in-club', (users) => {
       setMembers(users)
     })
-    
     socket.on('removed-user-from-club', (club_id, user) => {
       setMembers(members.filter(u => u._id !== user._id))
     })
@@ -104,7 +118,7 @@ const TabMember = ({club_id}) => {
       flex: 0.7
     },
     { field: 'email', headerName: 'Email', flex: 1.5 },
-    { 
+    {
       field: 'btn-remove',
       headerName: '',
       align: 'center',
@@ -163,7 +177,7 @@ const TabMember = ({club_id}) => {
         <div className='members__card'>
           <h3>Trưởng câu lạc bộ</h3>
           <div className='member-selected'>
-            <Avatar src={leader?.img_url}/>
+            <Avatar src={leader?.img_url} />
             <div className='selected-info'>
               <span>{leader?.name}</span>
               <span>{leader?.email}</span>
@@ -173,7 +187,7 @@ const TabMember = ({club_id}) => {
         <div className='members__card'>
           <h3>Thủ quỹ</h3>
           <div className='member-selected'>
-            <Avatar src={treasurer?.img_url}/>
+            <Avatar src={treasurer?.img_url} />
             <div className='selected-info'>
               <span>{treasurer?.name}</span>
               <span>{treasurer?.email}</span>
@@ -191,31 +205,41 @@ const TabMember = ({club_id}) => {
                 '& > :not(style)': { width: '30ch' },
               }}
             >
-              <CustomTextField id="search-field-tabmember" label="Tìm kiếm thành viên " variant="standard" />
+              <CustomTextField
+                value={search}
+                onChange={handleChangeSearch}
+                id="search-field-tabmember"
+                label="Tìm kiếm thành viên "
+                variant="standard"
+                onKeyPress={event => event.key === 'Enter' ? handleSearchMembers(event) : null}
+              />
             </Box>
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
                 className='btn-search3'
                 variant="text"
                 disableElevation
+                onClick={handleSearchMembers}
               >
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            <Button
-              className='btn-add-tabmember'
-              variant="contained"
-              disableElevation
-              style={{ background: '#1B264D' }}>
-              Thêm thành viên
-            </Button>
+            {user?.username.includes('admin')
+              || user?._id === leader?._id
+              ? (<Button
+                className='btn-add-tabmember'
+                variant="contained"
+                disableElevation
+                style={{ background: '#1B264D' }}>
+                Thêm thành viên
+              </Button>) : <></>}
           </div>
         </div>
         <div style={{ height: 400, width: '95%', marginTop: '10px', marginLeft: '20px' }}>
           <DataGrid
             getRowId={(r) => r._id}
             rows={members}
-            columns={user?.username.includes('admin') 
+            columns={user?.username.includes('admin')
               || user?._id === leader?._id
               ? leaderColumns : memberColumns}
             pageSize={5}
