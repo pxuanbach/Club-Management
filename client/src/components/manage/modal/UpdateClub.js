@@ -74,7 +74,7 @@ const UpdateClub = ({ setShowFormUpdate, club }) => {
             </TabPanel>
             <TabPanel value={tabValue} index={2}>
                 <AddMember
-                    club={club}
+                    club_id={club._id}
                 />
             </TabPanel>
         </div>

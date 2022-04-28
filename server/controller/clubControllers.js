@@ -164,17 +164,18 @@ module.exports = function (socket, io) {
     })
 
     socket.on('add-member', (club_id, user_id) => {
-        Club.findById(club_id, function (err, doc) {
+        Club.findById(club_id, function (err, clubDoc) {
             if (err) return;
-            doc.members.push(user_id)
-            doc.save().then(result => {
-                io.emit('member-added', user_id, result)
+            clubDoc.members.push(user_id)
+            clubDoc.save().then(result => {
+                User.findById(user_id, function (err, userDoc) {
+                    if (err) return;
+                    userDoc.clubs.push(club_id)
+                    userDoc.save().then(userAdded => {
+                        io.emit('member-added', userAdded, ConvertClub(result))
+                    })
+                })
             })
-        })
-        User.findById(user_id, function (err, doc) {
-            if (err) return;
-            doc.clubs.push(club_id)
-            doc.save();
         })
     })
 

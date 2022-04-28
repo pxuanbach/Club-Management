@@ -18,7 +18,7 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const AddMember = ({ club }) => {
+const AddMember = ({ club_id }) => {
   const [search, setSearch] = useState();
   const [users, setUsers] = useState([]);
 
@@ -34,7 +34,7 @@ const AddMember = ({ club }) => {
   const handleAddMember = (event, param) => {
     event.stopPropagation();
     //console.log(param)
-    socket.emit('add-member', club._id, param._id)
+    socket.emit('add-member', club_id, param._id)
     setUsers(users.filter(user => user._id !== param._id))
   }
 
@@ -47,7 +47,7 @@ const AddMember = ({ club }) => {
   }, [ENDPT])
 
   useEffect(() => {
-    socket.emit('get-users-not-members', club._id)
+    socket.emit('get-users-not-members', club_id)
     socket.on('output-users-not-members', users => {
       setUsers(users)
     })

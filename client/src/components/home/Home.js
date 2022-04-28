@@ -55,8 +55,8 @@ const Home = () => {
     socket.on('club-created', clb => {
       setClubs([...clubs, clb])
     })
-    socket.on('member-added', (user_id, clb) => {
-      if (user._id === user_id) {
+    socket.on('member-added', (userAdded, clb) => {
+      if (user._id === userAdded._id) {
         setClubs([...clubs, clb])
       }
     })

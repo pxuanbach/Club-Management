@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Avatar, Box, Button, Tooltip, TextField } from '@mui/material';
+import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import io from 'socket.io-client'
 import { ENDPT } from '../../../helper/Helper';
 import { UserContext } from '../../../UserContext'
+import AddMember from '../../manage/modal/update/AddMember'
 import './TabMember.css'
 
 let socket
@@ -34,6 +35,7 @@ const style = {
 
 const TabMember = ({ club_id }) => {
   const { user, setUser } = useContext(UserContext);
+  const [showFormAdd, setShowFormAdd] = useState(false);
   const [search, setSearch] = useState()
   const [leader, setLeader] = useState()
   const [treasurer, setTreasurer] = useState()
@@ -85,6 +87,9 @@ const TabMember = ({ club_id }) => {
     })
     socket.on('removed-user-from-club', (club_id, user) => {
       setMembers(members.filter(u => u._id !== user._id))
+    })
+    socket.on('member-added', (userAdded, club) => {
+      setMembers([...members, userAdded])
     })
   }, [members])
 
@@ -173,6 +178,18 @@ const TabMember = ({ club_id }) => {
 
   return (
     <div className='div-tabmember'>
+      <Modal
+        open={showFormAdd}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormAdd(false);
+        }}
+      >
+        <Box sx={style}>
+          <AddMember club_id={club_id} setShowFormAdd={setShowFormAdd} />
+        </Box>
+      </Modal>
       <div className='members__head'>
         <div className='members__card'>
           <h3>Trưởng câu lạc bộ</h3>
@@ -227,6 +244,9 @@ const TabMember = ({ club_id }) => {
             {user?.username.includes('admin')
               || user?._id === leader?._id
               ? (<Button
+                onClick={() => {
+                  setShowFormAdd(true)
+                }}
                 className='btn-add-tabmember'
                 variant="contained"
                 disableElevation
