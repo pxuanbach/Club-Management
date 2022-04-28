@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
     require('./controller/clubControllers')(socket, io);
     require('./controller/userControllers')(socket, io);
     require('./controller/chatRoomControllers')(socket, io);
+    require('./controller/groupControllers')(socket, io);
 
     socket.on('disconnect', () => {
         const user = removeUser(socket.id);

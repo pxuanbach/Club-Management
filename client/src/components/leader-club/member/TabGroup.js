@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { Avatar, Divider, Button, Tooltip, TextField } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react'
+import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import Group from './Group'
+import AddGroup from './AddGroup'
+import { UserContext } from '../../../UserContext'
+import io from 'socket.io-client'
+import { ENDPT } from '../../../helper/Helper';
 import './TabGroup.css'
+
+let socket
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -14,9 +20,52 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const TabGroup = () => {
+const style = {
+  position: 'absolute',
+  top: '45%',
+  left: '50%',
+  transform: 'translate(-30%, -45%)',
+  width: 700,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+};
+
+const TabGroup = ({club_id}) => {
+  const { user, setUser } = useContext(UserContext);
+  const [showFormAdd, setShowFormAdd] = useState(false);
+  const [leader, setLeader] = useState()
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [])
+
+  useEffect(() => {
+    socket.emit('get-user', club_id, 'leader')
+    socket.on('output-leader', res => {
+      setLeader(res)
+    })
+  }, [])
+
   return (
     <div className='div-tabgroup'>
+      <Modal
+        open={showFormAdd}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormAdd(false);
+        }}
+      >
+        <Box sx={style}>
+          <AddGroup/>
+        </Box>
+      </Modal>
       <div className='div-header-tabgroup'>
         <div className='div-search-tabgroup'>
           <CustomTextField id="search-field-tabmember" label="Tìm kiếm nhóm" variant="standard" />
@@ -31,12 +80,17 @@ const TabGroup = () => {
           </Tooltip>
         </div>
         <div className='div-action-tabgroup'>
-          <Button
-            className='btn-add-tabmember'
-            variant="contained"
-            style={{ background: '#1B264D' }}>
-            Thêm nhóm
-          </Button>
+          {user?.username.includes('admin')
+              || user?._id === leader?._id
+              ? (<Button
+                onClick={() => {
+                  setShowFormAdd(true)
+                }}
+                className='btn-add-tabmember'
+                variant="contained"
+                style={{ background: '#1B264D' }}>
+                Thêm nhóm
+              </Button>) : <></>}
         </div>
 
       </div>

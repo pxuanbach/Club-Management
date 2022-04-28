@@ -2,7 +2,7 @@ import React from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { Avatar, Divider, Button, Tooltip } from '@mui/material';
 
-const Group = () => {
+const Group = ({group}) => {
 
     const columns = [
         { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
