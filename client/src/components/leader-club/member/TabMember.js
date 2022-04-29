@@ -94,7 +94,6 @@ const TabMember = ({ club_id }) => {
   }, [members])
 
   const leaderColumns = [
-    { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
     {
       field: 'img_url',
       headerName: 'Hình đại diện',
@@ -145,7 +144,6 @@ const TabMember = ({ club_id }) => {
   ];
 
   const memberColumns = [
-    { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
     {
       field: 'img_url',
       headerName: 'Hình đại diện',

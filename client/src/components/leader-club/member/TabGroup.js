@@ -32,7 +32,7 @@ const style = {
   p: 4,
 };
 
-const TabGroup = ({club_id}) => {
+const TabGroup = ({ club_id }) => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [leader, setLeader] = useState()
@@ -63,12 +63,19 @@ const TabGroup = ({club_id}) => {
         }}
       >
         <Box sx={style}>
-          <AddGroup/>
+          <AddGroup club_id={club_id} setShowFormAdd={setShowFormAdd} />
         </Box>
       </Modal>
       <div className='div-header-tabgroup'>
         <div className='div-search-tabgroup'>
-          <CustomTextField id="search-field-tabmember" label="Tìm kiếm nhóm" variant="standard" />
+          <Box
+            component="form"
+            sx={{
+              '& > :not(style)': { width: '30ch' },
+            }}>
+            <CustomTextField id="search-field-tabmember" label="Tìm kiếm nhóm" variant="standard" />
+          </Box>
+
           <Tooltip title='Tìm kiếm' placement='right-start'>
             <Button
               className='btn-search3'
@@ -81,16 +88,16 @@ const TabGroup = ({club_id}) => {
         </div>
         <div className='div-action-tabgroup'>
           {user?.username.includes('admin')
-              || user?._id === leader?._id
-              ? (<Button
-                onClick={() => {
-                  setShowFormAdd(true)
-                }}
-                className='btn-add-tabmember'
-                variant="contained"
-                style={{ background: '#1B264D' }}>
-                Thêm nhóm
-              </Button>) : <></>}
+            || user?._id === leader?._id
+            ? (<Button
+              onClick={() => {
+                setShowFormAdd(true)
+              }}
+              className='btn-add-tabmember'
+              variant="contained"
+              style={{ background: '#1B264D' }}>
+              Thêm nhóm
+            </Button>) : <></>}
         </div>
 
       </div>

@@ -114,6 +114,22 @@ module.exports = function (socket, io) {
         })
     })
 
+    socket.on('get-members-leader-treasurer', club_id => {
+        Club.findById(club_id).then(club => {
+            let arrId = club.members
+            arrId.push(club.leader._id)
+            arrId.push(club.treasurer._id)
+            //console.log(arrId)
+            User.find({ 
+                _id: { 
+                    $in: arrId
+                } 
+            }).then(users => {
+                io.emit('output-members-leader-treasurer', ConvertUsers(users));
+            })
+        })
+    })
+
     socket.on('search-member-in-club', (club_id, search) => {
         Club.findById(club_id).then(club => {
             User.find({
