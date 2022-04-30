@@ -35,7 +35,8 @@ const style = {
 const TabGroup = ({ club_id }) => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
-  const [leader, setLeader] = useState()
+  const [leader, setLeader] = useState();
+  const [groups, setGroups] = useState([])
 
   useEffect(() => {
     socket = io(ENDPT);
@@ -47,10 +48,20 @@ const TabGroup = ({ club_id }) => {
 
   useEffect(() => {
     socket.emit('get-user', club_id, 'leader')
+    socket.emit('get-groups', club_id)
     socket.on('output-leader', res => {
       setLeader(res)
     })
+    socket.on('output-groups', grs => {
+      setGroups(grs)
+    })
   }, [])
+
+  useEffect(() => {
+    socket.on('group-created', newGroup => {
+      setGroups([...groups, newGroup])
+    })
+  }, [groups])
 
   return (
     <div className='div-tabgroup'>
@@ -93,7 +104,6 @@ const TabGroup = ({ club_id }) => {
               onClick={() => {
                 setShowFormAdd(true)
               }}
-              className='btn-add-tabmember'
               variant="contained"
               style={{ background: '#1B264D' }}>
               Thêm nhóm
@@ -101,8 +111,14 @@ const TabGroup = ({ club_id }) => {
         </div>
 
       </div>
-      <div>
-        <Group />
+      <div className='div-list-tabgroup'>
+        {groups.length > 0 ? 
+        groups.map(group => (
+          <Group key={group._id} data={group}/>
+        )) :
+        (<div style={{textAlign: 'center', marginTop: 100}}>
+          <h3>Câu lạc bộ chưa có nhóm nào...</h3>
+        </div>)}
       </div>
     </div>
   )

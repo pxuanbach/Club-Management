@@ -1,11 +1,21 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { Avatar, Divider, Button, Tooltip } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
+import './Group.css'
 
-const Group = ({group}) => {
+const Group = ({ data }) => {
+
+    const handleUpdateGroup = (e) => {
+
+    }
+
+    const handleDeleteGroup = (e) => {
+
+    }
 
     const columns = [
-        { field: '_id', headerName: 'ID', width: 70, flex: 0.5 },
         {
             field: 'img_url',
             headerName: 'Hình đại diện',
@@ -36,23 +46,39 @@ const Group = ({group}) => {
         { field: 'email', headerName: 'Email', flex: 1.5 },
     ];
 
-    const rows = [
-        { _id: 1, fullName: 'Nguyễn Văn A', avata: '', MSSV: '19521345', phoneNumber: '0123456789', email: '19521234@gm.uit.edu.vn' },
-        { _id: 2, fullName: 'Nguyễn Văn A', MSSV: '19521345', phoneNumber: '0123456789', email: '19521234@gm.uit.edu.vn' },
-        { _id: 3, fullName: 'Nguyễn Văn A', MSSV: '19521345', phoneNumber: '0123456789', email: '19521234@gm.uit.edu.vn' },
-
-    ];
-
     return (
         <div>
-            <h3 className='title-tabgroup'>Ban nội dung</h3>
-            <div style={{ height: 267, width: '95%', marginTop: '10px', marginLeft: '20px' }}>
+            <div className='header-group'>
+                <h3 className='title-group'>{data.name}</h3>
+                <div className='control-group'>
+                    <Tooltip title='Chỉnh sửa' placement='right-start'>
+                        <Button
+                            onClick={handleUpdateGroup}
+                            variant="outlined"
+                            disableElevation
+                        >
+                            <EditIcon sx={{ color: '#1B264D' }} />
+                        </Button>
+                    </Tooltip>
+                    <Tooltip title='Xóa nhóm' placement='right-start'>
+                        <Button
+                            onClick={handleDeleteGroup}
+                            variant="outlined"
+                            disableElevation
+                        >
+                            <ClearIcon sx={{ color: '#1B264D' }} />
+                        </Button>
+                    </Tooltip>
+                </div>
+            </div>
+            <div style={{ marginTop: '10px', marginLeft: '20px' }}>
                 <DataGrid
                     getRowId={(r) => r._id}
-                    rows={rows}
+                    rows={data.members}
                     columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
+                    pageSize={3}
+                    rowsPerPageOptions={[3]}
+                    autoHeight
                     checkboxSelection
                 />
             </div>

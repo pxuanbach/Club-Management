@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Avatar, TextField, Button, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import io from 'socket.io-client'
@@ -12,6 +12,7 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
     const [nameErr, setNameErr] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
     const [members, setMembers] = useState([])
+    const [membersSelected, setMembersSelected] = useState([])
 
     const handleClose = () => {
         setShowFormAdd(false)
@@ -19,7 +20,20 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
 
     const handleSave = (event) => {
         event.preventDefault();
-        console.log(name)
+        setNameErr('')
+        if (name) {
+            setIsSuccess(true)
+            socket.emit('create-group',
+                club_id, 
+                name, 
+                membersSelected,
+                () => {
+                    setIsSuccess(false)
+                }
+            )
+        } else {
+            setNameErr('Tên nhóm trống')
+        }
     }
 
     useEffect(() => {
@@ -83,6 +97,7 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={(event) => {
+                            setNameErr('')
                             setName(event.target.value)
                         }}
                         helperText={nameErr}
@@ -96,6 +111,13 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
                         columns={columns}
                         pageSize={4}
                         rowsPerPageOptions={[4]}
+                        onSelectionModelChange={(ids) => {
+                            const selectedIDs = new Set(ids)
+                            const selectedRows = members.filter((row) =>
+                                selectedIDs.has(row._id),
+                            );
+                            setMembersSelected(selectedRows)
+                        }}
                     />
                     <div className='stack-right'>
                         <Button disabled={isSuccess}
