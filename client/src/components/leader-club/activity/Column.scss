@@ -1,0 +1,60 @@
+.column{
+    flex: 0 0 auto;
+    width: 280px;
+    height: calc(90vh);
+    margin-left: 10px;
+    > * {
+        background-color: #ebecf0;
+        color: #333;
+        padding: 0 10px;
+    }
+    header.column-drag-handle{
+        padding-left: 15px;
+        height: 46px;
+        line-height: 46px;
+        font-size: 16px;
+        font-weight: bold;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        cursor: pointer;
+    }
+    footer{
+        padding-left: 15px;
+        height: 46px;
+        line-height: 46px;
+        font-weight: bold;
+        cursor: pointer;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    .card-list{
+        list-style-type: none;
+        margin: 0;
+        max-height: calc(70%);
+        overflow-y: auto;
+        &::-webkit-scrollbar{
+            -webkit-appearance: none;
+        }
+        &::-webkit-scrollbar:vertical{
+            width: 11px;
+        }
+        &::-webkit-scrollbar-thumb{
+            background-color: darken(#ebecf0, 15);
+            border-right: 5px solid #ebecf0;
+        }
+        .card-ghost {
+            transition: transform 0.18s ease;
+            transform: rotateZ(5deg)
+        }
+          
+        .card-ghost-drop{
+        transition: transform 0.18s ease-in-out;
+        transform: rotateZ(0deg)
+        }
+        .card-drop-preview {
+            background-color: rgba(150, 150, 200, 0.1);
+            border: 1px dashed #abc;
+            margin: 5px;
+        }
+    }
+}

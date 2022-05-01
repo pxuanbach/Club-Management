@@ -1,71 +1,53 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import {Container, Draggable} from 'react-smooth-dnd'
 import './FormActivity.scss'
-import image1 from '../../../assets/anhminhhoa.jpg' 
-const FormActivity = ({ setShowForm }) => {
+import Column from './Column'
+import {mapOrder} from './utilities/sort'
+import { initialData } from './action/initialData'
+import {isEmpty} from 'lodash'
 
+const FormActivity = ({ setShowForm }) => {
+  const [board, setBoard] = useState({})
+  const [columns,setColumns] = useState([])
+
+  useEffect(() => {
+    const boardFromDB = initialData.boards.find(board => board.id === 'board-1')
+    if(boardFromDB){
+      setBoard(boardFromDB)
+      //sort column
+
+
+      setColumns(mapOrder(boardFromDB.columns,boardFromDB.columnOrder,'id'))
+    }
+  },[])
+
+  if(isEmpty(board)){
+    return <div className='not-found' style={{'padding':'60px', 'color':'blue'}}>Board not found</div>
+  }
+  const onColumnDrop = (dropResult) => {
+    console.log(dropResult)
+  }
   return (
     <div  className='div-detail-activity'>
       <div className='board-columns'>
+        <Container
+          orientation='horizontal'
+          onDrop={onColumnDrop}
+          getChildPayload={index => columns[index]}
+          dragHandleSelector=".column-drag-handle"
+          dropPlaceholder={{
+            animationDuration: 150,
+            showOnTop: true,
+            className: 'column-drop-preview'
+          }}
         
-        <div className='column'>
-          <header>Cần làm</header>
-          <ul>
-            <li>
-              <img src={image1}/>
-              Title: Làm slide
-            </li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-          </ul>
-          <footer>Thêm thẻ khác</footer>
-        </div>
-        <div className='column'>
-          <header>Đang làm</header>
-          <ul>
-            <li>
-              <img src=''/>
-              Title: Làm slide
-            </li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-          </ul>
-          <footer>Thêm thẻ khác</footer>
-        </div>
-        <div className='column'>
-          <header>Đã xong</header>
-          <ul>
-            <li>
-              <img src=''/>
-              Title: Làm slide
-            </li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-          </ul>
-          <footer>Thêm thẻ khác</footer>
-        </div>
-        <div className='column'>
-          <header>Tổng kết</header>
-          <ul>
-            <li>
-              <img src=''/>
-              Title: Làm slide
-            </li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-            <li>Add what you'd like to work on below</li>
-          </ul>
-          <footer>Thêm thẻ khác</footer>
-        </div>
-
-
+        >
+          {columns.map((column, index) => (
+            <Draggable key={index}>
+              <Column column={column} />
+            </Draggable>
+          ))}
+        </Container>
       </div>
     </div>
   )
