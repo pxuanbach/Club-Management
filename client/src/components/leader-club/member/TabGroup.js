@@ -40,6 +40,8 @@ const TabGroup = ({ club_id }) => {
 
   useEffect(() => {
     socket = io(ENDPT);
+    socket.emit('get-user', club_id, 'leader')
+    socket.emit('get-groups', club_id)
     return () => {
       socket.emit('disconnect');
       socket.off();
@@ -47,19 +49,20 @@ const TabGroup = ({ club_id }) => {
   }, [])
 
   useEffect(() => {
-    socket.emit('get-user', club_id, 'leader')
-    socket.emit('get-groups', club_id)
     socket.on('output-leader', res => {
       setLeader(res)
     })
+  }, [leader])
+
+  useEffect(() => {
     socket.on('output-groups', grs => {
       setGroups(grs)
     })
-  }, [])
-
-  useEffect(() => {
     socket.on('group-created', newGroup => {
       setGroups([...groups, newGroup])
+    })
+    socket.on('group-deleted', delGroup => {
+      setGroups(groups.filter(group => group._id !== delGroup._id))
     })
   }, [groups])
 
@@ -114,10 +117,10 @@ const TabGroup = ({ club_id }) => {
       <div className='div-list-tabgroup'>
         {groups.length > 0 ? 
         groups.map(group => (
-          <Group key={group._id} data={group}/>
+          <Group key={group._id} data={group} socket={socket}/>
         )) :
         (<div style={{textAlign: 'center', marginTop: 100}}>
-          <h3>Câu lạc bộ chưa có nhóm nào...</h3>
+          <span>Câu lạc bộ chưa có nhóm nào...</span>
         </div>)}
       </div>
     </div>

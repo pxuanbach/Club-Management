@@ -10,7 +10,6 @@ let socket
 const AddGroup = ({ club_id, setShowFormAdd }) => {
     const [name, setName] = useState();
     const [nameErr, setNameErr] = useState('');
-    const [isSuccess, setIsSuccess] = useState(false);
     const [members, setMembers] = useState([])
     const [membersSelected, setMembersSelected] = useState([])
 
@@ -22,15 +21,15 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
         event.preventDefault();
         setNameErr('')
         if (name) {
-            setIsSuccess(true)
+            console.log(club_id, name, membersSelected)
             socket.emit('create-group',
-                club_id, 
-                name, 
-                membersSelected,
-                () => {
-                    setIsSuccess(false)
+                {
+                    club_id: club_id, 
+                    name: name, 
+                    members: membersSelected
                 }
             )
+            setShowFormAdd(false)
         } else {
             setNameErr('Tên nhóm trống')
         }
@@ -38,19 +37,20 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
 
     useEffect(() => {
         socket = io(ENDPT);
+        socket.emit('get-members-leader-treasurer', club_id)
         return () => {
+            setMembersSelected([])
             socket.emit('disconnect');
             socket.off();
         }
     }, [])
 
     useEffect(() => {
-        socket.emit('get-members-leader-treasurer', club_id)
         socket.on('output-members-leader-treasurer', users => {
             //console.log('users', users)
             setMembers(users)
         })
-    }, [])
+    }, [members])
 
     const columns = [
         {
@@ -120,13 +120,13 @@ const AddGroup = ({ club_id, setShowFormAdd }) => {
                         }}
                     />
                     <div className='stack-right'>
-                        <Button disabled={isSuccess}
+                        <Button 
                             variant="contained"
                             disableElevation
                             onClick={handleSave}>
                             Lưu
                         </Button>
-                        <Button disabled={isSuccess}
+                        <Button 
                             variant="outlined"
                             disableElevation
                             onClick={handleClose}>

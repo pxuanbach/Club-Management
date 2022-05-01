@@ -5,14 +5,15 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import './Group.css'
 
-const Group = ({ data }) => {
+const Group = ({ data, socket }) => {
 
     const handleUpdateGroup = (e) => {
 
     }
 
     const handleDeleteGroup = (e) => {
-
+        e.preventDefault();
+        socket.emit('delete-group', data._id)
     }
 
     const columns = [

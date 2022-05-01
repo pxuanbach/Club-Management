@@ -215,7 +215,6 @@ const TabMember = ({ club_id }) => {
           <h3 className='name-h4'>Thành viên (x)</h3>
           <div className='div-search-tabmember'>
             <Box
-              component="form"
               sx={{
                 '& > :not(style)': { width: '30ch' },
               }}
