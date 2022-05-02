@@ -3,8 +3,10 @@ import {Container, Draggable} from 'react-smooth-dnd'
 import './FormActivity.scss'
 import Column from './Column'
 import {mapOrder} from './utilities/sort'
+import {applyDrag} from './utilities/dragDrop'
 import { initialData } from './action/initialData'
 import {isEmpty} from 'lodash'
+import 'font-awesome/css/font-awesome.min.css'
 
 const FormActivity = ({ setShowForm }) => {
   const [board, setBoard] = useState({})
@@ -24,8 +26,28 @@ const FormActivity = ({ setShowForm }) => {
   if(isEmpty(board)){
     return <div className='not-found' style={{'padding':'60px', 'color':'blue'}}>Board not found</div>
   }
+
   const onColumnDrop = (dropResult) => {
-    console.log(dropResult)
+    let newColumns = [...columns]
+    newColumns = applyDrag(newColumns, dropResult)
+
+    let newBoard = {...board}
+    newBoard.columnOrder = newColumns.map(c => c.id)
+    newBoard.columns = newColumns
+    setColumns(newColumns)
+    setBoard(newBoard)
+  }
+
+  const onCardDrop = (columnId, dropResult) => {
+    if(dropResult.removedIndex !== null || dropResult.addedIndex !== null){
+      let newColumns = [...columns]
+
+      let currentColumn = newColumns.find( c => c.id === columnId)
+      currentColumn.cards = applyDrag(currentColumn.cards, dropResult)
+      currentColumn.cardOrder = currentColumn.cards.map(i => i.id)
+    
+      setColumns(newColumns)
+    }
   }
   return (
     <div  className='div-detail-activity'>
@@ -44,7 +66,7 @@ const FormActivity = ({ setShowForm }) => {
         >
           {columns.map((column, index) => (
             <Draggable key={index}>
-              <Column column={column} />
+              <Column column={column} onCardDrop={onCardDrop} />
             </Draggable>
           ))}
         </Container>
