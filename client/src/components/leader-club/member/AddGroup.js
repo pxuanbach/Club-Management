@@ -7,8 +7,8 @@ import './AddGroup.css'
 
 let socket
 
-const AddGroup = ({ club_id, setShowFormAdd }) => {
-    const [name, setName] = useState();
+const AddGroup = ({ club_id, setShowFormAdd, group = null }) => {
+    const [name, setName] = useState(group ? group.name : '');
     const [nameErr, setNameErr] = useState('');
     const [members, setMembers] = useState([])
     const [membersSelected, setMembersSelected] = useState([])

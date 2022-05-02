@@ -1,14 +1,17 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { Avatar, Divider, Button, Tooltip } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import './Group.css'
 
 const Group = ({ data, socket }) => {
 
-    const handleUpdateGroup = (e) => {
-
+    const handleAddMembersGroup = (e) => {
+        e.preventDefault();
     }
 
     const handleDeleteGroup = (e) => {
@@ -16,14 +19,27 @@ const Group = ({ data, socket }) => {
         socket.emit('delete-group', data._id)
     }
 
+    const handleDeleteMember = (e, param) => {
+        e.stopPropagation();
+        socket.emit('delete-member-from-group', data._id, param._id) //group_id, member_id
+    }
+
     const columns = [
+        {
+            field: '_id',
+            headerName: 'ID',
+            headerAlign: 'center',
+            align: 'center',
+            flex: 0.5,
+            disableColumnMenu: true,
+        },
         {
             field: 'img_url',
             headerName: 'Hình đại diện',
             disableColumnMenu: true,
             sortable: false,
             align: 'center',
-            flex: 0.6,
+            flex: 0.5,
             renderCell: (value) => {
                 return (
                     <Avatar src={value.row.img_url} />
@@ -35,16 +51,37 @@ const Group = ({ data, socket }) => {
             headerName: 'Họ và tên',
             description: 'This column has a value getter and is not sortable.',
             sortable: false,
-            width: 200,
             flex: 1
         },
-
         {
             field: 'username',
             headerName: 'Mã sinh viên',
             flex: 0.7
         },
-        { field: 'email', headerName: 'Email', flex: 1.5 },
+        { 
+            field: 'email', 
+            headerName: 'Email', 
+            flex: 1.5 
+        },
+        {
+            field: 'btn-delete',
+            headerName: '',
+            align: 'center',
+            flex: 0.4,
+            disableColumnMenu: true,
+            sortable: false,
+            renderCell: (value) => {
+              return (
+                <Tooltip title="Xóa khỏi nhóm" placement="right-start">
+                  <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
+                    handleDeleteMember(event, value.row)
+                  }}>
+                    <ClearIcon/>
+                  </Button>
+                </Tooltip>
+              )
+            }
+          }
     ];
 
     return (
@@ -54,11 +91,11 @@ const Group = ({ data, socket }) => {
                 <div className='control-group'>
                     <Tooltip title='Chỉnh sửa' placement='right-start'>
                         <Button
-                            onClick={handleUpdateGroup}
+                            onClick={handleAddMembersGroup}
                             variant="outlined"
                             disableElevation
                         >
-                            <EditIcon sx={{ color: '#1B264D' }} />
+                            <GroupAddIcon sx={{ color: '#1B264D' }} />
                         </Button>
                     </Tooltip>
                     <Tooltip title='Xóa nhóm' placement='right-start'>
@@ -67,7 +104,7 @@ const Group = ({ data, socket }) => {
                             variant="outlined"
                             disableElevation
                         >
-                            <ClearIcon sx={{ color: '#1B264D' }} />
+                            <DeleteOutlineIcon sx={{ color: '#1B264D' }} />
                         </Button>
                     </Tooltip>
                 </div>
@@ -80,7 +117,6 @@ const Group = ({ data, socket }) => {
                     pageSize={3}
                     rowsPerPageOptions={[3]}
                     autoHeight
-                    checkboxSelection
                 />
             </div>
         </div>

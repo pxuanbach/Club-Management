@@ -15,10 +15,10 @@ module.exports = function (socket, io) {
 
         group.save().then(gr => {
             gr.populate('members')
-            .execPopulate()
-            .then(result => {
-                io.emit('group-created', result)
-            })
+                .execPopulate()
+                .then(result => {
+                    io.emit('group-created', result)
+                })
         })
     })
 
@@ -26,6 +26,22 @@ module.exports = function (socket, io) {
         Group.findByIdAndDelete(group_id).then(result => {
             console.log(result)
             io.emit('group-deleted', result)
+        })
+    })
+
+    socket.on('delete-member-from-group', (group_id, member_id) => {
+        Group.findById(group_id, function (err, doc) {
+            if (err) return;
+            let newMembers = doc.members.filter(member => member.toString() !== member_id)
+            doc.members = newMembers;
+            //console.log(newMembers)
+            doc.save().then(gr => {
+                gr.populate('members')
+                    .execPopulate()
+                    .then(result => {
+                        io.emit('deleted-member-from-group', result)
+                    })
+            })
         })
     })
 }

@@ -64,6 +64,18 @@ const TabGroup = ({ club_id }) => {
     socket.on('group-deleted', delGroup => {
       setGroups(groups.filter(group => group._id !== delGroup._id))
     })
+    socket.on('deleted-member-from-group', gr => {
+      const updateGroups = groups.map((elm) => {
+        if (elm._id === gr._id) {
+          return {
+            ...elm,
+            members: gr.members
+          }
+        }
+        return elm;
+      });
+      setGroups(updateGroups)
+    })
   }, [groups])
 
   return (

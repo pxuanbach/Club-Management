@@ -84,7 +84,7 @@ const ManageClub = () => {
     setClubs(updateClubs)
   }
 
-  const handleDelte = (event, param) => {
+  const handleDelete = (event, param) => {
     event.stopPropagation();
     setClubSelected(param);
     setOpenDialog(true)
@@ -165,7 +165,7 @@ const ManageClub = () => {
         return (
           <Tooltip title="Xóa" placement="right-start">
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-              handleDelte(event, value.row)
+              handleDelete(event, value.row)
             }}>
               <ClearIcon/>
             </Button>
