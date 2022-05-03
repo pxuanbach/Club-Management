@@ -4,6 +4,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import Group from './Group'
 import AddGroup from './AddGroup'
+import UpdateGroup from './UpdateGroup';
+import DeleteGroup from './DeleteGroup';
 import { UserContext } from '../../../UserContext'
 import io from 'socket.io-client'
 import { ENDPT } from '../../../helper/Helper';
@@ -35,8 +37,23 @@ const style = {
 const TabGroup = ({ club_id }) => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
+  const [showFormUpdate, setShowFormUpdate] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [leader, setLeader] = useState();
-  const [groups, setGroups] = useState([])
+  const [groups, setGroups] = useState([]);
+  const [groupSelected, setGroupSelected] = useState();
+
+  const handleUpdateGroup = (event, group) => {
+    event.preventDefault();
+    setGroupSelected(group)
+    setShowFormUpdate(true)
+  }
+
+  const handleDeleteGroup = (event, group) => {
+    event.preventDefault();
+    setGroupSelected(group)
+    setShowDialog(true)
+  }
 
   useEffect(() => {
     socket = io(ENDPT);
@@ -89,9 +106,27 @@ const TabGroup = ({ club_id }) => {
         }}
       >
         <Box sx={style}>
-          <AddGroup club_id={club_id} setShowFormAdd={setShowFormAdd} />
+          <AddGroup club_id={club_id} setShow={setShowFormAdd} />
         </Box>
       </Modal>
+      <Modal
+        open={showFormUpdate}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormUpdate(false);
+        }}
+      >
+        <Box sx={style}>
+          <UpdateGroup club_id={club_id} group={groupSelected} setShow={setShowFormUpdate}/>
+        </Box>
+      </Modal>
+      <DeleteGroup
+        open={showDialog}
+        setOpen={setShowDialog}
+        socket={socket}
+        group={groupSelected}
+      />
       <div className='div-header-tabgroup'>
         <div className='div-search-tabgroup'>
           <Box
@@ -127,13 +162,22 @@ const TabGroup = ({ club_id }) => {
 
       </div>
       <div className='div-list-tabgroup'>
-        {groups.length > 0 ? 
-        groups.map(group => (
-          <Group key={group._id} data={group} socket={socket}/>
-        )) :
-        (<div style={{textAlign: 'center', marginTop: 100}}>
-          <span>Câu lạc bộ chưa có nhóm nào...</span>
-        </div>)}
+        {groups.length > 0 ?
+          groups.map(group => (
+            <Group key={group._id}
+              data={group}
+              socket={socket}
+              handleDeleteGroup={(event) => {
+                handleDeleteGroup(event, group)
+              }}
+              handleUpdateGroup={(event) => {
+                handleUpdateGroup(event, group)
+              }}
+            />
+          )) :
+          (<div style={{ textAlign: 'center', marginTop: 100 }}>
+            <span>Câu lạc bộ chưa có nhóm nào...</span>
+          </div>)}
       </div>
     </div>
   )

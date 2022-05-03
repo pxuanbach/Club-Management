@@ -3,22 +3,11 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Avatar, Divider, Button, Tooltip } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import './Group.css'
 
-const Group = ({ data, socket }) => {
-
-    const handleAddMembersGroup = (e) => {
-        e.preventDefault();
-    }
-
-    const handleDeleteGroup = (e) => {
-        e.preventDefault();
-        socket.emit('delete-group', data._id)
-    }
-
+const Group = ({ data, socket, handleDeleteGroup, handleUpdateGroup }) => {
+    
     const handleDeleteMember = (e, param) => {
         e.stopPropagation();
         socket.emit('delete-member-from-group', data._id, param._id) //group_id, member_id
@@ -91,11 +80,11 @@ const Group = ({ data, socket }) => {
                 <div className='control-group'>
                     <Tooltip title='Chỉnh sửa' placement='right-start'>
                         <Button
-                            onClick={handleAddMembersGroup}
+                            onClick={handleUpdateGroup}
                             variant="outlined"
                             disableElevation
                         >
-                            <GroupAddIcon sx={{ color: '#1B264D' }} />
+                            <EditIcon sx={{ color: '#1B264D' }} />
                         </Button>
                     </Tooltip>
                     <Tooltip title='Xóa nhóm' placement='right-start'>

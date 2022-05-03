@@ -114,7 +114,7 @@ module.exports = function (socket, io) {
         })
     })
 
-    socket.on('get-members-leader-treasurer', club_id => {
+    socket.on('get-members-leader-treasurer', (club_id) => {
         Club.findById(club_id).then(club => {
             let arrId = club.members
             arrId.push(club.leader._id)

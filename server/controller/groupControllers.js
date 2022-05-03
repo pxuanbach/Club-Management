@@ -1,4 +1,13 @@
 const Group = require('../models/Group')
+const Club = require('../models/Club')
+const User = require('../models/User')
+const {ConvertUsers} = require('../helper/ConvertDataHelper')
+
+function userExists(arr, id) {
+    return arr.some(function(el) {
+      return el._id === id;
+    }); 
+  }
 
 module.exports = function (socket, io) {
     socket.on('get-groups', club_id => {
@@ -9,8 +18,34 @@ module.exports = function (socket, io) {
             })
     })
 
-    socket.on('create-group', ({ club_id, name, members }) => {
+    socket.on('get-members-not-in-group', (club_id, members) => {
+        console.log(members)
+        Club.findById(club_id).then(club => {
+            let arrId = club.members
+            if (!userExists(members, club.leader._id)) {
+                arrId.push(club.leader._id)
+            }
+            if (!userExists(members, club.treasurer._id)) {
+                arrId.push(club.treasurer._id)
+            }
+            
+            arrId = arrId.filter(el => {
+                return !members.find(obj => {
+                    return el === obj._id;
+                })
+            })
 
+            User.find({ 
+                _id: { 
+                    $in: arrId
+                } 
+            }).then(users => {
+                io.emit('output-members-not-in-group', ConvertUsers(users));
+            })
+        })
+    })
+
+    socket.on('create-group', ({ club_id, name, members }) => {
         let group = new Group({ club: club_id, name, members })
 
         group.save().then(gr => {
@@ -22,10 +57,11 @@ module.exports = function (socket, io) {
         })
     })
 
-    socket.on('delete-group', group_id => {
+    socket.on('delete-group', (group_id, callback) => {
         Group.findByIdAndDelete(group_id).then(result => {
             console.log(result)
             io.emit('group-deleted', result)
+            callback()
         })
     })
 

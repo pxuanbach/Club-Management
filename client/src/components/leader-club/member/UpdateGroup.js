@@ -3,12 +3,11 @@ import { Avatar, TextField, Button, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import io from 'socket.io-client'
 import { ENDPT } from '../../../helper/Helper';
-import './AddGroup.css'
 
 let socket
 
-const AddGroup = ({ club_id, setShow }) => {
-    const [name, setName] = useState();
+const UpdateGroup = ({ club_id, group, setShow }) => {
+    const [name, setName] = useState(group?.name);
     const [nameErr, setNameErr] = useState('');
     const [members, setMembers] = useState([]);
     const [membersSelected, setMembersSelected] = useState([])
@@ -17,28 +16,14 @@ const AddGroup = ({ club_id, setShow }) => {
         setShow(false)
     }
 
-    const handleSave = (event) => {
-        event.preventDefault();
-        //console.log(members)
-        setNameErr('')
-        if (name) {
-            console.log(club_id, name, membersSelected)
-            socket.emit('create-group',
-                {
-                    club_id: club_id,
-                    name: name,
-                    members: membersSelected
-                }
-            )
-            handleClose();
-        } else {
-            setNameErr('Tên nhóm trống')
-        }
+    const handleSave = (e) => {
+        e.preventDefault();
+
     }
 
     useEffect(() => {
         socket = io(ENDPT);
-        socket.emit('get-members-leader-treasurer', club_id)
+        socket.emit('get-members-not-in-group', club_id, group.members)
         return () => {
             setMembersSelected([])
             socket.emit('disconnect');
@@ -47,7 +32,7 @@ const AddGroup = ({ club_id, setShow }) => {
     }, [])
 
     useEffect(() => {
-        socket.on('output-members-leader-treasurer', users => {
+        socket.on('output-members-not-in-group', users => {
             setMembers(users)
         })
     }, [members])
@@ -139,4 +124,4 @@ const AddGroup = ({ club_id, setShow }) => {
     )
 }
 
-export default AddGroup
+export default UpdateGroup
