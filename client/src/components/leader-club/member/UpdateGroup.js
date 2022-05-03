@@ -18,7 +18,17 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
 
     const handleSave = (e) => {
         e.preventDefault();
-
+        setNameErr('')
+        if (name) {
+            socket.emit('update-group', {
+                group_id: group._id,
+                name: name,
+                members: membersSelected
+            })
+            handleClose();
+        } else {
+            setNameErr('Tên nhóm trống')
+        }
     }
 
     useEffect(() => {
@@ -71,7 +81,7 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
     return (
         <div>
             <h2 id="modal-modal-title">
-                Thêm nhóm mới
+                Cập nhật thông tin nhóm
             </h2>
             <div id="modal-modal-description">
                 <div className='addgroup-modal'>
@@ -88,6 +98,7 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
                         helperText={nameErr}
                         error={nameErr}
                     />
+                    <h3>Thêm thành viên mới</h3>
                     <DataGrid
                         getRowId={(r) => r._id}
                         checkboxSelection

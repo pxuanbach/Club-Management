@@ -1,13 +1,13 @@
 const Group = require('../models/Group')
 const Club = require('../models/Club')
 const User = require('../models/User')
-const {ConvertUsers} = require('../helper/ConvertDataHelper')
+const { ConvertUsers } = require('../helper/ConvertDataHelper')
 
 function userExists(arr, id) {
-    return arr.some(function(el) {
-      return el._id === id;
-    }); 
-  }
+    return arr.some(function (el) {
+        return el._id === id;
+    });
+}
 
 module.exports = function (socket, io) {
     socket.on('get-groups', club_id => {
@@ -19,7 +19,7 @@ module.exports = function (socket, io) {
     })
 
     socket.on('get-members-not-in-group', (club_id, members) => {
-        console.log(members)
+        //console.log(members)
         Club.findById(club_id).then(club => {
             let arrId = club.members
             if (!userExists(members, club.leader._id)) {
@@ -28,17 +28,17 @@ module.exports = function (socket, io) {
             if (!userExists(members, club.treasurer._id)) {
                 arrId.push(club.treasurer._id)
             }
-            
+
             arrId = arrId.filter(el => {
                 return !members.find(obj => {
                     return el === obj._id;
                 })
             })
 
-            User.find({ 
-                _id: { 
+            User.find({
+                _id: {
                     $in: arrId
-                } 
+                }
             }).then(users => {
                 io.emit('output-members-not-in-group', ConvertUsers(users));
             })
@@ -76,6 +76,27 @@ module.exports = function (socket, io) {
                     .execPopulate()
                     .then(result => {
                         io.emit('deleted-member-from-group', result)
+                    })
+            })
+        })
+    })
+
+    socket.on('update-group', ({ group_id, name, members }) => {
+        Group.findById(group_id, function (err, doc) {
+            if (err) return;
+            doc.name = name;
+            
+            members.forEach(elm => {
+                doc.members.push(elm._id)
+            });
+            //console.log(doc.members)
+            
+            doc.save().then(gr => {
+                //console.log(gr)
+                gr.populate('members')
+                    .execPopulate()
+                    .then(result => {
+                        io.emit('group-updated', result)
                     })
             })
         })

@@ -93,6 +93,19 @@ const TabGroup = ({ club_id }) => {
       });
       setGroups(updateGroups)
     })
+    socket.on('group-updated', gr => {
+      const updateGroups = groups.map((elm) => {
+        if (elm._id === gr._id) {
+          return {
+            ...elm,
+            name: gr.name,
+            members: gr.members
+          }
+        }
+        return elm;
+      });
+      setGroups(updateGroups)
+    })
   }, [groups])
 
   return (
