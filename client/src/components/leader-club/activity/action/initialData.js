@@ -62,7 +62,7 @@ export const initialData = {
                 {
                     id:'column-4',
                     boardId:'board-1',
-                    title: 'Tổng kết',
+                    title: 'Ghi chú',
                     cardOrder:['card-12', 'card-13','card-14','card-15'],
                     cards:[
 
