@@ -42,6 +42,7 @@ const TabGroup = ({ club_id }) => {
   const [leader, setLeader] = useState();
   const [groups, setGroups] = useState([]);
   const [groupSelected, setGroupSelected] = useState();
+  const [search, setSearch] = useState();
 
   const handleUpdateGroup = (event, group) => {
     event.preventDefault();
@@ -53,6 +54,11 @@ const TabGroup = ({ club_id }) => {
     event.preventDefault();
     setGroupSelected(group)
     setShowDialog(true)
+  }
+
+  const handleSearchGroups = (event) => {
+    event.preventDefault();
+    socket.emit('search-groups', club_id, search)
   }
 
   useEffect(() => {
@@ -106,6 +112,9 @@ const TabGroup = ({ club_id }) => {
       });
       setGroups(updateGroups)
     })
+    socket.on('groups-searched', grs => {
+      setGroups(grs)
+    })
   }, [groups])
 
   return (
@@ -131,7 +140,7 @@ const TabGroup = ({ club_id }) => {
         }}
       >
         <Box sx={style}>
-          <UpdateGroup club_id={club_id} group={groupSelected} setShow={setShowFormUpdate}/>
+          <UpdateGroup club_id={club_id} group={groupSelected} setShow={setShowFormUpdate} />
         </Box>
       </Modal>
       <DeleteGroup
@@ -147,7 +156,18 @@ const TabGroup = ({ club_id }) => {
             sx={{
               '& > :not(style)': { width: '30ch' },
             }}>
-            <CustomTextField id="search-field-tabmember" label="Tìm kiếm nhóm" variant="standard" />
+            <CustomTextField
+              value={search}
+              id="search-field-tabmember"
+              label="Tìm kiếm nhóm"
+              variant="standard"
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+              onKeyPress={event => 
+                event.key === 'Enter' ? handleSearchGroups(event) : null
+              }
+            />
           </Box>
 
           <Tooltip title='Tìm kiếm' placement='right-start'>
@@ -155,6 +175,7 @@ const TabGroup = ({ club_id }) => {
               className='btn-search3'
               variant="text"
               disableElevation
+              onClick={handleSearchGroups}
             >
               <SearchIcon sx={{ color: '#1B264D' }} />
             </Button>

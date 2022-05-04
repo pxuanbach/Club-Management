@@ -12,6 +12,7 @@ function userExists(arr, id) {
 module.exports = function (socket, io) {
     socket.on('get-groups', club_id => {
         Group.find({ club: club_id })
+            .sort({ name: 1 })
             .populate('members')
             .then(result => {
                 io.emit('output-groups', result)
@@ -85,12 +86,12 @@ module.exports = function (socket, io) {
         Group.findById(group_id, function (err, doc) {
             if (err) return;
             doc.name = name;
-            
+
             members.forEach(elm => {
                 doc.members.push(elm._id)
             });
             //console.log(doc.members)
-            
+
             doc.save().then(gr => {
                 //console.log(gr)
                 gr.populate('members')
@@ -100,5 +101,18 @@ module.exports = function (socket, io) {
                     })
             })
         })
+    })
+
+    socket.on('search-groups', (club_id, search) => {
+        Group.find({
+            $and: [
+                { club: club_id },
+                { name: { $regex: search } }
+            ]
+        }).sort({ name: 1 })
+            .populate('members')
+            .then(grs => {
+                io.emit('groups-searched', grs)
+            })
     })
 }
