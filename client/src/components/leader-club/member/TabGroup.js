@@ -35,6 +35,7 @@ const style = {
 };
 
 const TabGroup = ({ club_id }) => {
+  let isLeader = false;
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
@@ -117,6 +118,9 @@ const TabGroup = ({ club_id }) => {
     })
   }, [groups])
 
+  if (user) {
+    isLeader = user._id === leader?._id;
+  }
   return (
     <div className='div-tabgroup'>
       <Modal
@@ -169,7 +173,6 @@ const TabGroup = ({ club_id }) => {
               }
             />
           </Box>
-
           <Tooltip title='Tìm kiếm' placement='right-start'>
             <Button
               className='btn-search3'
@@ -182,8 +185,7 @@ const TabGroup = ({ club_id }) => {
           </Tooltip>
         </div>
         <div className='div-action-tabgroup'>
-          {user?.username.includes('admin')
-            || user?._id === leader?._id
+          {isLeader
             ? (<Button
               onClick={() => {
                 setShowFormAdd(true)
@@ -201,6 +203,7 @@ const TabGroup = ({ club_id }) => {
             <Group key={group._id}
               data={group}
               socket={socket}
+              isLeader={isLeader}
               handleDeleteGroup={(event) => {
                 handleDeleteGroup(event, group)
               }}

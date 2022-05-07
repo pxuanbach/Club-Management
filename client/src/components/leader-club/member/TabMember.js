@@ -34,6 +34,7 @@ const style = {
 };
 
 const TabMember = ({ club_id }) => {
+  let isLeader = false;
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [search, setSearch] = useState()
@@ -79,6 +80,7 @@ const TabMember = ({ club_id }) => {
     socket.on('output-treasurer', res => {
       setTreasurer(res)
     })
+    //console.log(user._id === leader._id)
   }, [])
 
   useEffect(() => {
@@ -174,6 +176,9 @@ const TabMember = ({ club_id }) => {
     { field: 'email', headerName: 'Email', flex: 1.5 },
   ];
 
+  if (user) {
+    isLeader = user._id === leader?._id;
+  }
   return (
     <div className='div-tabmember'>
       <Modal
@@ -238,8 +243,7 @@ const TabMember = ({ club_id }) => {
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            {user?.username.includes('admin')
-              || user?._id === leader?._id
+            {isLeader
               ? (<Button
                 onClick={() => {
                   setShowFormAdd(true)
@@ -256,8 +260,7 @@ const TabMember = ({ club_id }) => {
           <DataGrid
             getRowId={(r) => r._id}
             rows={members}
-            columns={user?.username.includes('admin')
-              || user?._id === leader?._id
+            columns={isLeader
               ? leaderColumns : memberColumns}
             pageSize={5}
             rowsPerPageOptions={[5]}

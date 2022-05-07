@@ -232,10 +232,9 @@ module.exports = function (socket, io) {
                 })
                 //console.log('new member:', newMembers)
                 doc.members = newMembers;
-                //console.log('except new leader id:',doc.members)
-                console.log('current leader id: ', cur_leader_id)
+                //console.log('current leader id: ', cur_leader_id)
                 doc.members.push(cur_leader_id);
-                console.log('add cur leader id:', doc.members)
+                //console.log('add cur leader id:', doc.members)
 
                 doc.save().then(() => {
                     io.emit('promoted-to-leader', user)
@@ -258,9 +257,9 @@ module.exports = function (socket, io) {
                 })
                 doc.members = newMembers;
                 //console.log('except new treasurer id:',doc.members)
-                console.log('current treasurer id: ', cur_treasurer_id)
+                //console.log('current treasurer id: ', cur_treasurer_id)
                 doc.members.push(cur_treasurer_id);
-                console.log('add cur treasurer id:', doc.members)
+                //console.log('add cur treasurer id:', doc.members)
 
                 doc.save().then(() => {
                     io.emit('promoted-to-treasurer', user)
@@ -275,7 +274,7 @@ module.exports.verifyclub = async (req, res, next) => {
 
     const club = await Club.findById(club_id)
     if (club) {
-        console.log(club)
+        //console.log(club)
         if (club.isblocked) {
             res.status(400).json({ club: 'blocked' })
         } else {
