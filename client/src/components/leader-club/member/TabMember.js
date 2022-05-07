@@ -99,6 +99,7 @@ const TabMember = ({ club_id }) => {
     {
       field: 'img_url',
       headerName: 'Hình đại diện',
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       align: 'center',
@@ -149,6 +150,7 @@ const TabMember = ({ club_id }) => {
     {
       field: 'img_url',
       headerName: 'Hình đại diện',
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       align: 'center',

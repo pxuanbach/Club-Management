@@ -85,6 +85,7 @@ const Group = ({ data, socket, isLeader, handleDeleteGroup, handleUpdateGroup })
         {
             field: 'img_url',
             headerName: 'Hình đại diện',
+            headerAlign: 'center',
             disableColumnMenu: true,
             sortable: false,
             align: 'center',

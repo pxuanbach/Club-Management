@@ -48,7 +48,7 @@ const Club = () => {
             <Member club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/fund`}>
-            <Fund />
+            <Fund club_id={club_id}/>
           </Route>
         </Switch>
       </div>
