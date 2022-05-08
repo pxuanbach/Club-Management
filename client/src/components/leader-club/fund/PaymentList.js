@@ -3,17 +3,18 @@ import { DataGrid } from '@mui/x-data-grid';
 import Chip from '@mui/material/Chip';
 
 const rows = [
-  { id: 1, content: 'Nguyễn Tiến Đạt - đóng tiền quỹ', type: 'Thu', money: 100000, time: '14/04/2022' },
-  { id: 2, content: 'Nguyễn Tiến Đạt - đóng tiền quỹ', type: 'Thu', money: 100000, time: '14/04/2022' },
-  { id: 3, content: 'Tiền mua đồng phục', type: 'Chi', money: 100000, time: '14/04/2022' },
-  { id: 4, content: 'Tiền mua dụng cụ', type: 'Chi', money: 100000, time: '14/04/2022' },
-  { id: 5, content: 'Tiền mua dụng cụ', type: 'Chi', money: 100000, time: '14/04/2022' },
+  { _id: 1, content: 'Nguyễn Tiến Đạt - đóng tiền quỹ', type: 'Thu', total: 100000, createAt: '14/04/2022', author: { name: 'Phạm Xuân Bách'} },
+  { _id: 2, content: 'Nguyễn Tiến Đạt - đóng tiền quỹ', type: 'Thu', total: 100000, createAt: '14/04/2022', author: { name: 'Nguyễn Tiến Đạt'} },
+  { _id: 3, content: 'Tiền mua đồng phục', type: 'Chi', total: 100000, createAt: '14/04/2022', author: { name: 'Nguyễn Tiến Đạt'} },
+  { _id: 4, content: 'Tiền mua dụng cụ', type: 'Chi', total: 100000, createAt: '14/04/2022', author: { name: 'Nguyễn Tiến Đạt'} },
+  { _id: 5, content: 'Tiền mua dụng cụ', type: 'Chi', total: 100000, createAt: '14/04/2022', author: { name: 'Nguyễn Ngọc Thịnh'} },
+  { _id: 6, content: 'Tiền mua dụng cụ', type: 'Chi', total: 100000, createAt: '14/04/2022', author: { name: 'Hồ Quang Linh'} },
 ];
 
 export default function DataTable() {
   const columns = [
     {
-      field: 'id',
+      field: '_id',
       headerName: 'ID',
       align: 'center',
       headerAlign: 'center',
@@ -23,7 +24,7 @@ export default function DataTable() {
       field: 'content',
       headerName: 'Nội dung',
       sortable: false,
-      flex: 1.5
+      flex: 1.2
     },
     {
       field: 'type',
@@ -32,7 +33,6 @@ export default function DataTable() {
       headerAlign: 'center',
       flex: 0.5,
       renderCell: (value) => {
-
         return (
           <Chip sx={{p: 1, fontSize: 14}}
             label={value.row.type}
@@ -42,26 +42,39 @@ export default function DataTable() {
       }
     },
     {
-      field: 'money',
-      headerName: 'Số tiền đóng',
+      field: 'createAt',
+      headerName: 'Thời gian',
+      flex: 0.6,
+    },
+    {
+      field: 'total',
+      headerName: 'Số tiền',
       type: 'number',
       flex: 0.5
 
     },
     {
-      field: 'link',
-      headerName: 'Liên kết',
+      field: 'file_url',
+      headerName: 'Tệp liên kết',
       flex: 0.7
     },
+    {
+      field: 'author',
+      headerName: 'Người tạo',
+      flex: 0.7,
+      valueGetter: (value) => value.row.author.name
+    }
   ];
 
   return (
-    <div style={{ height: 400, width: '95%' }}>
+    <div style={{ width: '95%' }}>
       <DataGrid
+        getRowId={(r) => r._id}
         rows={rows}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
+        autoHeight
       />
     </div>
   );

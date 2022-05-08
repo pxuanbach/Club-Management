@@ -4,18 +4,6 @@
     display: flex;
     justify-content: flex-end;
 }
-.div-todo-fund button{
-    margin-right: 10px;
-    width: 100px;
-    height: 45px;
-    background-color: #1B264D;
-    color: white;
-    font-weight: 500;
-}
-.div-todo-fund button:hover{
-    color: #1B264D;
-    border: 1px solid #1B264D;
-}
-.div-todo-fund button:last-child{
-    margin-right: 0px;
+.info-fund{
+    margin-bottom: 15px;
 }

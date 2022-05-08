@@ -115,3 +115,19 @@
     height: 45px;
 
 }
+.fund-type{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+}
+.fund-type.plus{
+    background-color: #2E7D32;
+}
+.fund-type.minus{
+    background-color: #D32F2F;
+}
