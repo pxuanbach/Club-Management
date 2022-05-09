@@ -1,0 +1,27 @@
+.div-detail-activity{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(100, 100, 207);
+    margin-top: -20px;
+  
+
+}
+
+.board-columns{
+    padding-top: 100px;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+    .column-drop-preview {
+        background-color: rgba(150, 150, 200, 0.1);
+        border: 1px dashed #abc;
+        margin: 5px 45px 5px 5px;
+    }
+    .icon{
+        font-size: 14px;
+        margin-right: 3px;
+    }
+    
+
+   
+}

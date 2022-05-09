@@ -115,3 +115,11 @@
     height: 45px;
 
 }
+
+@media only screen  and (max-width: 63.9375em){
+    .status-card{
+        margin-right: 0;
+
+    }
+  
+  }

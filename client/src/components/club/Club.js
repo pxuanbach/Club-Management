@@ -16,7 +16,7 @@ const Club = () => {
 
   return (
     <div className='club'>
-      <div >
+      <div className='div-left-club'>
       <NavbarClub/>
       </div>
       <div className="div-right-club">
