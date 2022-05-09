@@ -5,5 +5,31 @@
     justify-content: flex-end;
 }
 .info-fund{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     margin-bottom: 15px;
+}
+.fund-uploadfile{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.total-suggest{
+    margin-top: 5px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.total-suggest.none{
+    display: none;
+}
+.total-suggest-item{
+    width: min-content;
+    text-decoration: underline;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent;
 }

@@ -79,7 +79,7 @@ const Fund = ({club_id}) => {
         }}
       >
         <Box sx={style}>
-          <AddFund setShowFormAdd={setShowFormAddFund} />
+          <AddFund setShowFormAdd={setShowFormAddFund} socket={socket}/>
         </Box>
       </Modal>
       <div>

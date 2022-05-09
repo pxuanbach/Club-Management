@@ -1,40 +1,81 @@
-import React, {useState, useRef} from 'react'
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import React, { useState, useRef } from 'react'
+import {
+    Button, TextField, ToggleButton, ToggleButtonGroup,
+    Tooltip, Chip
+} from '@mui/material';
 import { styled } from "@mui/material/styles";
+import NumberFormat from "react-number-format";
+import UploadIcon from '@mui/icons-material/Upload';
 import './AddFund.css'
 
 const ColorToggleButton = styled(ToggleButton)(({ selectedColor }) => ({
     '&.Mui-selected, &.Mui-selected:hover': {
         color: 'white',
         backgroundColor: selectedColor,
+        fontSize: 16,
     },
 }));
 
-const AddFund = ({ setShowFormAdd }) => {
+function NumberFormatCustom(props) {
+    const { inputRef, onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={inputRef}
+            onValueChange={values => {
+                onChange({
+                    target: {
+                        name: props.name,
+                        value: values.value
+                    }
+                });
+            }}
+            thousandSeparator="."
+            decimalSeparator=","
+        />
+    );
+}
+
+const AddFund = ({ setShowFormAdd, socket }) => {
     const inputFile = useRef(null);
     const [type, setType] = useState('Thu');
     const [file, setFile] = useState();
+    const [total, setTotal] = useState();
+    const [content, setContent] = useState('');
+    const [suggestOptions, setSuggestOptions] = useState([]);
 
     function isFileImage(file) {
-        if (file[type].split('/')[1] === 'pdf')
-        return true;
-        //return file && file['type'].split('/')[0] === 'image';
+        return file.type.includes('officedocument') || file.type.split('/')[1] === 'pdf';
     }
 
     const handleFileChange = (event) => {
         if (isFileImage(event.target.files[0])) {
             setFile(event.target.files[0]);
         } else {
-            alert('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...')
+            alert('Tệp tải lên nên là tệp tài liệu excel, word, pdf,...')
         }
     };
 
     const handleChange = (event, newValue) => {
-        setType(newValue);
+        if (newValue !== null) {
+            setType(newValue)
+        }
     };
+
+    const handleChangeTotal = (event) => {
+        let value = event.target.value
+        setTotal(value)
+        let newOptions = [value * 10, value * 100, value * 1000];
+        setSuggestOptions(newOptions)
+    }
+
+    const handleSave = (event) => {
+        event.preventDefault();
+        console.log(type)
+        console.log(total)
+        console.log(content)
+    }
 
     const onExitClick = () => {
         setShowFormAdd(false);
@@ -54,34 +95,74 @@ const AddFund = ({ setShowFormAdd }) => {
                     <ColorToggleButton selectedColor='#2E7D32' value="Thu"><b>Thu</b></ColorToggleButton>
                     <ColorToggleButton selectedColor='#D32F2F' value="Chi"><b>Chi</b></ColorToggleButton>
                 </ToggleButtonGroup>
-                <TextField fullWidth
-                    style={{ marginTop: '18px' }}
-                    label="Số tiền thu/chi"
-                    variant="outlined"
-                    size="small"
-                    inputProps={{ type: 'number' }}
-                />
-                <TextField fullWidth
-                    style={{ marginTop: '15px' }}
+                <div>
+                    <TextField
+                        value={total}
+                        className='fund-textfield'
+                        fullWidth
+                        label="Số tiền thu/chi"
+                        variant="outlined"
+                        size="small"
+                        InputProps={{
+                            inputComponent: NumberFormatCustom
+                        }}
+                        onChange={handleChangeTotal}
+                    />
+                    <div className={total ? 'total-suggest' : 'total-suggest none'}>
+                        <span>Gợi ý:</span>
+                        {suggestOptions.map((option) => (
+                            <Chip
+                                label={(
+                                    <NumberFormat
+                                        value={option}
+                                        className='total-suggest-item'
+                                        thousandSeparator="."
+                                        decimalSeparator=","
+                                    />
+                                )}
+                                onClick={() => setTotal(option)}
+                            />
+
+                        ))}
+                    </div>
+                </div>
+                <TextField
+                    value={content}
+                    fullWidth
                     label="Nội dung phiếu"
                     variant="outlined"
                     multiline
                     rows={4}
-                    margin="dense"
                     size="small"
+                    onChange={(e) => setContent(e.target.value)}
                 />
-                <input style={{display: 'none'}} type="file" ref={inputFile} onChange={handleFileChange} />
+                <div className='fund-uploadfile'>
+                    <input style={{ display: 'none' }} type="file" ref={inputFile} onChange={handleFileChange} />
+                    <Tooltip title='Chọn tệp tải lên' placement='right-start'>
+                        <Button
+                            variant="contained"
+                            disableElevation
+                            onClick={() => { inputFile.current.click() }}
+                        >
+                            <UploadIcon />
+                        </Button>
+                    </Tooltip>
+                    <span className='fund-uploadfile-name'>{file ? file.name : 'Chọn tệp tải lên (word, excel, pdf,...)'}</span>
+                </div>
+
             </div>
             <div className='stack-right'>
                 <Button
                     variant="contained"
                     disableElevation
+                    onClick={handleSave}
                 >
                     Lưu
                 </Button>
                 <Button
                     variant="outlined"
                     disableElevation
+                    onClick={onExitClick}
                 >
                     Hủy
                 </Button>
