@@ -9,12 +9,7 @@ import './Column.scss'
 import Card from './Card'
 import {mapOrder} from './utilities/sort'
 import {cloneDeep} from 'lodash'
-// const options = [
-//     'Thêm thẻ',
-//     'Xóa thẻ',
-//     'Xóa tất cả thẻ'
 
-//   ];
 const ITEM_HEIGHT = 48;
 const Column = (props) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
