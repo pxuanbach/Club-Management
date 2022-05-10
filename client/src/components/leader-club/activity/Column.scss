@@ -1,0 +1,121 @@
+.column{
+    flex: 0 0 auto;
+    width: 280px;
+    height: calc(90vh);
+    margin-left: 10px;
+    > * {
+        background-color: #ebecf0;
+        color: #333;
+        padding: 0 10px;
+    }
+    header.column-drag-handle{
+        display: flex;
+        padding-left: 15px;
+        height: 46px;
+        line-height: 46px;
+        font-size: 16px;
+        font-weight: bold;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        cursor: pointer;
+        .column-title{
+            flex: 90%
+        }
+        .column-dropdown-actions{
+            flex: 10%;
+            transform: rotate(90deg);
+            
+        }
+        #long-button{
+            color: #333;
+        }
+    }
+    footer{
+        padding-left: 10px;
+        height: 55px;
+        min-height: 10px;
+        line-height: 46px;
+        cursor: pointer;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        color: #888;
+        .footer-actions{
+            margin-left: 10px;
+            cursor: pointer;
+            &:hover{
+                color: #333;
+            }
+        }
+        .add-new-card-actions{
+            Button{
+                width: 100px ;
+                text-transform: none;
+                font-family: arial;
+                
+
+            }
+            span.cancel-icon{
+                margin-left: 10px;
+                cursor: pointer;
+                i{
+                    font-size: 18px;
+                    
+                }
+                &:hover{
+                    color: red;
+                }
+            }
+        }
+    }
+    .card-list{
+        list-style-type: none;
+        max-height: calc(70%);
+        overflow-y: auto;
+        &::-webkit-scrollbar{
+            -webkit-appearance: none;
+           
+        }
+        &::-webkit-scrollbar:vertical{
+            width: 10px;
+            
+        }
+        &::-webkit-scrollbar-thumb{
+            background-color: darken(#ebecf0, 15);
+            border-right: 5px solid #ebecf0;
+        }
+        .card-ghost {
+            transition: transform 0.18s ease;
+            transform: rotateZ(5deg);
+            font-weight: bold;
+
+        }
+        .card-ghost-drop{
+            transition: transform 0.18s ease-in-out;
+            transform: rotateZ(0deg);
+            font-weight: bold;
+        }
+        .card-drop-preview {
+            background-color: rgba(150, 150, 200, 0.1);
+            border: 1px dashed #abc;
+            margin: 5px;
+        }
+        .add-new-card-area{
+            .textarea-enter-new-card{
+                height: 50px;
+                padding: 10px;
+                max-height: 162px;
+                outline-color: #abc;
+                font-size: 15px;
+                font-family: arial;
+                border: none;
+                border-radius: 5px;
+                box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+                width: 100%;
+                resize: vertical;
+
+            }
+
+
+        }
+    }
+}

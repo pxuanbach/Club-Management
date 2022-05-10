@@ -1,0 +1,198 @@
+.title-card{
+    font-size: 25px;
+    font-weight: bold;
+    display: flex;
+    color: #1B264D;;
+    /* 
+    align-items: flex-end;
+    justify-content: space-between; */
+}
+
+.button-close{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    font-size: 22px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    top:10px;
+    right: 10px;
+    
+}
+
+.body-card-detail{
+    display: flex;
+    margin-top: 20px;
+    
+}
+
+.div-left-card-detail{
+    flex:1;
+    
+}
+.description{
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1B264D;;
+}
+.description-activity{
+    margin-top: 30px;
+    font-size: 20px;
+    font-weight: bold;
+}
+.description-activity>h4{
+    color: #1B264D;;
+}
+.textarea-enter-description{
+    width: 100%;
+    padding: 10px;
+    outline-color: #abc;
+    margin-top: 10px;
+    font-size: 15px;
+    font-family: arial;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    resize: none;
+}
+
+.add-description-area{
+    height: 60px;
+    margin-top: 15px;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #e7e9ee;
+}
+.add-description-area:hover{
+    background-color:#dbdcef;
+}
+.add-description-area > h5{
+    font-weight: lighter;
+    
+}
+.add-new-description-action{
+    margin-top: 5px;
+}
+.add-new-description-action > Button {
+    width: 100px ;
+    text-transform: none;
+    font-family: arial;
+    background-color: #1B264D;
+}
+.cancel-icon{
+    margin-left: 10px;
+    cursor: pointer;
+}
+.cancel-icon > i {
+    font-size: 18px;
+}
+.cancel-icon > i:hover{
+    color: red;
+}
+
+.btn-action:hover{
+    background-color: #dbdcef;
+}
+.comment-area{
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    border: 1px solid #d6d2d2;
+    cursor: pointer;
+}
+.textarea-enter-comment{
+    width: 100%;
+    background-color: #fff!important;
+    padding: 10px;
+    outline: none;
+    font-size: 15px;
+    font-family: arial;
+    border: none;
+    border-radius: 5px;
+    resize: none;
+    cursor: pointer;
+    
+}
+
+
+.not-display{
+    display: none;
+}
+.display{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    height: 45px;
+    border: none;
+    cursor: pointer;
+    margin-top: 5px;
+
+
+}
+.btn-save-text{
+    display: flex;
+    font-size: 16px;
+    font-family: Arial;
+    height: 35px;
+    width: 50px;
+    border-radius: 5px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    background-color: #1B264D;
+    font-weight: lighter;
+}
+.list-action-for-text{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    margin-right: 10px;
+}
+.icon-button-text>i{
+    font-size: 16px;
+    color: #1B264D;
+}
+.icon-button-text>p{
+    font-size: 17px;
+    padding-bottom: 1px;
+    color: #1B264D;
+}
+
+
+
+/* div right */
+.div-right-card-detail{
+    flex:0.3;
+    margin-left: 20px;
+}
+.title-action{
+    color: #1B264D;
+}
+.action-2{
+    margin-top: 20px;
+}
+.btn-action{
+    width: 100%;
+    height: 35px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: rgb(235, 239, 244);
+    display: flex;
+    align-items: center;
+    color: rgb(13, 37, 67);
+    font-size: 14px;
+    
+}
+.btn-action > i {
+    margin-left: 15px;
+    margin-right: 10px;
+    
+}

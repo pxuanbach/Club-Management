@@ -115,6 +115,7 @@
     height: 45px;
 
 }
+
 .fund-type{
     display: flex;
     align-items: center;
@@ -131,3 +132,12 @@
 .fund-type.minus{
     background-color: #D32F2F;
 }
+
+
+@media only screen  and (max-width: 63.9375em){
+    .status-card{
+        margin-right: 0;
+
+    }
+  
+  }

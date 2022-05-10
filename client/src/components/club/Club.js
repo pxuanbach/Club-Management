@@ -30,8 +30,8 @@ const Club = () => {
   }, [])
   return (
     <div className='club'>
-      <div >
-      <NavbarClub club={club}/>
+      <div className='div-left-club'>
+        <NavbarClub/>
       </div>
       <div className="div-right-club">
         <Switch >

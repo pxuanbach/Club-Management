@@ -1,10 +1,13 @@
 .club{
     display: flex;
+   
     height: 100%;
-}
-.div-right-club{
-    margin-left: 17.7vw;
-    margin-top: 0px;
     width: 100%;
+}
+
+.div-right-club{
+    margin-left: 17vw;
+    margin-top: 0px;
+    width: 100vw;
     height: 100vh;
 }

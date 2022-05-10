@@ -234,6 +234,7 @@ const TabMember = ({ club_id }) => {
                 variant="standard"
                 onKeyPress={event => event.key === 'Enter' ? handleSearchMembers(event) : null}
               />
+
             </Box>
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
