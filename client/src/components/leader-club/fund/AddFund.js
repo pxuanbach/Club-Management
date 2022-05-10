@@ -70,11 +70,13 @@ const AddFund = ({ setShowFormAdd, socket }) => {
         setSuggestOptions(newOptions)
     }
 
-    const handleSave = (event) => {
+    const handleSave = async (event) => {
         event.preventDefault();
         console.log(type)
         console.log(total)
         console.log(content)
+        console.log(file)
+        
     }
 
     const onExitClick = () => {
