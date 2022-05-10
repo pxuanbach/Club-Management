@@ -12,7 +12,11 @@ module.exports.upload = async (req, res) => {
             resource_type: 'auto',
             folder: 'Club-Management/Files'
         })
-        urls.push(newPath)
+        
+        urls.push({
+            url: newPath.url,
+            public_id: newPath.public_id,
+        })
         fs.unlinkSync(path)
     }
 
