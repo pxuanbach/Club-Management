@@ -6,7 +6,8 @@ import {
 import { styled } from "@mui/material/styles";
 import NumberFormat from "react-number-format";
 import UploadIcon from '@mui/icons-material/Upload';
-import './AddFund.css'
+import { my_API } from '../../../helper/Helper'
+import './AddFund.css';
 
 const ColorToggleButton = styled(ToggleButton)(({ selectedColor }) => ({
     '&.Mui-selected, &.Mui-selected:hover': {
@@ -41,19 +42,23 @@ const AddFund = ({ setShowFormAdd, socket }) => {
     const inputFile = useRef(null);
     const [type, setType] = useState('Thu');
     const [file, setFile] = useState();
+    const [inputFileMessage, setInputFileMessage] = useState('Chọn tệp tải lên (word, excel, pdf,...)');
     const [total, setTotal] = useState();
-    const [content, setContent] = useState('');
+    const [totalErr, setTotalErr] = useState();
+    const [content, setContent] = useState();
+    const [contentErr, setContentErr] = useState();
     const [suggestOptions, setSuggestOptions] = useState([]);
 
     function isFileImage(file) {
-        return file.type.includes('officedocument') || file.type.split('/')[1] === 'pdf';
+        //console.log(file.type)
+        return file.type.includes('spreadsheetml.sheet');
     }
 
     const handleFileChange = (event) => {
         if (isFileImage(event.target.files[0])) {
             setFile(event.target.files[0]);
         } else {
-            alert('Tệp tải lên nên là tệp tài liệu excel, word, pdf,...')
+            alert('Tệp tải lên nên là tệp có đuôi excel')
         }
     };
 
@@ -70,13 +75,41 @@ const AddFund = ({ setShowFormAdd, socket }) => {
         setSuggestOptions(newOptions)
     }
 
+    const validateEmpty = () => {
+        let isEmpty = false
+        if (!total) {
+            setTotalErr('Số tiền thu/chi trống')
+            isEmpty = true;
+        }
+        if (!content) {
+            setContentErr('Nội dung trống')
+            isEmpty = true;
+        }
+
+        return isEmpty;
+    }
+
     const handleSave = async (event) => {
         event.preventDefault();
-        console.log(type)
-        console.log(total)
-        console.log(content)
-        console.log(file)
-        
+
+        if (!validateEmpty()) {
+            var formdata = new FormData();
+            formdata.append("file", file);
+
+            var requestOptions = {
+                method: 'POST',
+                body: formdata,
+                redirect: 'follow'
+            };
+
+            const res = await fetch("http://localhost:5000/upload", requestOptions)
+            const uploadResult = await res.json();
+            
+            if (uploadResult.error) {
+                setInputFileMessage(uploadResult.error.message)
+                setFile(null)
+            }
+        }
     }
 
     const onExitClick = () => {
@@ -109,6 +142,8 @@ const AddFund = ({ setShowFormAdd, socket }) => {
                             inputComponent: NumberFormatCustom
                         }}
                         onChange={handleChangeTotal}
+                        helperText={totalErr}
+                        error={totalErr}
                     />
                     <div className={total ? 'total-suggest' : 'total-suggest none'}>
                         <span>Gợi ý:</span>
@@ -137,6 +172,8 @@ const AddFund = ({ setShowFormAdd, socket }) => {
                     rows={4}
                     size="small"
                     onChange={(e) => setContent(e.target.value)}
+                    helperText={contentErr}
+                    error={contentErr}
                 />
                 <div className='fund-uploadfile'>
                     <input style={{ display: 'none' }} type="file" ref={inputFile} onChange={handleFileChange} />
@@ -149,7 +186,7 @@ const AddFund = ({ setShowFormAdd, socket }) => {
                             <UploadIcon />
                         </Button>
                     </Tooltip>
-                    <span className='fund-uploadfile-name'>{file ? file.name : 'Chọn tệp tải lên (word, excel, pdf,...)'}</span>
+                    <span className='fund-uploadfile-name'>{file ? file.name : inputFileMessage}</span>
                 </div>
 
             </div>

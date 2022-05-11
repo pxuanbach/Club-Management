@@ -71,7 +71,7 @@ const AddAccount = ({ handleClose }) => {
                 headers: { 'Content-Type': 'application/json' }
             })
             const data = await res.json();
-            console.log('signup response', data)
+            //console.log('signup response', data)
             if (data.errors) {
                 setUsernameErr(data.errors.username)
                 setPasswordErr(data.errors.password);
