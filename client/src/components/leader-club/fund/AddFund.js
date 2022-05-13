@@ -1,13 +1,14 @@
 import React, { useState, useRef } from 'react'
 import {
     Button, TextField, ToggleButton, ToggleButtonGroup,
-    Tooltip, Chip
+    Tooltip, Chip, LinearProgress, Typography, Box
 } from '@mui/material';
+import PropTypes from 'prop-types';
 import { styled } from "@mui/material/styles";
 import NumberFormat from "react-number-format";
 import UploadIcon from '@mui/icons-material/Upload';
-import { my_API } from '../../../helper/Helper'
 import './AddFund.css';
+import axiosInstance from '../../../helper/Axios'
 
 const ColorToggleButton = styled(ToggleButton)(({ selectedColor }) => ({
     '&.Mui-selected, &.Mui-selected:hover': {
@@ -16,6 +17,25 @@ const ColorToggleButton = styled(ToggleButton)(({ selectedColor }) => ({
         fontSize: 16,
     },
 }));
+
+function LinearProgressWithLabel(props) {
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress variant="determinate" {...props} />
+            </Box>
+            <Box sx={{ minWidth: 35 }}>
+                <Typography variant="body2" color="text.secondary">{`${Math.round(
+                    props.value,
+                )}%`}</Typography>
+            </Box>
+        </Box>
+    );
+}
+
+LinearProgressWithLabel.propTypes = {
+    value: PropTypes.number.isRequired,
+};
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
@@ -38,7 +58,7 @@ function NumberFormatCustom(props) {
     );
 }
 
-const AddFund = ({ setShowFormAdd, socket }) => {
+const AddFund = ({ setShowFormAdd, socket, club_id, user }) => {
     const inputFile = useRef(null);
     const [type, setType] = useState('Thu');
     const [file, setFile] = useState();
@@ -48,6 +68,7 @@ const AddFund = ({ setShowFormAdd, socket }) => {
     const [content, setContent] = useState();
     const [contentErr, setContentErr] = useState();
     const [suggestOptions, setSuggestOptions] = useState([]);
+    const [progress, setProgress] = useState();
 
     function isFileImage(file) {
         //console.log(file.type)
@@ -55,10 +76,11 @@ const AddFund = ({ setShowFormAdd, socket }) => {
     }
 
     const handleFileChange = (event) => {
+        setProgress(0)
         if (isFileImage(event.target.files[0])) {
             setFile(event.target.files[0]);
         } else {
-            alert('Tệp tải lên nên là tệp có đuôi excel')
+            alert('Tệp tải lên nên là tệp định dạng excel')
         }
     };
 
@@ -85,29 +107,52 @@ const AddFund = ({ setShowFormAdd, socket }) => {
             setContentErr('Nội dung trống')
             isEmpty = true;
         }
+        if (!file) {
+            setInputFileMessage('Chưa chọn tệp nào')
+            isEmpty = true;
+        }
 
         return isEmpty;
     }
 
     const handleSave = async (event) => {
         event.preventDefault();
-
         if (!validateEmpty()) {
-            var formdata = new FormData();
-            formdata.append("file", file);
+            setTotalErr('')
+            setContentErr('')
+            var formData = new FormData();
+            formData.append("file", file);
 
-            var requestOptions = {
-                method: 'POST',
-                body: formdata,
-                redirect: 'follow'
-            };
+            const res = await axiosInstance.post("/upload", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                onUploadProgress: progressEvent => {
+                    const { loaded, total } = progressEvent;
+                    let percent = Math.floor((loaded * 100) / total)
+                    //console.log(`${loaded}kb of ${total}kb | ${percent}%`);
 
-            const res = await fetch("http://localhost:5000/upload", requestOptions)
-            const uploadResult = await res.json();
-            
+                    if (percent < 100) {
+                        setProgress(percent)
+                    }
+                },
+            })
+            const uploadResult = res.data;
+            console.log(uploadResult)
             if (uploadResult.error) {
                 setInputFileMessage(uploadResult.error.message)
                 setFile(null)
+            } else {
+                setProgress(100)
+                socket.emit('create-fundHistory',
+                    club_id,
+                    user._id,
+                    type,
+                    total,
+                    content,
+                    uploadResult.data[0].public_id,
+                    uploadResult.data[0].url)
+                //onExitClick()
             }
         }
     }
@@ -147,8 +192,8 @@ const AddFund = ({ setShowFormAdd, socket }) => {
                     />
                     <div className={total ? 'total-suggest' : 'total-suggest none'}>
                         <span>Gợi ý:</span>
-                        {suggestOptions.map((option) => (
-                            <Chip
+                        {suggestOptions.map((option, index) => (
+                            <Chip key={index}
                                 label={(
                                     <NumberFormat
                                         value={option}
@@ -188,6 +233,7 @@ const AddFund = ({ setShowFormAdd, socket }) => {
                     </Tooltip>
                     <span className='fund-uploadfile-name'>{file ? file.name : inputFileMessage}</span>
                 </div>
+                {progress > 0 && <LinearProgressWithLabel value={progress} />}
 
             </div>
             <div className='stack-right'>

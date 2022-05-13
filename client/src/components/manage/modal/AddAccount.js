@@ -7,7 +7,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../Mng.css'
 import io from 'socket.io-client'
-import { ENDPT, my_API } from '../../../helper/Helper'
+import axiosInstance from '../../../helper/Axios';
+import { ENDPT } from '../../../helper/Helper'
 import { UploadImageUser } from '../../../helper/UploadImage'
 
 let socket;
@@ -58,8 +59,7 @@ const AddAccount = ({ handleClose }) => {
         setEmailErr('');
         try {
             setIsSuccess(true);
-            const res = await fetch(my_API + 'signup', {
-                method: 'POST',
+            const res = await axiosInstance.post('/signup', {
                 credentials: 'include',
                 body: JSON.stringify({
                     'username': values.username,

@@ -33,11 +33,12 @@ const style = {
   p: 4,
 };
 
-const Fund = ({club_id}) => {
+const Fund = ({ club_id }) => {
   let isTreasurer = false;
   const { user, setUser } = useContext(UserContext);
   const [search, setSearch] = useState();
   const [treasurer, setTreasurer] = useState();
+  const [fundHistorys, setFundHistorys] = useState([])
   const [showFormAddFund, setShowFormAddFund] = useState(false);
 
   const handleChangeSearch = (event) => {
@@ -51,6 +52,7 @@ const Fund = ({club_id}) => {
   useEffect(() => {
     socket = io(ENDPT);
     socket.emit('get-user', club_id, 'treasurer')
+    socket.emit('get-fundHistory', club_id)
     return () => {
       socket.emit('disconnect');
       socket.off();
@@ -58,14 +60,23 @@ const Fund = ({club_id}) => {
   }, [])
 
   useEffect(() => {
-    
     socket.on('output-treasurer', res => {
       setTreasurer(res)
     })
-    //console.log(user._id === leader._id)
   }, [treasurer])
 
-  if (user) { 
+  useEffect(() => {
+    socket.on('output-fundHistory', res => {
+      //console.log(res)
+      setFundHistorys(res)
+    })
+    socket.on('fundHistory-created', res => {
+      console.log('created')
+      setFundHistorys([...fundHistorys, res])
+    })
+  }, [fundHistorys])
+
+  if (user) {
     isTreasurer = user._id === treasurer?._id
   }
   return (
@@ -79,7 +90,12 @@ const Fund = ({club_id}) => {
         }}
       >
         <Box sx={style}>
-          <AddFund setShowFormAdd={setShowFormAddFund} socket={socket}/>
+          <AddFund
+            setShowFormAdd={setShowFormAddFund}
+            socket={socket}
+            club_id={club_id}
+            user={user}
+          />
         </Box>
       </Modal>
       <div>
@@ -162,21 +178,21 @@ const Fund = ({club_id}) => {
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            {isTreasurer ? 
-            (<Button
-              onClick={() => {
-                setShowFormAddFund(true)
-              }}
-              className='btn-add-tabmember'
-              variant="contained"
-              disableElevation
-              style={{ background: '#1B264D' }}>
-              Thêm phiếu
-            </Button>) : <></>}
+            {isTreasurer ?
+              (<Button
+                onClick={() => {
+                  setShowFormAddFund(true)
+                }}
+                className='btn-add-tabmember'
+                variant="contained"
+                disableElevation
+                style={{ background: '#1B264D' }}>
+                Thêm phiếu
+              </Button>) : <></>}
           </div>
         </div>
         <div className='table-paymentlist'>
-          <PaymentList></PaymentList>
+          <PaymentList rows={fundHistorys}/>
         </div>
       </div>
     </div>

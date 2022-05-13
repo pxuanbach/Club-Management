@@ -4,17 +4,15 @@ import './Navbar.css'
 import SignedInMenu from './SignedInMenu'
 import SignedOutMenu from './SignedOutMenu'
 import logo_web from "../../assets/logoweb.png";
-import { my_API } from '../../helper/Helper'
+import axiosInstance from '../../helper/Axios'
 
 const Navbar = () => {
     const {user, setUser} = useContext(UserContext);
 
     const logout = async () => {
         try {
-            const res = await fetch(my_API + 'logout', {
-                credentials: 'include',
-            });
-            const data = res.json();
+            const res = await axiosInstance.get('/logout', { withCredentials: true });
+            const data = res.data;
             console.log('logout data', data);
             setUser(null);
         } catch (error) {

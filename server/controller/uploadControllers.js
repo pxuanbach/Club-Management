@@ -12,7 +12,7 @@ module.exports.upload = async (req, res) => {
             resource_type: 'auto',
             folder: 'Club-Management/Files'
         }).catch(error => {
-            //console.log(error)
+            console.log(error)
             res.status(400).json({
                 error
             })
@@ -34,6 +34,6 @@ module.exports.upload = async (req, res) => {
             data: urls
         });
     }
-    
+    console.log('sended')
     res.send();
 }

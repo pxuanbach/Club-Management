@@ -6,7 +6,7 @@ import Member from "../leader-club/member/Member"
 import Message from "../leader-club/message/Message"
 import Fund from "../leader-club/fund/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
-import { my_API } from '../../helper/Helper';
+import axiosInstance from '../../helper/Axios';
 import './Club.css'
 
 const Club = () => {
@@ -15,11 +15,8 @@ const Club = () => {
   useEffect(() => {
     const verifyClub = async () => {
       try {
-        const res = await fetch( my_API + `verifyclub/${club_id}`, {
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await res.json();
+        const res = await axiosInstance.get(`/verifyclub/${club_id}`, { withCredentials: true });
+        const data = res.data;
         console.log('club', data)
         setClub(data);
       } catch (error) {

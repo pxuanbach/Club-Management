@@ -1,18 +1,14 @@
 import React, { useContext, useState } from 'react'
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
+import {
+    InputAdornment, IconButton, OutlinedInput, InputLabel,
+    FormControl, TextField, Button, FormHelperText
+} from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import FormHelperText from '@mui/material/FormHelperText';
+import axiosInstance from '../../helper/Axios';
 import './Login.css'
-import { my_API } from '../../helper/Helper';
 
 const Login = () => {
     const { user, setUser } = useContext(UserContext);
@@ -32,13 +28,14 @@ const Login = () => {
         setUsernameErr('')
         setPasswordErr('')
         try {
-            const res = await fetch(my_API + 'login', {
-                method: 'POST',
-                credentials: 'include',
-                body: JSON.stringify({ username, password }),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            const data = await res.json();
+            const res = await axiosInstance.post('/login', JSON.stringify({ username, password }),
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "application/json",
+                      },
+                })
+            const data = await res.data;
             console.log(data)
             if (data.errors) {
                 setUsernameErr(data.errors.username);
@@ -94,7 +91,7 @@ const Login = () => {
                     />
                     <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                 </FormControl>
-                <Button variant='contained' 
+                <Button variant='contained'
                     disableElevation
                     onClick={handleSubmit}>
                     Đăng nhập
