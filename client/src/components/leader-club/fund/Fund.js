@@ -58,6 +58,10 @@ const Fund = ({ club_id }) => {
     socket.emit('get-club', { club_id })
     socket.emit('get-fundHistory', club_id)
     socket.emit('get-col-pay-in-month', club_id)
+    socket.on('output-col-pay-in-month', (col, pay) => {
+      setCollectInMonth(col)
+      setPayInMonth(pay)
+    })
     return () => {
       socket.emit('disconnect');
       socket.off();
@@ -81,6 +85,13 @@ const Fund = ({ club_id }) => {
         ...prevClub,
         fund: fund
       }))
+
+      if (newFundHistory.type === 'Thu') {
+        setCollectInMonth(collectInMonth + newFundHistory.total)
+      } else {
+        setPayInMonth(payInMonth + newFundHistory.total)
+      }
+
       setFundHistorys([...fundHistorys, newFundHistory])
     })
   }, [fundHistorys])

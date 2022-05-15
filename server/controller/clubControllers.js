@@ -15,7 +15,7 @@ module.exports = function (socket, io) {
     })
 
     socket.on('get-club', ({ club_id }) => {
-        Club.findOne({ _id: club_id }).then(result => {
+        Club.findById(club_id).then(result => {
             io.emit('output-club', result)
         })
     })

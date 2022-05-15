@@ -64,8 +64,8 @@ module.exports = function (socket, io) {
                         pay += fh.total
                     }
                 })
-                console.log(result, collect, pay, firstDay, lastDay)
-                io.emit('ouput-col-pay-in-month', collect, pay)
+                //console.log(result, collect, pay, firstDay, lastDay)
+                io.emit('output-col-pay-in-month', collect, pay)
             })
     })
 }
