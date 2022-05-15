@@ -28,7 +28,7 @@ const Club = () => {
   return (
     <div className='club'>
       <div className='div-left-club'>
-        <NavbarClub/>
+        <NavbarClub club={club}/>
       </div>
       <div className="div-right-club">
         <Switch >

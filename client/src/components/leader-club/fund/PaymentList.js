@@ -75,7 +75,7 @@ export default function DataTable({ rows }) {
   ];
 
   return (
-    <div style={{ width: '95%' }}>
+    <div style={{ paddingRight: '40px' }}>
       <DataGrid
         getRowId={(r) => r._id}
         rows={rows}

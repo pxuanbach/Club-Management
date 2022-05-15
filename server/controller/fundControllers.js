@@ -40,6 +40,32 @@ module.exports = function (socket, io) {
 
                 });
             })
-
         })
+
+    socket.on('get-col-pay-in-month', (club_id) => {
+        let date = new Date();
+        firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
+        lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+
+        FundHistory.find({$and: [
+            { club: club_id },
+            { createdAt: {
+                $gt: firstDay,
+                $lte: lastDay
+            }}
+        ]})
+            .then(result => {
+                let collect = 0;
+                let pay = 0;
+                result.forEach((fh) => {
+                    if (fh.type === "Thu") {
+                        collect += fh.total
+                    } else {
+                        pay += fh.total
+                    }
+                })
+                console.log(result, collect, pay, firstDay, lastDay)
+                io.emit('ouput-col-pay-in-month', collect, pay)
+            })
+    })
 }

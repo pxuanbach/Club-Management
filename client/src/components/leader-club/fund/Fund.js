@@ -35,12 +35,15 @@ const style = {
 };
 
 const Fund = ({ club_id }) => {
+  let date = new Date();
   let isTreasurer = false;
   const { user, setUser } = useContext(UserContext);
   const [search, setSearch] = useState();
   const [club, setClub] = useState();
   const [fundHistorys, setFundHistorys] = useState([])
   const [showFormAddFund, setShowFormAddFund] = useState(false);
+  const [collectInMonth, setCollectInMonth] = useState(0);
+  const [payInMonth, setPayInMonth] = useState(0);
 
   const handleChangeSearch = (event) => {
     setSearch(event.target.value)
@@ -54,6 +57,7 @@ const Fund = ({ club_id }) => {
     socket = io(ENDPT);
     socket.emit('get-club', { club_id })
     socket.emit('get-fundHistory', club_id)
+    socket.emit('get-col-pay-in-month', club_id)
     return () => {
       socket.emit('disconnect');
       socket.off();
@@ -106,8 +110,8 @@ const Fund = ({ club_id }) => {
       <div>
         <h2 className='title-header'>Tổng quan</h2>
         <div className="dashboard-overview">
-          <div className="dashboard-overview-row row">
-            <div className="col-3">
+          <div className="dashboard-overview-row">
+            <div className="dashboard-overview-row-cell">
               <div className='status-card'>
                 <div className='status-card_icon'>
                   {/* <PaidIcon /> */}
@@ -125,39 +129,43 @@ const Fund = ({ club_id }) => {
                 </div>
               </div>
             </div>
-            <div className="col-3">
+            <div className="dashboard-overview-row-cell">
               <div className='status-card'>
                 <div className='status-card_icon'>
 
                 </div>
                 <div className='status-card_info'>
-                  <h4>Tiền thu </h4>
-                  <h3>1.000.000</h3>
+                  <h4>{"Tiền thu tháng " + (date.getMonth() + 1)}</h4>
+                  <h3>
+                    <NumberFormat
+                      displayType='text'
+                      value={collectInMonth}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                    />
+                  </h3>
                 </div>
               </div>
             </div>
-            <div className="col-3">
+            <div className="dashboard-overview-row-cell">
               <div className='status-card'>
                 <div className='status-card_icon'>
 
                 </div>
                 <div className='status-card_info'>
-                  <h4>Tiền chi </h4>
-                  <h3>500.000</h3>
+                  <h4>{"Tiền chi tháng " + (date.getMonth() + 1)}</h4>
+                  <h3>
+                    <NumberFormat
+                      displayType='text'
+                      value={payInMonth}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                    />
+                  </h3>
                 </div>
               </div>
             </div>
-            <div className="col-3">
-              <div className='status-card'>
-                <div className='status-card_icon'>
 
-                </div>
-                <div className='status-card_info'>
-                  <h4>ABCDE </h4>
-                  <h3>10</h3>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
