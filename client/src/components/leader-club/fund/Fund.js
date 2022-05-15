@@ -6,6 +6,7 @@ import { UserContext } from '../../../UserContext';
 import { ENDPT } from '../../../helper/Helper';
 import AddFund from './AddFund';
 import PaymentList from "./PaymentList"
+import NumberFormat from 'react-number-format';
 import "./Fund.css"
 import "../../../assets/css/grid.css"
 import '../../manage/Mng.css'
@@ -37,7 +38,7 @@ const Fund = ({ club_id }) => {
   let isTreasurer = false;
   const { user, setUser } = useContext(UserContext);
   const [search, setSearch] = useState();
-  const [treasurer, setTreasurer] = useState();
+  const [club, setClub] = useState();
   const [fundHistorys, setFundHistorys] = useState([])
   const [showFormAddFund, setShowFormAddFund] = useState(false);
 
@@ -51,7 +52,7 @@ const Fund = ({ club_id }) => {
 
   useEffect(() => {
     socket = io(ENDPT);
-    socket.emit('get-user', club_id, 'treasurer')
+    socket.emit('get-club', { club_id })
     socket.emit('get-fundHistory', club_id)
     return () => {
       socket.emit('disconnect');
@@ -60,24 +61,28 @@ const Fund = ({ club_id }) => {
   }, [])
 
   useEffect(() => {
-    socket.on('output-treasurer', res => {
-      setTreasurer(res)
+    socket.on('output-club', res => {
+      //console.log(res)
+      setClub(res)
     })
-  }, [treasurer])
+  }, [club])
 
   useEffect(() => {
     socket.on('output-fundHistory', res => {
-      //console.log(res)
       setFundHistorys(res)
     })
-    socket.on('fundHistory-created', res => {
-      console.log('created')
-      setFundHistorys([...fundHistorys, res])
+    socket.on('fundHistory-created', (newFundHistory, fund) => {
+      //console.log('created')
+      setClub(prevClub => ({
+        ...prevClub,
+        fund: fund
+      }))
+      setFundHistorys([...fundHistorys, newFundHistory])
     })
   }, [fundHistorys])
 
   if (user) {
-    isTreasurer = user._id === treasurer?._id
+    isTreasurer = user._id === club?.treasurer._id
   }
   return (
     <div className='div-fund'>
@@ -108,8 +113,15 @@ const Fund = ({ club_id }) => {
                   {/* <PaidIcon /> */}
                 </div>
                 <div className='status-card_info'>
-                  <h4>Tổng quỹ </h4>
-                  <h3>2.000.000</h3>
+                  <h4>Tổng quỹ</h4>
+                  <h3>
+                    <NumberFormat
+                      displayType='text'
+                      value={club?.fund}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                    />
+                  </h3>
                 </div>
               </div>
             </div>
@@ -192,7 +204,7 @@ const Fund = ({ club_id }) => {
           </div>
         </div>
         <div className='table-paymentlist'>
-          <PaymentList rows={fundHistorys}/>
+          <PaymentList rows={fundHistorys} />
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ export default function DataTable({ rows }) {
       field: 'createdAt',
       headerName: 'Thời gian',
       flex: 0.7,
-      valueGetter: (value) => formatter.format(Date.parse(value.row.createdAt)),
+      valueGetter: (value) => formatter.format(Date.parse(value.row.createdAt)) + 'p',
     },
     {
       field: 'total',
