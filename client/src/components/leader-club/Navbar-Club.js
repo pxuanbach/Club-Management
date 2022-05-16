@@ -9,37 +9,21 @@ import {ENDPT} from '../../helper/Helper'
 
 let socket;
 
-const NavbarClub = () => {
+const NavbarClub = ({club}) => {
     let { club_id, club_name } = useParams();
-
     const { user, setUser } = useContext(UserContext);
-
-    const [club, setClub] = useState();
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        socket.emit('get-club', { club_id })
-        socket.on('output-club', result => {
-            setClub(result);
-            console.log(result)
-        })
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
-    }, [])
 
     return (
 
         <nav className='div-left-nav'>
             <div className="nav-club">
                 <div className='div-back'>
-                    <a href="/" className="btn-back">
+                    <Link to='/' className="btn-back">
                         <i class="fa-solid fa-angle-left"></i>
-                        All team</a>
+                        All team</Link>
                 </div>
                 <div className='div-clb'>
-                    <Avatar className='logo-team' sx={{ width: 120, height: 120 }} src={club ? club.img_url : ''}></Avatar>
+                    <Avatar className='logo-team' sx={{ width: 120, height: 120 }} src={club?.img_url}></Avatar>
                     <div className='name-team'>
                         {club_name}
                     </div>

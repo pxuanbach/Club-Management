@@ -1,13 +1,19 @@
 .div-tabgroup{
-    margin-top: 50px;
+    margin-top: 42px;
+}
+.div-header-tabgroup{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 20px;
 }
 .div-search-tabgroup{
     display: flex;
-    margin-left: 20px;
-    
+    align-items: flex-end;
 }
-.title-tabgroup{
-    color: #1B264D;
-    margin-top: 20px;
-    margin-left: 20px;
+.div-list-tabgroup{
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }

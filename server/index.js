@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 const corsOptions = {
     origin: 'http://localhost:3000',
     credentials: true,
@@ -18,6 +19,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRoutes);
+app.use(uploadRoutes);
 
 //Connect DB
 mongoose
@@ -30,34 +32,19 @@ mongoose
 
 
 const PORT = process.env.PORT || 5000
-const { addUser, removeUser, getUser } = require('./helper/UserHelper');
-const Club = require('./models/Club')
-const User = require('./models/User');
+const { removeUser } = require('./helper/ChatRoomHelper');
 
 io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/clubControllers')(socket, io);
     require('./controller/userControllers')(socket, io);
-    
-    
-    //join chat room, club chat room
-    socket.on('join', ({ name, room_id, user_id }) => {
-        const { error, user } = addUser({
-            socket_id: socket.id,
-            name,
-            user_id,
-            room_id
-        })
-        socket.join(room_id);
-        if (error) {
-            console.log('join error', error)
-        } else {
-            console.log('join user', user)
-        }
-    }) 
+    require('./controller/chatRoomControllers')(socket, io);
+    require('./controller/groupControllers')(socket, io);
+    require('./controller/fundControllers')(socket, io);
 
     socket.on('disconnect', () => {
-        //
+        const user = removeUser(socket.id);
+        console.log('A user disconnected', user)
     })
 })
 

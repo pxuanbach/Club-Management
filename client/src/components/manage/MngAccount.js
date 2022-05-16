@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
-import Avatar from '@mui/material/Avatar';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import { Avatar, TextField, Button, Tooltip, Box, Modal } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './modal/AddAccount';
 import io from 'socket.io-client'
 import { ENDPT } from '../../helper/Helper';
-import {UserContext} from '../../UserContext'
+import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 
 const CustomTextField = styled(TextField)({
@@ -40,7 +37,9 @@ let socket;
 const ManageAccount = () => {
   const { user, setUser } = useContext(UserContext);
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [search, setSearch] = useState();
+  const [userSelected, setUserSelected] = useState();
   const [users, setUsers] = useState([]);
 
   const handleChangeSearchField = (e) => {
@@ -48,7 +47,13 @@ const ManageAccount = () => {
   }
 
   const handleSearch = (e) => {
-    console.log(search)
+    e.preventDefault();
+    socket.emit('search-user', search)
+  }
+
+  const handleRefresh = (e) => {
+    e.preventDefault();
+    socket.emit('get-users')
   }
 
   const handleOpenAdd = () => setOpenModalAdd(true);
@@ -63,12 +68,22 @@ const ManageAccount = () => {
   }, [ENDPT])
 
   useEffect(() => {
+    socket.emit('get-users')
     socket.on('output-users', users => {
       setUsers(users)
       //console.log('users', users)
     })
   }, [])
-  
+
+  useEffect(() => {
+    socket.on('new-user', newUser => {
+      setUsers([...users, newUser])
+    })
+    socket.on('output-search-user', users => {
+      setUsers(users)
+    })
+  }, [users])
+
   const handleBlockOrUnblock = (event, param) => {
     event.stopPropagation();
     socket.emit('block-unblock-account', param._id)
@@ -84,7 +99,13 @@ const ManageAccount = () => {
 
     setUsers(updateUsers)
   }
-  
+
+  const handleDeleteUser = (event, param) => {
+    event.stopPropagation();
+    setUserSelected(param)
+    setOpenDialog(true)
+  }
+
   const columns = [
     {
       field: '_id',
@@ -109,9 +130,9 @@ const ManageAccount = () => {
       }
     },
     { field: 'username', headerName: 'Tài khoản', flex: 0.7 },
-    { field: 'name', headerName: 'Tên người dùng', flex: 1 },
+    { field: 'name', headerName: 'Tên người dùng', flex: 1.5 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
-    { field: 'groups_num', headerName: 'Số nhóm tham gia', flex: 1 , sortable: false},
+    { field: 'groups_num', headerName: 'Số nhóm tham gia', type: 'number', flex: 0.8, sortable: false },
     {
       field: 'btn-block',
       headerName: '',
@@ -136,7 +157,7 @@ const ManageAccount = () => {
   ];
 
   if (!user) {
-    return <Redirect to='/login'/>
+    return <Redirect to='/login' />
   }
   return (
     <div className='container'>
@@ -147,33 +168,43 @@ const ManageAccount = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <AddAccount handleClose={handleCloseAdd}/>
+          <AddAccount handleClose={handleCloseAdd} />
         </Box>
       </Modal>
       <div className='mng__header'>
         <h2>Quản lý tài khoản</h2>
         <div className='header__stack'>
           <div className='stack-left'>
-              <CustomTextField
-                id="search-field"
-                label="Tìm kiếm (Tài khoản, tên, email)"
-                variant="standard"
-                value={search}
-                onChange={handleChangeSearchField}
-                size='small'
-              />
+            <CustomTextField
+              id="search-field"
+              label="Tìm kiếm (Tài khoản, tên, email)"
+              variant="standard"
+              value={search}
+              onChange={handleChangeSearchField}
+              size='small'
+              onKeyPress={event => event.key === 'Enter' ? handleSearch(event) : null}
+            />
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
                 variant="text"
                 disableElevation
                 onClick={handleSearch}>
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <SearchIcon style={{ color: '#1B264D' }} />
+              </Button>
+            </Tooltip>
+            <Tooltip title='Làm mới' placement='right-start'>
+              <Button style={{ borderColor: '#1B264D' }}
+                className='btn-refresh'
+                variant="outlined"
+                disableElevation
+                onClick={handleRefresh}>
+                <RefreshIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
           </div>
 
           <div className='stack-right'>
-          <Button
+            <Button
               style={{ background: '#1B264D' }}
               variant="contained"
               disableElevation

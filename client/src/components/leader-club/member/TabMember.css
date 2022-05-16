@@ -43,19 +43,7 @@
 }
 .div-search-tabmember{
     display: flex;
+    align-items: flex-end;
     margin-right: 40px;
     
-}
-
-
-.btn-search3 i{
-    color: var(--primary-color);
-    font-size: 18px;
-    padding-right: 30px;
-    padding-top: 10px;
-}
-.btn-add-tabmember{
-    height: 45px;
-     
-
 }

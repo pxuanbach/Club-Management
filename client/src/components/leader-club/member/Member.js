@@ -40,7 +40,7 @@ function a11yProps(index) {
   };
 }
 
-export default function BasicTabs() {
+export default function BasicTabs({club_id}) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -58,11 +58,11 @@ export default function BasicTabs() {
       </Box>
       <div>
       <TabPanel className='body-member' value={value} index={0}>
-        <TabMember></TabMember>
+        <TabMember club_id={club_id}></TabMember>
 
       </TabPanel>
       <TabPanel className='body-member' value={value} index={1}>
-        <TabGroup></TabGroup>
+        <TabGroup club_id={club_id}></TabGroup>
       </TabPanel>
       </div>
     </Box>

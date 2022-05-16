@@ -2,14 +2,10 @@ import React, { useRef, useState, useEffect } from 'react'
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import io from 'socket.io-client'
 import './General.css'
-import { ENDPT } from '../../../../helper/Helper';
 import { UploadImageClub } from '../../../../helper/UploadImage'
 
-let socket;
-
-const GeneralUpdate = ({ setShowFormUpdate, club }) => {
+const GeneralUpdate = ({ setShowFormUpdate, club, socket }) => {
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
     const [avatarHeight, setAvatarHeight] = useState();
@@ -48,14 +44,6 @@ const GeneralUpdate = ({ setShowFormUpdate, club }) => {
             club.cloudinary_id, //cur_cloud_id
             () => setIsLoading(false)) 
     }
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        return () => {
-          socket.emit('disconnect');
-          socket.off();
-        }
-      }, [ENDPT])
 
     useEffect(() => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)

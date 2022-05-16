@@ -9,7 +9,7 @@ import Info from "./components/info/Info";
 import Navbar from "./components/layout/Navbar";
 import Club from './components/club/Club';
 import Login from './components/auth/Login'
-import {my_API} from './helper/Helper'
+import axiosInstance from "./helper/Axios";
 
 
 function App() {
@@ -17,11 +17,8 @@ function App() {
   useEffect(() => {
     const verifyUser = async () => {
       try {
-        const res = await fetch( my_API + 'verifyuser', {
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await res.json();
+        const res = await axiosInstance.get('/verifyuser', { withCredentials: true });
+        const data = res.data;
         console.log(data)
         setUser(data);
       } catch (error) {

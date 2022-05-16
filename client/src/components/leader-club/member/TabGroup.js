@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { Avatar, Divider, Button, Tooltip } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
+import React, { useState, useEffect, useContext } from 'react'
+import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
+import Group from './Group'
+import AddGroup from './AddGroup'
+import UpdateGroup from './UpdateGroup';
+import DeleteGroup from './DeleteGroup';
+import { UserContext } from '../../../UserContext'
+import io from 'socket.io-client'
+import { ENDPT } from '../../../helper/Helper';
 import './TabGroup.css'
+
+let socket
+
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: '#1B264D',
@@ -13,6 +21,7 @@ const CustomTextField = styled(TextField)({
     borderBottomColor: '#1B264D',
   },
 });
+
 const style = {
   position: 'absolute',
   top: '45%',
@@ -25,117 +34,187 @@ const style = {
   p: 4,
 };
 
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70,flex:0.5 },
-  { field: 'img_url',
-  headerName: 'Hình đại diện',
-  disableColumnMenu: true,
-  sortable: false,
-  align: 'center',
-  flex: 0.6,
-  renderCell: (value) => {
-    return (
-      <Avatar src={value.row.img_url} />
-    )
-  } },
-  {
-    field: 'fullName', 
-    headerName: 'Họ và tên',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 200,
-    flex:1
-  },
+const TabGroup = ({ club_id }) => {
+  let isLeader = false;
+  const { user, setUser } = useContext(UserContext);
+  const [showFormAdd, setShowFormAdd] = useState(false);
+  const [showFormUpdate, setShowFormUpdate] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [leader, setLeader] = useState();
+  const [groups, setGroups] = useState([]);
+  const [groupSelected, setGroupSelected] = useState();
+  const [search, setSearch] = useState();
 
-  {
-    field: 'MSSV',
-    headerName: 'MSSV',
-    width: 150,
-    flex:0.7
-    
-  },
+  const handleUpdateGroup = (event, group) => {
+    event.preventDefault();
+    setGroupSelected(group)
+    setShowFormUpdate(true)
+  }
 
-  { field: 'phoneNumber', headerName: 'Số điện thoại', width: 150,flex:1 },
-  { field: 'email', headerName: 'Email', width: 150,flex:1.5}
-];
+  const handleDeleteGroup = (event, group) => {
+    event.preventDefault();
+    setGroupSelected(group)
+    setShowDialog(true)
+  }
 
-const rows = [
-  { id: 1, fullName: 'Nguyễn Văn A',avata:'', MSSV: '19521345',phoneNumber:'0123456789',email:'19521234@gm.uit.edu.vn' },
-  { id: 2, fullName: 'Nguyễn Văn A', MSSV: '19521345',phoneNumber:'0123456789',email:'19521234@gm.uit.edu.vn' },
-  { id: 3, fullName: 'Nguyễn Văn A', MSSV: '19521345',phoneNumber:'0123456789',email:'19521234@gm.uit.edu.vn' },
+  const handleSearchGroups = (event) => {
+    event.preventDefault();
+    socket.emit('search-groups', club_id, search)
+  }
 
-];
+  useEffect(() => {
+    socket = io(ENDPT);
+    socket.emit('get-user', club_id, 'leader')
+    socket.emit('get-groups', club_id)
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [])
 
-const TabGroup = () => {
+  useEffect(() => {
+    socket.on('output-leader', res => {
+      setLeader(res)
+    })
+  }, [leader])
+
+  useEffect(() => {
+    socket.on('output-groups', grs => {
+      setGroups(grs)
+    })
+    socket.on('group-created', newGroup => {
+      setGroups([...groups, newGroup])
+    })
+    socket.on('group-deleted', delGroup => {
+      setGroups(groups.filter(group => group._id !== delGroup._id))
+    })
+    socket.on('deleted-member-from-group', gr => {
+      const updateGroups = groups.map((elm) => {
+        if (elm._id === gr._id) {
+          return {
+            ...elm,
+            members: gr.members
+          }
+        }
+        return elm;
+      });
+      setGroups(updateGroups)
+    })
+    socket.on('group-updated', gr => {
+      const updateGroups = groups.map((elm) => {
+        if (elm._id === gr._id) {
+          return {
+            ...elm,
+            name: gr.name,
+            members: gr.members
+          }
+        }
+        return elm;
+      });
+      setGroups(updateGroups)
+    })
+    socket.on('groups-searched', grs => {
+      setGroups(grs)
+    })
+  }, [groups])
+
+  if (user) {
+    isLeader = user._id === leader?._id;
+  }
   return (
     <div className='div-tabgroup'>
-      <div className='div-search-tabgroup'>
-        <Box
-          component="form"
-          sx={{
-            '& > :not(style)': { m: 1, width: '30ch' },
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <CustomTextField id="search-field-tabmember" label="Tìm kiếm thành viên " variant="standard"  />
+      <Modal
+        open={showFormAdd}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormAdd(false);
+        }}
+      >
+        <Box sx={style}>
+          <AddGroup club_id={club_id} setShow={setShowFormAdd} />
         </Box>
-        <Tooltip title='Tìm kiếm' placement='right-start'>
-          <Button
-            className='btn-search3'
-            variant="text"
-            disableElevation
-          >
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </Button>
-        </Tooltip>
-        <Button className='btn-add-tabmember' variant="contained"  style={{ background: '#1B264D',marginTop:'15px', fontWeight:'600', width:'160px',height:'50px', fontSize:'13px' }} >Thêm thành viên</Button>
-        <Button className='btn-add-tabmember' variant="contained"  style={{ background: '#1B264D',marginTop:'15px', fontWeight:'600', width:'160px',height:'50px', fontSize:'13px', marginLeft:'10px' }} >Thêm nhóm</Button>
+      </Modal>
+      <Modal
+        open={showFormUpdate}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormUpdate(false);
+        }}
+      >
+        <Box sx={style}>
+          <UpdateGroup club_id={club_id} group={groupSelected} setShow={setShowFormUpdate} />
+        </Box>
+      </Modal>
+      <DeleteGroup
+        open={showDialog}
+        setOpen={setShowDialog}
+        socket={socket}
+        group={groupSelected}
+      />
+      <div className='div-header-tabgroup'>
+        <div className='div-search-tabgroup'>
+          <Box
+            component="form"
+            sx={{
+              '& > :not(style)': { width: '30ch' },
+            }}>
+            <CustomTextField
+              value={search}
+              id="search-field-tabmember"
+              label="Tìm kiếm nhóm"
+              variant="standard"
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+              onKeyPress={event => 
+                event.key === 'Enter' ? handleSearchGroups(event) : null
+              }
+            />
+          </Box>
+          <Tooltip title='Tìm kiếm' placement='right-start'>
+            <Button
+              className='btn-search3'
+              variant="text"
+              disableElevation
+              onClick={handleSearchGroups}
+            >
+              <SearchIcon sx={{ color: '#1B264D' }} />
+            </Button>
+          </Tooltip>
+        </div>
+        <div className='div-action-tabgroup'>
+          {isLeader
+            ? (<Button
+              onClick={() => {
+                setShowFormAdd(true)
+              }}
+              variant="contained"
+              style={{ background: '#1B264D' }}>
+              Thêm nhóm
+            </Button>) : <></>}
+        </div>
+
       </div>
-      <div>
-        <h3 className='title-tabgroup'>Ban nội dung</h3>
-        <div style={{ height: 267, width: '95%',marginTop:'10px',marginLeft:'20px'  }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              checkboxSelection
+      <div className='div-list-tabgroup'>
+        {groups.length > 0 ?
+          groups.map(group => (
+            <Group key={group._id}
+              data={group}
+              socket={socket}
+              isLeader={isLeader}
+              handleDeleteGroup={(event) => {
+                handleDeleteGroup(event, group)
+              }}
+              handleUpdateGroup={(event) => {
+                handleUpdateGroup(event, group)
+              }}
             />
-        </div>
-
-        <h3 className='title-tabgroup'>Ban truyền thông</h3>
-        <div style={{ height: 267, width: '95%',marginTop:'10px',marginLeft:'20px'  }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              checkboxSelection
-            />
-        </div>
-
-        <h3 className='title-tabgroup'>Ban hậu cần</h3>
-        <div style={{ height: 267, width: '95%',marginTop:'10px',marginLeft:'20px'  }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              checkboxSelection
-            />
-        </div>
-
-        <h3 className='title-tabgroup'>Ban đối ngoại</h3>
-        <div style={{ height: 267, width: '95%',marginTop:'10px',marginLeft:'20px'  }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              checkboxSelection
-            />
-        </div>
+          )) :
+          (<div style={{ textAlign: 'center', marginTop: 100 }}>
+            <span>Câu lạc bộ chưa có nhóm nào...</span>
+          </div>)}
       </div>
     </div>
   )

@@ -1,15 +1,18 @@
-import React,{useState} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { Modal, Button, Tooltip, Box, TextField, styled } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import io from 'socket.io-client'
+import { UserContext } from '../../../UserContext';
+import { ENDPT } from '../../../helper/Helper';
+import AddFund from './AddFund';
+import PaymentList from "./PaymentList"
+import NumberFormat from 'react-number-format';
 import "./Fund.css"
 import "../../../assets/css/grid.css"
-import Modal from '@mui/material/Modal';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import PaymentList from "./PaymentList"
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import { styled } from '@mui/material/styles';
 import '../../manage/Mng.css'
-import AddFund from './AddFund';
+
+let socket
+
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: '#1B264D',
@@ -18,6 +21,7 @@ const CustomTextField = styled(TextField)({
     borderBottomColor: '#1B264D',
   },
 });
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -29,9 +33,76 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const Fund = () => {
-  const [showFormAddFund, setShowFormAddFund] = useState(false);
 
+const Fund = ({ club_id }) => {
+  let date = new Date();
+  let isTreasurer = false;
+  const { user, setUser } = useContext(UserContext);
+  const [search, setSearch] = useState();
+  const [club, setClub] = useState();
+  const [fundHistorys, setFundHistorys] = useState([])
+  const [showFormAddFund, setShowFormAddFund] = useState(false);
+  const [collectInMonth, setCollectInMonth] = useState(0);
+  const [payInMonth, setPayInMonth] = useState(0);
+
+  const handleChangeSearch = (event) => {
+    setSearch(event.target.value)
+  }
+
+  const handleSearchFund = (e) => {
+    e.preventDefault();
+    socket.emit('search-fundHistory', club_id, search)
+  }
+
+  useEffect(() => {
+    socket = io(ENDPT);
+    socket.emit('get-club', { club_id })
+    socket.emit('get-fundHistory', club_id)
+    socket.emit('get-col-pay-in-month', club_id)
+    socket.on('output-col-pay-in-month', (col, pay) => {
+      setCollectInMonth(col)
+      setPayInMonth(pay)
+    })
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+  }, [])
+
+  useEffect(() => {
+    socket.on('output-club', res => {
+      //console.log(res)
+      setClub(res)
+    })
+  }, [club])
+
+  useEffect(() => {
+    socket.on('output-fundHistory', res => {
+      setFundHistorys(res)
+    })
+
+    socket.on('fundHistory-created', (newFundHistory, fund) => {
+      //console.log('created')
+      setClub(prevClub => ({
+        ...prevClub,
+        fund: fund
+      }))
+      if (newFundHistory.type === 'Thu') {
+        setCollectInMonth(collectInMonth + newFundHistory.total)
+      } else {
+        setPayInMonth(payInMonth + newFundHistory.total)
+      }
+      setFundHistorys([...fundHistorys, newFundHistory])
+    })
+
+    socket.on('fundHistory-searched', res => {
+      setFundHistorys(res)
+    })
+  }, [fundHistorys])
+
+  if (user) {
+    isTreasurer = user._id === club?.treasurer._id
+  }
   return (
     <div className='div-fund'>
       <Modal
@@ -43,60 +114,73 @@ const Fund = () => {
         }}
       >
         <Box sx={style}>
-          <AddFund setShowFormAdd={setShowFormAddFund} />
+          <AddFund
+            setShowFormAdd={setShowFormAddFund}
+            socket={socket}
+            club_id={club_id}
+            user={user}
+          />
         </Box>
       </Modal>
-
-
-
       <div>
         <h2 className='title-header'>Tổng quan</h2>
         <div className="dashboard-overview">
-          <div className="dashboard-overview-row row">
-              <div className="col-3">
-                <div className='status-card'>
-                  <div className='status-card_icon'>
-                    {/* <PaidIcon /> */}
-                  </div>
-                  <div className='status-card_info'>
-                    <h4>Tổng quỹ </h4>
-                    <h3>2.000.000</h3>
-                  </div>
+          <div className="dashboard-overview-row">
+            <div className="dashboard-overview-row-cell">
+              <div className='status-card'>
+                <div className='status-card_icon'>
+                  {/* <PaidIcon /> */}
+                </div>
+                <div className='status-card_info'>
+                  <h4>Tổng quỹ</h4>
+                  <h3>
+                    <NumberFormat
+                      displayType='text'
+                      value={club?.fund}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                    />
+                  </h3>
                 </div>
               </div>
-              <div className="col-3">
-                <div className='status-card'>
-                  <div className='status-card_icon'>
+            </div>
+            <div className="dashboard-overview-row-cell">
+              <div className='status-card'>
+                <div className='status-card_icon'>
 
-                  </div>
-                  <div className='status-card_info'>
-                    <h4>Tiền thu </h4>
-                    <h3>1.000.000</h3>
-                  </div>
+                </div>
+                <div className='status-card_info'>
+                  <h4>{"Tiền thu tháng " + (date.getMonth() + 1)}</h4>
+                  <h3>
+                    <NumberFormat
+                      displayType='text'
+                      value={collectInMonth}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                    />
+                  </h3>
                 </div>
               </div>
-              <div className="col-3">
-                <div className='status-card'>
-                  <div className='status-card_icon'>
+            </div>
+            <div className="dashboard-overview-row-cell">
+              <div className='status-card'>
+                <div className='status-card_icon'>
 
-                  </div>
-                  <div className='status-card_info'>
-                    <h4>Tiền chi </h4>
-                    <h3>500.000</h3>
-                  </div>
+                </div>
+                <div className='status-card_info'>
+                  <h4>{"Tiền chi tháng " + (date.getMonth() + 1)}</h4>
+                  <h3>
+                    <NumberFormat
+                      displayType='text'
+                      value={payInMonth}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                    />
+                  </h3>
                 </div>
               </div>
-              <div className="col-3">
-                <div className='status-card'>
-                  <div className='status-card_icon'>
+            </div>
 
-                  </div>
-                  <div className='status-card_info'>
-                    <h4>ABCDE </h4>
-                    <h3>10</h3>
-                  </div>
-                </div>
-              </div>
           </div>
         </div>
       </div>
@@ -104,31 +188,46 @@ const Fund = () => {
       <div>
         <div className='div-title-search'>
           <h2 className='title-header2'>Lịch sử thu chi</h2>
-          <div className='div-search-fund'>
+          <div className='div-search-tabmember'>
             <Box
-              component="form"
               sx={{
-                '& > :not(style)': { m: 1, width: '30ch' },
+                '& > :not(style)': { width: '30ch' },
               }}
-              noValidate
-              autoComplete="off"
             >
-              <CustomTextField id="search-field" label="Tìm kiếm phiếu " variant="standard"  />
+              <CustomTextField
+                value={search}
+                onChange={handleChangeSearch}
+                id="search-field-tabmember"
+                label="Tìm kiếm phiếu thu/chi"
+                variant="standard"
+                onKeyPress={event => event.key === 'Enter' ? handleSearchFund(event) : null}
+              />
             </Box>
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
-                className='btn-search2'
+                className='btn-search3'
                 variant="text"
                 disableElevation
+                onClick={handleSearchFund}
               >
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            <Button className='btn-add-fund' variant="contained"  style={{ background: '#1B264D',marginTop:'10px', fontWeight:'600' }} onClick={() => setShowFormAddFund(true)}>Thêm phiếu</Button>
+            {isTreasurer ?
+              (<Button
+                onClick={() => {
+                  setShowFormAddFund(true)
+                }}
+                className='btn-add-tabmember'
+                variant="contained"
+                disableElevation
+                style={{ background: '#1B264D' }}>
+                Thêm phiếu
+              </Button>) : <></>}
           </div>
         </div>
         <div className='table-paymentlist'>
-          <PaymentList></PaymentList>
+          <PaymentList rows={fundHistorys} />
         </div>
       </div>
     </div>
