@@ -7,8 +7,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 function showhideOption(){
   var optionList = document.getElementById("extend-option");    
-    // document.getElementById("expand_less").style.display = "none";   
-    // document.getElementById("expand_less1").style.display = "none"; 
+
   if (optionList.className == "div-option")    
   {    
     optionList.className = "div-option-extend";
@@ -42,7 +41,7 @@ function showhideOption2(){
 const MessageOption = () => {
 
   return (
-    <div className='div-extand'>
+    <div className='div-extend'>
       <div className="edit-chat" onClick={()=>showhideOption()}>
           Tùy chỉnh đoạn chat
           <ExpandMoreIcon id="expand_more" className='icon-expand'></ExpandMoreIcon>

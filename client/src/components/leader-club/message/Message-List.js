@@ -1,14 +1,14 @@
 import React from 'react';
-import MessageItem from './message-item';
+import MessageItem from './Message-Item';
+import STB from 'react-scroll-to-bottom'
 
-
-const MessageList = (props) => {  
-        return (
-            <ul className="messages">
-                {props.messages.map(item =>
-                    <MessageItem key={item.id} user={item.userId === props.user? true: false} message={item.message}/>
-                )}
-            </ul>
-        )
+const MessageList = ({user, messages}) => {
+    return (
+        <STB className="messages">
+            {messages.map((message, index) => (
+                <MessageItem key={index} user={user} message={message} />
+            ))}
+        </STB>
+    )
 }
 export default MessageList;

@@ -60,6 +60,7 @@ module.exports.signup = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     const { username, password } = req.body;
+    //console.log(req.body)
     try {
         const user = await User.login(username, password);
         const token = createJWT(user._id);
@@ -74,7 +75,7 @@ module.exports.login = async (req, res) => {
 }
 module.exports.verifyuser = (req, res, next) => {
     const token = req.cookies.jwt;
-    //console.log(req)
+    //console.log(req.cookies.jwt)
     if (token) {
         jwt.verify(token, 'club secret', async (err, decodedToken) => {
             console.log('decoded Token', decodedToken);

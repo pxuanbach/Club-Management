@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
+import {
+    OutlinedInput, InputLabel, FormControl, InputAdornment,
+    IconButton, Button, TextField, Avatar, FormHelperText
+} from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Avatar from '@mui/material/Avatar';
-import FormHelperText from '@mui/material/FormHelperText';
 import '../Mng.css'
 import io from 'socket.io-client'
-import { ENDPT, my_API } from '../../../helper/Helper'
+import axiosInstance from '../../../helper/Axios';
+import { ENDPT } from '../../../helper/Helper'
 import { UploadImageUser } from '../../../helper/UploadImage'
 
 let socket;
@@ -35,9 +31,15 @@ const AddAccount = ({ handleClose }) => {
     const [passwordErr, setPasswordErr] = useState('');
     const [emailErr, setEmailErr] = useState('');
 
+    function isFileImage(file) {
+        return file && file['type'].split('/')[0] === 'image';
+    }
+
     const handleImageChange = (event) => {
-        if (event.target.files && event.target.files[0]) {
+        if (isFileImage(event.target.files[0])) {
             setAvatarImage(event.target.files[0]);
+        } else {
+            alert('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...')
         }
     };
 
@@ -57,8 +59,7 @@ const AddAccount = ({ handleClose }) => {
         setEmailErr('');
         try {
             setIsSuccess(true);
-            const res = await fetch(my_API + 'signup', {
-                method: 'POST',
+            const res = await axiosInstance.post('/signup', {
                 credentials: 'include',
                 body: JSON.stringify({
                     'username': values.username,
@@ -70,7 +71,7 @@ const AddAccount = ({ handleClose }) => {
                 headers: { 'Content-Type': 'application/json' }
             })
             const data = await res.json();
-            console.log('signup response', data)
+            //console.log('signup response', data)
             if (data.errors) {
                 setUsernameErr(data.errors.username)
                 setPasswordErr(data.errors.password);
@@ -81,10 +82,10 @@ const AddAccount = ({ handleClose }) => {
                 let img_upload_data = await UploadImageUser(avatarImage)
                     .catch(err => console.log(err));
 
-                socket.emit('account-created', 
-                    data.user._id, 
+                socket.emit('account-created',
+                    data.user._id,
                     img_upload_data.secure_url,
-                    img_upload_data.public_id, 
+                    img_upload_data.public_id,
                     handleClose);
             }
 
@@ -115,7 +116,7 @@ const AddAccount = ({ handleClose }) => {
                     <div className='modal-avatar'>
                         <input type="file" ref={inputAvatarImage} onChange={handleImageChange} />
                         <Avatar className='avatar' ref={avatarRef}
-                            sx={{ height: avatarHeight}}
+                            sx={{ height: avatarHeight }}
                             onClick={() => { inputAvatarImage.current.click() }}
                             src={avatarImage ? URL.createObjectURL(avatarImage)
                                 : ''}>

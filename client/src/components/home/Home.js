@@ -39,15 +39,31 @@ const Home = () => {
   }, [ENDPT])
 
   useEffect(() => {
+    let isAdmin = user?.username.includes('admin');
+    socket.emit('get-clubs', user?._id, isAdmin)
+  }, [user])
+
+  useEffect(() => {
     socket.on('output-clubs', clbs => {
       setClubs(clbs)
       console.log('clubs', clubs)
     })
+    
   }, [])
 
   useEffect(() => {
     socket.on('club-created', clb => {
       setClubs([...clubs, clb])
+    })
+    socket.on('member-added', (userAdded, clb) => {
+      if (user._id === userAdded._id) {
+        setClubs([...clubs, clb])
+      }
+    })
+    socket.on('removed-user-from-club', (club_id, userRemoved) => {
+      if (user._id === userRemoved._id) {
+        setClubs(clubs.filter(club => club._id !== club_id))
+      }
     })
   }, [clubs])
 
@@ -99,7 +115,8 @@ const Home = () => {
         <div className='div-card-team'>
           {clubs && clubs.map(club => (
             <Link key={club._id} 
-              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name}
+              style={{textDecoration: 'none'}}
+              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name + '/message'}
               onClick={() => {
                 setOpenSnackbar(true)
               }}>

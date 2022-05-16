@@ -8,10 +8,16 @@ function ConvertClub(data) {
     club.description = data.description;
     club.isblocked = data.isblocked;
     club.fund = data.fund;
-    club.leader = data.leader.name;
-    club.treasurer = data.treasurer.name;
+    club.leader = {
+        _id: data.leader._id,
+        name: data.leader.name,
+    };
+    club.treasurer = {
+        _id: data.treasurer._id,
+        name: data.treasurer.name,
+    };
     //Relation field
-    club.members_num = 2; // + ...
+    club.members_num = 2 + data.members.length; // + ...
 
     return club;
 }
@@ -29,15 +35,36 @@ function ConvertClubs(data) {
         club.description = elm.description;
         club.isblocked = elm.isblocked;
         club.fund = elm.fund;
-        club.leader = elm.leader.name;
-        club.treasurer = elm.treasurer.name;
+        club.leader = {
+            _id: elm.leader._id,
+            name: elm.leader.name,
+        };
+        club.treasurer = {
+            _id: elm.treasurer._id,
+            name: elm.treasurer.name,
+        };
         //Relation field
-        club.members_num = 2; // + ...
+        club.members_num = 2 + elm.members.length; // + ...
 
         clubs.push(club);
     })
 
     return clubs;
+}
+
+function ConvertUser(data) {
+    let user = {}
+
+    user._id = data._id;
+    user.name = data.name;
+    user.username = data.username;
+    user.img_url = data.img_url;
+    user.cloudinary_id = data.cloudinary_id;
+    user.email = data.email;
+    user.isblocked = data.isblocked;
+    user.groups_num = data.clubs.length;
+
+    return user;
 }
 
 function ConvertUsers(data) {
@@ -53,7 +80,7 @@ function ConvertUsers(data) {
         user.cloudinary_id = elm.cloudinary_id;
         user.email = elm.email;
         user.isblocked = elm.isblocked;
-        user.groups_num = elm.groups.length;
+        user.groups_num = elm.clubs.length;
 
         users.push(user)
     });
@@ -61,4 +88,4 @@ function ConvertUsers(data) {
     return users;
 }
 
-module.exports = { ConvertClub, ConvertClubs, ConvertUsers }
+module.exports = { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers }

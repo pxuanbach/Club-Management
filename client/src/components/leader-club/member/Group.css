@@ -1,0 +1,20 @@
+.header-group{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.title-group{
+    color: #1B264D;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+.control-group{
+    display: flex;
+    gap: 10px;
+}
+.control-group button{
+    min-width: 0;
+    padding: 3px 5px;
+    border-color: #1B264D;
+}
