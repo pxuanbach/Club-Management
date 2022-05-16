@@ -50,7 +50,8 @@ const Fund = ({ club_id }) => {
   }
 
   const handleSearchFund = (e) => {
-
+    e.preventDefault();
+    socket.emit('search-fundHistory', club_id, search)
   }
 
   useEffect(() => {
@@ -79,20 +80,23 @@ const Fund = ({ club_id }) => {
     socket.on('output-fundHistory', res => {
       setFundHistorys(res)
     })
+
     socket.on('fundHistory-created', (newFundHistory, fund) => {
       //console.log('created')
       setClub(prevClub => ({
         ...prevClub,
         fund: fund
       }))
-
       if (newFundHistory.type === 'Thu') {
         setCollectInMonth(collectInMonth + newFundHistory.total)
       } else {
         setPayInMonth(payInMonth + newFundHistory.total)
       }
-
       setFundHistorys([...fundHistorys, newFundHistory])
+    })
+
+    socket.on('fundHistory-searched', res => {
+      setFundHistorys(res)
     })
   }, [fundHistorys])
 

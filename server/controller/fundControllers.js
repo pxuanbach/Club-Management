@@ -47,13 +47,17 @@ module.exports = function (socket, io) {
         firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
         lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-        FundHistory.find({$and: [
-            { club: club_id },
-            { createdAt: {
-                $gt: firstDay,
-                $lte: lastDay
-            }}
-        ]})
+        FundHistory.find({
+            $and: [
+                { club: club_id },
+                {
+                    createdAt: {
+                        $gt: firstDay,
+                        $lte: lastDay
+                    }
+                }
+            ]
+        })
             .then(result => {
                 let collect = 0;
                 let pay = 0;
@@ -66,6 +70,22 @@ module.exports = function (socket, io) {
                 })
                 //console.log(result, collect, pay, firstDay, lastDay)
                 io.emit('output-col-pay-in-month', collect, pay)
+            })
+    })
+
+    socket.on('search-fundHistory', (club_id, search) => {
+        FundHistory.find({
+            $and: [
+                { club: club_id },
+                {
+                    $or: [
+                        { content: { $regex: search } },
+                    ]
+                }
+            ]
+        }).populate('author')
+            .then(result => {
+                io.emit('fundHistory-searched', result)
             })
     })
 }
