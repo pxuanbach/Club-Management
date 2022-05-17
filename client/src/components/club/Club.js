@@ -12,6 +12,7 @@ import './Club.css'
 const Club = () => {
   const { club_id, club_name } = useParams();
   const [club, setClub] = useState();
+
   useEffect(() => {
     const verifyClub = async () => {
       try {
@@ -24,7 +25,8 @@ const Club = () => {
       }
     }
     verifyClub();
-  }, [])
+  }, []);
+
   return (
     <div className='club'>
       <div className='div-left-club'>
@@ -33,7 +35,7 @@ const Club = () => {
       <div className="div-right-club">
         <Switch >
           <Route path={`/club/${club_id}/${club_name}/activity`}>
-            <Activity match={`/club/${club_id}/${club_name}/activity`}/>
+            <Activity match={`/club/${club_id}/${club_name}/activity`} club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/calendar`}>
             <Calendar />

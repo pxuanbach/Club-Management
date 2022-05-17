@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Avatar, Divider, Button, Tooltip, Modal } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Tooltip, Modal, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
-import './TabContent.css'
+import { Link } from 'react-router-dom';
+import io from 'socket.io-client';
 import ActivityItem from '../ActivityItem';
-import FormActivity from '../FormActivity';
-import { Link, Route, Switch } from 'react-router-dom'
+import AddActivity from '../action/AddActivity';
+import { ENDPT } from '../../../../helper/Helper'
+import './TabContent.css';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -18,15 +18,49 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const TabContent = ({ match }) => {
-  const [showFormActivity, setShowFormActivity] = useState(false);
+const style = {
+  position: 'absolute',
+  top: '45%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 550,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 3,
+};
+
+let socket
+
+const TabContent = ({ match, club_id }) => {
+  const [showFormAdd, setShowFormAdd] = useState(false);
 
   useEffect(() => {
-    console.log(match)
+    socket = io(ENDPT);
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
   }, [])
 
   return (
     <div>
+      <Modal
+        open={showFormAdd}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormAdd(false);
+        }}
+      >
+        <Box sx={style}>
+          <AddActivity
+            setShow={setShowFormAdd}
+            socket={socket}
+            club_id={club_id}
+          />
+        </Box>
+      </Modal>
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
@@ -54,7 +88,7 @@ const TabContent = ({ match }) => {
             </Tooltip>
             <Button
               onClick={() => {
-
+                setShowFormAdd(true)
               }}
               className='btn-add-tabcontent'
               variant="contained"
