@@ -9,6 +9,7 @@ import Info from "./components/info/Info";
 import Navbar from "./components/layout/Navbar";
 import Club from './components/club/Club';
 import Login from './components/auth/Login'
+import FormActivity from "./components/leader-club/activity/FormActivity";
 import axiosInstance from "./helper/Axios";
 
 

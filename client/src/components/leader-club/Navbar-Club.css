@@ -17,7 +17,7 @@
 .btn-back{
   text-decoration: none;
   color: #1B264D;
-  
+  cursor: pointer;
   
 }
 .btn-back >i{

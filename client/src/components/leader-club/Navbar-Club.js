@@ -20,7 +20,7 @@ const NavbarClub = ({club}) => {
                 <div className='div-back'>
                     <Link to='/' className="btn-back">
                         <i class="fa-solid fa-angle-left"></i>
-                        All team</Link>
+                        Tất cả câu lạc bộ</Link>
                 </div>
                 <div className='div-clb'>
                     <Avatar className='logo-team' sx={{ width: 120, height: 120 }} src={club?.img_url}></Avatar>

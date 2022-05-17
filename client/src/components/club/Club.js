@@ -1,6 +1,6 @@
 import { Switch, Route, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from "react";
-import Activity from "../leader-club/activity/Activity"
+import TabContent from '../leader-club/activity/tabcontent/TabContent';
 import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/member/Member"
 import Message from "../leader-club/message/Message"
@@ -33,7 +33,7 @@ const Club = () => {
       <div className="div-right-club">
         <Switch >
           <Route path={`/club/${club_id}/${club_name}/activity`}>
-            <Activity />
+            <TabContent />
           </Route>
           <Route path={`/club/${club_id}/${club_name}/calendar`}>
             <Calendar />

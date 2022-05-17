@@ -1,38 +1,38 @@
 import React, { useState, useEffect } from 'react'
-import {Container, Draggable} from 'react-smooth-dnd'
+import { Container, Draggable } from 'react-smooth-dnd'
 import './FormActivity.scss'
 import Column from './Column'
-import {mapOrder} from './utilities/sort'
-import {applyDrag} from './utilities/dragDrop'
+import { mapOrder } from './utilities/sort'
+import { applyDrag } from './utilities/dragDrop'
 import { initialData } from './action/initialData'
-import {isEmpty} from 'lodash'
+import { isEmpty } from 'lodash'
 import 'font-awesome/css/font-awesome.min.css'
 
 
-const FormActivity = ({ setShowForm }) => {
+const FormActivity = ({ setShowForm, showHideFunction }) => {
   const [board, setBoard] = useState({})
-  const [columns,setColumns] = useState([])
+  const [columns, setColumns] = useState([])
 
   useEffect(() => {
     const boardFromDB = initialData.boards.find(board => board.id === 'board-1')
-    if(boardFromDB){
+    if (boardFromDB) {
       setBoard(boardFromDB)
       //sort column
 
 
-      setColumns(mapOrder(boardFromDB.columns,boardFromDB.columnOrder,'id'))
+      setColumns(mapOrder(boardFromDB.columns, boardFromDB.columnOrder, 'id'))
     }
-  },[])
+  }, [])
 
-  if(isEmpty(board)){
-    return <div className='not-found' style={{'padding':'60px', 'color':'blue'}}>Board not found</div>
+  if (isEmpty(board)) {
+    return <div className='not-found' style={{ 'padding': '60px', 'color': 'blue' }}>Board not found</div>
   }
 
   const onColumnDrop = (dropResult) => {
     let newColumns = [...columns]
     newColumns = applyDrag(newColumns, dropResult)
 
-    let newBoard = {...board}
+    let newBoard = { ...board }
     newBoard.columnOrder = newColumns.map(c => c.id)
     newBoard.columns = newColumns
     setColumns(newColumns)
@@ -40,41 +40,52 @@ const FormActivity = ({ setShowForm }) => {
   }
 
   const onCardDrop = (columnId, dropResult) => {
-    if(dropResult.removedIndex !== null || dropResult.addedIndex !== null){
+    if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
       let newColumns = [...columns]
 
-      let currentColumn = newColumns.find( c => c.id === columnId)
+      let currentColumn = newColumns.find(c => c.id === columnId)
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult)
       currentColumn.cardOrder = currentColumn.cards.map(i => i.id)
-    
+
       setColumns(newColumns)
     }
   }
-  
+
   const onUpdateColumn = (newColumnToUpdate) => {
-    const columnIdToUpdate =newColumnToUpdate.id
+    const columnIdToUpdate = newColumnToUpdate.id
 
     let newColumns = [...columns]
     const columnIndexToUpdate = newColumns.findIndex(i => i.id === columnIdToUpdate)
 
-    if(newColumnToUpdate._destroy){
+    if (newColumnToUpdate._destroy) {
       newColumns.splice(columnIndexToUpdate, 1)
     } else {
       console.log(newColumnToUpdate)
       newColumns.splice(columnIndexToUpdate, 1, newColumnToUpdate)
     }
 
-    let newBoard = {...board}
-    newBoard.columnOrder = newColumns.map( c => c.id)
+    let newBoard = { ...board }
+    newBoard.columnOrder = newColumns.map(c => c.id)
     newBoard.columns = newColumns
 
     setColumns(newColumns)
-    setBoard(newBoard )
+    setBoard(newBoard)
   }
 
-
   return (
-    <div  className='div-detail-activity'>
+    <div className='div-detail-activity'>
+      <div className='div-back'>
+        <a className="btn-back" 
+          style={{ color: 'white' }}
+          onClick={() => {
+            console.log('click')
+            showHideFunction()
+          }}
+        >
+          <i class="fa-solid fa-angle-left"></i>
+          Trở về
+        </a>
+      </div>
       <div className='board-columns'>
         <Container
           orientation='horizontal'
@@ -86,13 +97,13 @@ const FormActivity = ({ setShowForm }) => {
             showOnTop: true,
             className: 'column-drop-preview'
           }}
-        
+
         >
           {columns.map((column, index) => (
             <Draggable key={index}>
-              <Column 
-                column={column} 
-                onCardDrop={onCardDrop} 
+              <Column
+                column={column}
+                onCardDrop={onCardDrop}
                 onUpdateColumn={onUpdateColumn}
               />
             </Draggable>

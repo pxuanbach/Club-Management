@@ -238,7 +238,6 @@ const TabMember = ({ club_id }) => {
             </Box>
             <Tooltip title='Tìm kiếm' placement='right-start'>
               <Button
-                className='btn-search3'
                 variant="text"
                 disableElevation
                 onClick={handleSearchMembers}
