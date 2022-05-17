@@ -2,6 +2,7 @@ import React from 'react'
 import Button from '@mui/material/Button';
 import './Info.css'
 import KeyIcon from '@mui/icons-material/Key';
+import ImageInfo from '../../assets/imageInfo.png'
 const Info = () => {
   const showhideFunction = () => {
     var actionList = document.getElementById("listButton");    
@@ -62,7 +63,7 @@ const showhideFunction2 = () => {
   } 
 }
   return (
-    <div style={{display: "flex"}}>
+    <div className='page-infor' style={{display: "flex"}}>
       <div className='div-infor'>
         <h3 className='title-profile'>Thông tin cá nhân</h3> 
 
@@ -143,37 +144,43 @@ const showhideFunction2 = () => {
         </div>
         
       </div>
+      <div style={{flex: 1}}>
+        <div className='div-image'>
+          <img className='imageInfo' src={ImageInfo} />
+        
+        </div>
+        <div style={{border: "1px solid #ccc", borderRadius: 5, margin: 20,marginLeft:0,marginTop:20, height: "50vh", backgroundColor:'white'}}>
+          <div style={{display:"flex", borderBottom: "1px solid #ccc", alignItems:"center" }}>
+            <div style={{padding:10, paddingLeft: 25}}>
+            <KeyIcon sx={{fontSize: "2.5rem",transform: "rotate(-45deg)"}}></KeyIcon>
+            </div>
+            <div style={{lineHeight:1.4}}>
+            <h4 className='title-reset-pass'>Đổi mật khẩu</h4>
+            <p style={{width:500, color: "grey", fontFamily:"arial", fontSize: "14px"}}>Bạn nên sử dụng mật khẩu mạnh mà mình chưa sử dụng ở đâu khác</p>
+            </div>
+          </div>
+          <div style={{borderBottom: "1px solid #ccc"}}>
+            <div className='div-text-password'>
+              <label>Mật khẩu hiện tại:</label>
+              <input></input>
+            </div>
+            <div className='div-text-password'>
+              <label>Mật khẩu mới:</label>
+              <input></input>
+            </div>
+            <div className='div-text-password'>
+              <label>Nhập lại mật khẩu mới:</label>
+              <input></input>
+            </div>
+            <div style={{padding:20}} >
+              <label style={{color:"#1976d2", marginLeft:100, cursor:'pointer'}}>Bạn quên mật khẩu ?</label>
+            </div>
+          </div>
+          <div className='list-action-password'>
+              <Button variant='outlined'>Lưu thay đổi</Button>
+          </div>
+        </div>
 
-      <div style={{border: "1px solid #ccc", margin: 20,marginLeft:5, height: "50vh"}}>
-        <div style={{display:"flex", borderBottom: "1px solid #ccc", alignItems:"center" }}>
-          <div style={{padding:10, paddingLeft: 25}}>
-          <KeyIcon sx={{fontSize: "2.5rem",transform: "rotate(-45deg)"}}></KeyIcon>
-          </div>
-          <div style={{lineHeight:1.4}}>
-          <h4 className='title-reset-pass'>Đổi mật khẩu</h4>
-          <p style={{width:500, color: "grey", fontFamily:"arial", fontSize: "14px"}}>Bạn nên sử dụng mật khẩu mạnh mà mình chưa sử dụng ở đâu khác</p>
-          </div>
-        </div>
-        <div style={{borderBottom: "1px solid #ccc"}}>
-          <div className='div-text-password'>
-            <label>Mật khẩu hiện tại:</label>
-            <input></input>
-          </div>
-          <div className='div-text-password'>
-            <label>Mật khẩu mới:</label>
-            <input></input>
-          </div>
-          <div className='div-text-password'>
-            <label>Nhập lại mật khẩu mới:</label>
-            <input></input>
-          </div>
-          <div style={{padding:20}} >
-            <label style={{color:"#1976d2", marginLeft:100, cursor:'pointer'}}>Bạn quên mật khẩu ?</label>
-          </div>
-        </div>
-        <div className='list-action-password'>
-            <Button variant='outlined'>Lưu thay đổi</Button>
-        </div>
       </div>
     </div>
   )

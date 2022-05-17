@@ -1,11 +1,13 @@
 .div-infor{
+    flex: 2;
     margin: 20px;
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 20px;
-    width: 55%;
+    border-radius: 5px;
     /* box-shadow: 1px 2px 10px rgb(0 0 0 / 25%); */
     border: 1px solid #ccc;
+    background-color: white;
 }
 .title-profile{
     border-bottom: 1px solid #ccc;
@@ -98,6 +100,7 @@
     outline: none;
 }
 .div-text-profile > p{
+    width: 50%;
     padding-right: 10px;
     padding-left: 20px;
     font-size: 1.0rem;
@@ -158,4 +161,28 @@
     padding: 15px;
     padding-right: 20px;
     
+}
+.div-image{
+    width: 290px;
+    margin-left: 180px;
+    padding-top: 30px;
+    
+}
+.imageInfo{
+    width: 80%;
+    border-radius: 50%;
+    
+}
+
+
+
+@media only screen and (max-width: 63.9375em) {
+    .page-infor{
+        flex-direction: column;
+        padding: 0;
+    }
+    .div-infor{
+        width: 100%;
+        margin: 0;
+    }
 }
