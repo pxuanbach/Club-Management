@@ -7,9 +7,10 @@ import { applyDrag } from './utilities/dragDrop'
 import { initialData } from './action/initialData'
 import { isEmpty } from 'lodash'
 import 'font-awesome/css/font-awesome.min.css'
+import {Link} from 'react-router-dom'
 
 
-const FormActivity = ({ setShowForm, showHideFunction }) => {
+const FormActivity = ({ setShowForm, showHideFunction, match }) => {
   const [board, setBoard] = useState({})
   const [columns, setColumns] = useState([])
 
@@ -75,16 +76,13 @@ const FormActivity = ({ setShowForm, showHideFunction }) => {
   return (
     <div className='div-detail-activity'>
       <div className='div-back'>
-        <a className="btn-back" 
+        <Link className="btn-back" 
           style={{ color: 'white' }}
-          onClick={() => {
-            console.log('click')
-            showHideFunction()
-          }}
+          to={`${match}`}
         >
           <i class="fa-solid fa-angle-left"></i>
           Trở về
-        </a>
+        </Link>
       </div>
       <div className='board-columns'>
         <Container

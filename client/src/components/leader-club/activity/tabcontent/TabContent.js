@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import './TabContent.css'
 import ActivityItem from '../ActivityItem';
 import FormActivity from '../FormActivity';
+import { Link, Route, Switch } from 'react-router-dom'
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -17,21 +18,13 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const showHideFunction = () => {
-  var formContent = document.getElementById("formcontent");
-  var formactivity = document.getElementById("formactivity");
-  if (formContent.className === "div-tabcontent") {
-    formContent.className = "div-tabcontentOff";
-    formactivity.className = "form-activityOn"
-
-  } else {
-    formContent.className = "div-tabcontent";
-    formactivity.className = "form-activityOff"
-  }
-}
-
-const TabContent = () => {
+const TabContent = ({ match }) => {
   const [showFormActivity, setShowFormActivity] = useState(false);
+
+  useEffect(() => {
+    console.log(match)
+  }, [])
+
   return (
     <div>
       <div id='formcontent' className='div-tabcontent'>
@@ -72,14 +65,15 @@ const TabContent = () => {
           </div>
         </div>
         <div className='div-body-content' >
-          <div className='item-work' onClick={() => showHideFunction()}>
-            <ActivityItem ></ActivityItem>
+          <div className='item-work' onClick={() => { }}>
+            <Link to={match + '/chaongaymoi'}>
+              <ActivityItem></ActivityItem>
+            </Link>
+
           </div>
         </div>
       </div>
-      <div id='formactivity' className='form-activityOff'>
-        <FormActivity showHideFunction={showHideFunction}></FormActivity>
-      </div>
+
     </div>
   )
 }
