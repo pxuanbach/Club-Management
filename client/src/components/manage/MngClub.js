@@ -11,6 +11,7 @@ import DeleteClub from './modal/DeleteClub';
 import io from 'socket.io-client'
 import './Mng.css';
 import { ENDPT } from '../../helper/Helper';
+import axiosInstance from '../../helper/Axios';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 
@@ -176,53 +177,67 @@ const ManageClub = () => {
   ];
 
   useEffect(() => {
-    socket = io(ENDPT);
-    //socket.emit('join', { username: values.username, password: values.password})
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
+    const getListClub = async () => {
+      let isAdmin = user?.username.includes('admin');
+      let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      let data = res.data
+      if (data) {
+        setClubs(data)
+      }
     }
-  }, [ENDPT])
-
-  useEffect(() => {
-    socket.emit('get-clubs', '', true)
-    socket.on('output-clubs', clbs => {
-      setClubs(clbs)
-      console.log('clubs', clubs)
-    })
+    getListClub()
   }, [])
 
-  useEffect(() => {
-    socket.on('club-created', clb => {
-      setClubs([...clubs, clb])
-    })
-    socket.on('club-updated', clb => {
-      const updateClubs = clubs.map((elm) => {
-        if (elm._id === clb._id) {
-          return {
-            ...elm,
-            name: clb.name,
-            description: clb.description,
-            img_url: clb.img_url,
-            cloudinary_id: clb.cloudinary_id,
-          }
-        }
-        return elm;
-      });
+  // useEffect(() => {
+  //   socket = io(ENDPT);
+  //   //socket.emit('join', { username: values.username, password: values.password})
+  //   return () => {
+  //     socket.emit('disconnect');
+  //     socket.off();
+  //   }
+  // }, [ENDPT])
 
-      setClubs(updateClubs)
-    })
-    socket.on('club-deleted', clb => {
-      var deleteClubs = clubs.filter(function (value, index, arr) {
-        return value._id !== clb._id;
-      })
+  // useEffect(() => {
+  //   socket.emit('get-clubs', '', true)
+  //   socket.on('output-clubs', clbs => {
+  //     setClubs(clbs)
+  //     console.log('clubs', clubs)
+  //   })
+  // }, [])
 
-      setClubs(deleteClubs)
-    })
-    socket.on('club-searched', clbs => {
-      setClubs(clbs);
-    })
-  }, [clubs])
+  // useEffect(() => {
+  //   socket.on('club-created', clb => {
+  //     setClubs([...clubs, clb])
+  //   })
+  //   socket.on('club-updated', clb => {
+  //     const updateClubs = clubs.map((elm) => {
+  //       if (elm._id === clb._id) {
+  //         return {
+  //           ...elm,
+  //           name: clb.name,
+  //           description: clb.description,
+  //           img_url: clb.img_url,
+  //           cloudinary_id: clb.cloudinary_id,
+  //         }
+  //       }
+  //       return elm;
+  //     });
+
+  //     setClubs(updateClubs)
+  //   })
+  //   socket.on('club-deleted', clb => {
+  //     var deleteClubs = clubs.filter(function (value, index, arr) {
+  //       return value._id !== clb._id;
+  //     })
+
+  //     setClubs(deleteClubs)
+  //   })
+  //   socket.on('club-searched', clbs => {
+  //     setClubs(clbs);
+  //   })
+  // }, [clubs])
 
   if (!user) {
     return <Redirect to='/login' />
@@ -238,7 +253,7 @@ const ManageClub = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAdd={setShowFormAdd} />
+          <AddClub setShowFormAdd={setShowFormAdd} clubs={clubs} setClubs={setClubs}/>
         </Box>
       </Modal>
       <Modal

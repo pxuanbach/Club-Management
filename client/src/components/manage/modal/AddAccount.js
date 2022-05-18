@@ -59,18 +59,20 @@ const AddAccount = ({ handleClose }) => {
         setEmailErr('');
         try {
             setIsSuccess(true);
-            const res = await axiosInstance.post('/signup', {
-                credentials: 'include',
-                body: JSON.stringify({
+            const res = await axiosInstance.post('/signup',
+                JSON.stringify({
                     'username': values.username,
                     'password': values.password,
                     'img_url': '',
                     'name': values.name,
                     'email': values.email,
-                }),
-                headers: { 'Content-Type': 'application/json' }
+                }), {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                }
             })
-            const data = await res.json();
+            const data = res.data;
             //console.log('signup response', data)
             if (data.errors) {
                 setUsernameErr(data.errors.username)

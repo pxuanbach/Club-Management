@@ -47,6 +47,7 @@ const alertError = (err) => {
 
 module.exports.signup = async (req, res) => {
     const { username, password, img_url, cloudinary_id, name, email } = req.body;
+    console.log(req.body)
     try {
         const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
         res.status(201).json({user});

@@ -297,11 +297,39 @@ module.exports.getList = async (req, res) => {
     }
     //console.log(query)
 
-    var clubs = await Club.find(query);
+    var clubs = await Club.find(query).populate('leader').populate('treasurer');
 
     if (clubs) {
-        res.status(200).send(clubs)
+        res.status(200).send(ConvertClubs(clubs))
     } else {
         res.status(404).send()
     }
+}
+
+module.exports.create = async (req, res) => {
+    const {
+        name, img_url, cloudinary_id, description, leader, treasurer
+    } = req.body
+    //console.log(name, img_url, cloudinary_id, description, leader, treasurer);
+
+    const club = new Club({
+        name, img_url, cloudinary_id, description, leader, treasurer
+    });
+
+    club.save().then(result => {
+        User.find({ _id: { $in: [leader, treasurer] } })
+            .then(users => {
+                users.forEach(user => {
+                    user.clubs.push(result._id)
+                    user.save();
+                });
+            })
+            
+        ChatRoom.create({ room_id: result._id })
+        res.status(200).send(ConvertClub(result))
+        //console.log(result)
+    }).catch(err => {
+        console.log(err)
+        res.status(404).send({err})
+    })
 }

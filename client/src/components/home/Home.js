@@ -3,15 +3,11 @@ import AddClub from '../manage/modal/AddClub';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Snackbar from '@mui/material/Snackbar';
-import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
-import {ENDPT} from '../../helper/Helper';
 import axiosInstance from '../../helper/Axios'
 import { Link, Redirect } from 'react-router-dom'
 import {UserContext} from '../../UserContext'
-
-let socket;
 
 const style = {
   position: 'absolute',
@@ -43,7 +39,6 @@ const Home = () => {
       }
     }
     getListClub()
-
   }, [])
 
   // useEffect(() => {

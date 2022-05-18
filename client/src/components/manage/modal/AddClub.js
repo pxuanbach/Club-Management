@@ -3,7 +3,7 @@ import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
+import axiosInstance from '../../../helper/Axios'
 import io from 'socket.io-client';
 import FindMember from './FindMember'
 import { UploadImageClub } from '../../../helper/UploadImage';
@@ -11,7 +11,7 @@ import { ENDPT } from '../../../helper/Helper'
 
 let socket;
 
-const AddClub = ({ setShowFormAdd }) => {
+const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
     const [avatarHeight, setAvatarHeight] = useState(150);
@@ -80,14 +80,32 @@ const AddClub = ({ setShowFormAdd }) => {
             img_upload_data = await UploadImageClub(avatarImage)
                 .catch(err => console.log(err));;
         }
-        socket.emit('create-club',
-            values.name,
-            img_upload_data.secure_url,
-            img_upload_data.public_id,
-            values.description,
-            leaderSelected,
-            treasurerSelected,
-            resetState)
+        
+        const res = await axiosInstance.post('/club/create', JSON.stringify({
+            'name': values.name,
+            'img_url': img_upload_data.secure_url,
+            'cloudinary_id': img_upload_data.public_id,
+            'description': values.description,
+            'leader': leaderSelected._id,
+            'treasurer': treasurerSelected._id
+        }), {
+            headers: { 'Content-Type': 'application/json' }
+        })
+
+        const data = res.data
+        
+        if (data) {
+            setClubs([...clubs, data])
+            resetState();
+        }
+        // socket.emit('create-club',
+        //     values.name,
+        //     img_upload_data.secure_url,
+        //     img_upload_data.public_id,
+        //     values.description,
+        //     leaderSelected,
+        //     treasurerSelected,
+        //     resetState)
     }
 
     const resetState = () => {
