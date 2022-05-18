@@ -11,7 +11,6 @@ module.exports = function (socket, io) {
             //console.log('output-clubs: ', clubs)
             socket.emit('output-clubs', ConvertClubs(clubs))
         })
-
     })
 
     socket.on('get-club', ({ club_id }) => {
@@ -106,7 +105,7 @@ module.exports = function (socket, io) {
         callback();
     })
 
-    socket.on('get-members', club_id => {
+    socket.on('get-members', (user_id, club_id) => {
         Club.findById(club_id).then(club => {
             User.find({ _id: { $in: club.members } }).then(users => {
                 io.emit('output-members', ConvertUsers(users));
@@ -120,10 +119,10 @@ module.exports = function (socket, io) {
             arrId.push(club.leader._id)
             arrId.push(club.treasurer._id)
             //console.log(arrId)
-            User.find({ 
-                _id: { 
+            User.find({
+                _id: {
                     $in: arrId
-                } 
+                }
             }).then(users => {
                 io.emit('output-members-leader-treasurer', ConvertUsers(users));
             })
@@ -284,4 +283,25 @@ module.exports.verifyclub = async (req, res, next) => {
         res.status(400).json({ club: 'none' })
     }
 
+}
+
+module.exports.getList = async (req, res) => {
+    const isAdmin = req.params.isAdmin;
+    const userId = req.params.userId;
+    //console.log(typeof isAdmin, userId)
+    let query;
+    if (isAdmin === 'true') {
+        query = {}
+    } else {
+        query = { $or: [{ members: userId }, { 'leader._id': userId }, { 'treasurer._id': userId }] }
+    }
+    //console.log(query)
+
+    var clubs = await Club.find(query);
+
+    if (clubs) {
+        res.status(200).send(clubs)
+    } else {
+        res.status(404).send()
+    }
 }

@@ -3,20 +3,6 @@ const Message = require('../models/Message')
 const { addUser, getUser } = require('../helper/ChatRoomHelper');
 
 module.exports = function (socket, io) {
-    socket.on('join', ({ user_id, room_id }) => {
-        const { error, user } = addUser({
-            socket_id: socket.id,
-            user_id,
-            room_id
-        })
-        socket.join(room_id);
-        if (error) {
-            console.log('join error', error)
-        } else {
-            console.log('join user', user)
-        }
-    })
-
     socket.on('sendMessage', (user_id, type, content, room_id, callback) => {
         console.log(socket.id)
         const user = getUser({user_id, room_id});

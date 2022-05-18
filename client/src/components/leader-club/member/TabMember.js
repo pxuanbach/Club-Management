@@ -67,7 +67,7 @@ const TabMember = ({ club_id }) => {
 
   useEffect(() => {
     //console.log('club id', club_id)
-    socket.emit('get-members', club_id)
+    socket.emit('get-members', user?._id, club_id)
     socket.on('output-members', users => {
       setMembers(users)
     })

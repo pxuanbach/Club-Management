@@ -7,6 +7,7 @@ import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
 import {ENDPT} from '../../helper/Helper';
+import axiosInstance from '../../helper/Axios'
 import { Link, Redirect } from 'react-router-dom'
 import {UserContext} from '../../UserContext'
 
@@ -31,41 +32,56 @@ const Home = () => {
   const [clubs, setClubs] = useState([])
 
   useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
+    const getListClub = async () => {
+      let isAdmin = user?.username.includes('admin');
+      let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      let data = res.data
+      if (data) {
+        setClubs(data)
+      }
     }
-  }, [ENDPT])
+    getListClub()
 
-  useEffect(() => {
-    let isAdmin = user?.username.includes('admin');
-    socket.emit('get-clubs', user?._id, isAdmin)
-  }, [user])
-
-  useEffect(() => {
-    socket.on('output-clubs', clbs => {
-      setClubs(clbs)
-      console.log('clubs', clubs)
-    })
-    
   }, [])
 
-  useEffect(() => {
-    socket.on('club-created', clb => {
-      setClubs([...clubs, clb])
-    })
-    socket.on('member-added', (userAdded, clb) => {
-      if (user._id === userAdded._id) {
-        setClubs([...clubs, clb])
-      }
-    })
-    socket.on('removed-user-from-club', (club_id, userRemoved) => {
-      if (user._id === userRemoved._id) {
-        setClubs(clubs.filter(club => club._id !== club_id))
-      }
-    })
-  }, [clubs])
+  // useEffect(() => {
+  //   socket = io(ENDPT);
+  //   return () => {
+  //     socket.emit('disconnect');
+  //     socket.off();
+  //   }
+  // }, [ENDPT])
+
+  // useEffect(() => {
+  //   let isAdmin = user?.username.includes('admin');
+  //   socket.emit('get-clubs', user?._id, isAdmin)
+  // }, [user])
+
+  // useEffect(() => {
+  //   socket.on('output-clubs', clbs => {
+  //     setClubs(clbs)
+  //     console.log('clubs', clubs)
+  //   })
+    
+  // }, [])
+
+  // useEffect(() => {
+  //   socket.on('club-created', clb => {
+  //     setClubs([...clubs, clb])
+  //   })
+  //   socket.on('member-added', (userAdded, clb) => {
+  //     if (user._id === userAdded._id) {
+  //       setClubs([...clubs, clb])
+  //     }
+  //   })
+  //   socket.on('removed-user-from-club', (club_id, userRemoved) => {
+  //     if (user._id === userRemoved._id) {
+  //       setClubs(clubs.filter(club => club._id !== club_id))
+  //     }
+  //   })
+  // }, [clubs])
 
   if (!user) {
     return <Redirect to='/login'/>

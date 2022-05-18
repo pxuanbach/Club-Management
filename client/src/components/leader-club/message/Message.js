@@ -36,18 +36,12 @@ const Message = ({ club_id }) => {
 
   useEffect(() => {
     socket = io(ENDPT);
+    socket.emit('join', { user_id: user?._id, room_id: club_id })
     return () => {
       socket.emit('disconnect');
       socket.off();
     }
   }, [])
-
-  useEffect(() => {
-    socket.emit('join', {
-      user_id: user?._id,
-      room_id: club_id
-    })
-  }, [user])
 
   useEffect(() => {
     socket.on('message', message => {
