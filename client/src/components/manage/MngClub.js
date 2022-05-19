@@ -51,11 +51,18 @@ const ManageClub = () => {
     setSearch(e.target.value)
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     //console.log(search)
-    if (search)
-      socket.emit('search-club', search)
+    if (search) {
+      const res = await axiosInstance.get(`/club/search/${search}`)
+
+      const data = res.data;
+      //console.log(data)
+      if (data) {
+        setClubs(data)
+      }
+    }
   }
 
   const handleUpdate = (event, param) => {
@@ -64,20 +71,26 @@ const ManageClub = () => {
     setShowFormUpdate(true)
   }
 
-  const handleBlockOrUnblock = (event, param) => {
+  const handleBlockOrUnblock = async (event, param) => {
     event.stopPropagation();
-    socket.emit('block-unblock-club', param._id)
-    const updateClubs = clubs.map((elm) => {
-      if (elm._id === param._id) {
-        return {
-          ...elm,
-          isblocked: !param.isblocked
-        }
-      }
-      return elm;
-    });
+    //socket.emit('block-unblock-club', param._id)
+    const res = await axiosInstance.patch(`/club/block/${param._id}`)
 
-    setClubs(updateClubs)
+    const data = res.data;
+
+    if (data) {
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === data._id) {
+          return {
+            ...elm,
+            isblocked: data.isblocked
+          }
+        }
+        return elm;
+      });
+  
+      setClubs(updateClubs)
+    }
   }
 
   const handleDelete = (event, param) => {
@@ -282,7 +295,7 @@ const ManageClub = () => {
           <div className='stack-left'>
             <CustomTextField
               id="search-field"
-              label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
+              label="Tìm kiếm (Tên Câu lạc bộ)"
               variant="standard"
               value={search}
               onChange={handleChangeSearchField}

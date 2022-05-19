@@ -59,21 +59,21 @@ const TabMember = ({ club_id }) => {
 
   useEffect(() => {
     socket = io(ENDPT);
+    socket.emit('get-user', club_id, 'leader')
+    socket.emit('get-user', club_id, 'treasurer')
     return () => {
       socket.emit('disconnect');
       socket.off();
     }
-  }, [])
+  }, [ENDPT])
+
+  useEffect(() => {
+    socket.emit('get-members', user?._id, club_id)
+  }, [user])
 
   useEffect(() => {
     //console.log('club id', club_id)
-    socket.emit('get-members', user?._id, club_id)
-    socket.on('output-members', users => {
-      setMembers(users)
-    })
-
-    socket.emit('get-user', club_id, 'leader')
-    socket.emit('get-user', club_id, 'treasurer')
+    
     socket.on('output-leader', res => {
       setLeader(res)
     })
@@ -84,6 +84,9 @@ const TabMember = ({ club_id }) => {
   }, [])
 
   useEffect(() => {
+    socket.on('output-members', users => {
+      setMembers(users)
+    })
     socket.on('searched-member-in-club', (users) => {
       setMembers(users)
     })

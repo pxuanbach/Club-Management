@@ -11,13 +11,13 @@ const Buffer = require('buffer').Buffer
 
 
 module.exports = function (socket, io) {
-    socket.on('get-clubs', (user_id, isAdmin) => {
-        let query = isAdmin ? {} : { $or: [{ members: user_id }, { 'leader._id': user_id }, { 'treasurer._id': user_id }] }
-        Club.find(query).then(clubs => {
-            //console.log('output-clubs: ', clubs)
-            socket.emit('output-clubs', ConvertClubs(clubs))
-        })
-    })
+    // socket.on('get-clubs', (user_id, isAdmin) => {
+    //     let query = isAdmin ? {} : { $or: [{ members: user_id }, { 'leader._id': user_id }, { 'treasurer._id': user_id }] }
+    //     Club.find(query).then(clubs => {
+    //         //console.log('output-clubs: ', clubs)
+    //         socket.emit('output-clubs', ConvertClubs(clubs))
+    //     })
+    // })
 
     socket.on('get-club', ({ club_id }) => {
         Club.findById(club_id).then(result => {
@@ -25,99 +25,99 @@ module.exports = function (socket, io) {
         })
     })
 
-    socket.on('search-club', search => {
-        //create search index in mongoDB
-        Club.find({
-            '$or': [
-                { name: { $regex: search } },
-                { "leader.name": { $regex: search } },
-            ]
-        }).then(clubs => {
-            //console.log(clubs)
-            io.emit('club-searched', ConvertClubs(clubs))
-        })
-    })
+    // socket.on('search-club', search => {
+    //     //create search index in mongoDB
+    //     Club.find({
+    //         '$or': [
+    //             { name: { $regex: search } },
+    //             { "leader.name": { $regex: search } },
+    //         ]
+    //     }).then(clubs => {
+    //         //console.log(clubs)
+    //         io.emit('club-searched', ConvertClubs(clubs))
+    //     })
+    // })
 
-    socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
-        const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
-        club.save().then(result => {
-            User.find({ _id: { $in: [leader._id, treasurer._id] } }).then(users => {
-                users.forEach(user => {
-                    user.clubs.push(result._id)
-                    user.save();
-                });
-            })
-            ChatRoom.create({ room_id: result._id })
-            io.emit('club-created', ConvertClub(result))
-            //console.log(result)
-            callback();
-        })
-    })
+    // socket.on('create-club', (name, img_url, cloudinary_id, description, leader, treasurer, callback) => {
+    //     const club = new Club({ name, img_url, cloudinary_id, description, leader, treasurer });
+    //     club.save().then(result => {
+    //         User.find({ _id: { $in: [leader._id, treasurer._id] } }).then(users => {
+    //             users.forEach(user => {
+    //                 user.clubs.push(result._id)
+    //                 user.save();
+    //             });
+    //         })
+    //         ChatRoom.create({ room_id: result._id })
+    //         io.emit('club-created', ConvertClub(result))
+    //         //console.log(result)
+    //         callback();
+    //     })
+    // })
 
-    socket.on('update-club-info', (club_id, name, description, new_img_url, new_cloud_id, cur_cloud_id, callback) => {
-        console.log('club want to update: ', club_id)
-        Club.findById(club_id, function (err, doc) {
-            if (err) {
-                console.log(err)
-                return;
-            }
+    // socket.on('update-club-info', (club_id, name, description, new_img_url, new_cloud_id, cur_cloud_id, callback) => {
+    //     console.log('club want to update: ', club_id)
+    //     Club.findById(club_id, function (err, doc) {
+    //         if (err) {
+    //             console.log(err)
+    //             return;
+    //         }
 
-            doc.name = name;
-            doc.description = description;
+    //         doc.name = name;
+    //         doc.description = description;
 
-            if (new_img_url) {
-                cloudinary.uploader.destroy(cur_cloud_id, function (result) {
-                    console.log(result);
-                })
-                doc.img_url = new_img_url;
-                doc.cloudinary_id = new_cloud_id;
-            }
+    //         if (new_img_url) {
+    //             cloudinary.uploader.destroy(cur_cloud_id, function (result) {
+    //                 console.log(result);
+    //             })
+    //             doc.img_url = new_img_url;
+    //             doc.cloudinary_id = new_cloud_id;
+    //         }
 
-            doc.save().then(result => {
-                let updatedClub = ConvertClub(result)
+    //         doc.save().then(result => {
+    //             let updatedClub = ConvertClub(result)
 
-                io.emit('club-updated', updatedClub)
-                console.log(result)
-                callback();
-            })
-        }
-        )
-        callback();
-    })
+    //             io.emit('club-updated', updatedClub)
+    //             console.log(result)
+    //             callback();
+    //         })
+    //     }
+    //     )
+    //     callback();
+    // })
 
-    socket.on('block-unblock-club', (club_id) => {
-        Club.findById(club_id, function (err, doc) {
-            if (err) return;
-            doc.isblocked = !doc.isblocked;
-            doc.save();
-        })
-    })
+    // socket.on('block-unblock-club', (club_id) => {
+    //     Club.findById(club_id, function (err, doc) {
+    //         if (err) return;
+    //         doc.isblocked = !doc.isblocked;
+    //         doc.save();
+    //     })
+    // })
 
-    socket.on('delete-club', (club_id, cloudinary_id, callback) => {
-        console.log('club want to delete: ', club_id)
-        Club.findByIdAndDelete(club_id, function (err, doc) {
-            if (err) console.log(err)
-            else {
-                cloudinary.uploader.destroy(cloudinary_id, function (result) {
-                    console.log(result);
-                })
-                console.log('Delete club:', doc)
-                //delete some relation
-                //
-                //
-                io.emit('club-deleted', doc)
-            }
-        })
-        callback();
-    })
+    // socket.on('delete-club', (club_id, cloudinary_id, callback) => {
+    //     console.log('club want to delete: ', club_id)
+    //     Club.findByIdAndDelete(club_id, function (err, doc) {
+    //         if (err) console.log(err)
+    //         else {
+    //             cloudinary.uploader.destroy(cloudinary_id, function (result) {
+    //                 console.log(result);
+    //             })
+    //             console.log('Delete club:', doc)
+    //             //delete some relation
+    //             //
+    //             //
+    //             io.emit('club-deleted', doc)
+    //         }
+    //     })
+    //     callback();
+    // })
 
-    socket.on('get-members', (user_id, club_id) => {
-        Club.findById(club_id).then(club => {
-            User.find({ _id: { $in: club.members } }).then(users => {
-                io.emit('output-members', ConvertUsers(users));
-            })
-        })
-    })
+    // socket.on('get-members', (user_id, club_id) => {
+    //     Club.findById(club_id).then(club => {
+    //         User.find({ _id: { $in: club.members } }).then(users => {
+    //             io.emit('output-members', ConvertUsers(users));
+    //         })
+    //     })
+    // })
 
     socket.on('get-members-leader-treasurer', (club_id) => {
         Club.findById(club_id).then(club => {
@@ -222,56 +222,56 @@ module.exports = function (socket, io) {
         })
     })
 
-    socket.on('promote-to-leader', (club_id, cur_leader_id, new_leader_id) => {
-        Club.findById(club_id, function (err, doc) {
-            if (err) return;
+    // socket.on('promote-to-leader', (club_id, cur_leader_id, new_leader_id) => {
+    //     Club.findById(club_id, function (err, doc) {
+    //         if (err) return;
 
-            //find new leader info
-            User.findById(new_leader_id).then(user => {
-                doc.leader = user;
+    //         //find new leader info
+    //         User.findById(new_leader_id).then(user => {
+    //             doc.leader = user;
 
-                //exchange new and current leader id
-                var newMembers = doc.members.filter(function (value, index, arr) {
-                    //console.log('new leader id: ', new_leader_id)
-                    return value !== new_leader_id;
-                })
-                //console.log('new member:', newMembers)
-                doc.members = newMembers;
-                //console.log('current leader id: ', cur_leader_id)
-                doc.members.push(cur_leader_id);
-                //console.log('add cur leader id:', doc.members)
+    //             //exchange new and current leader id
+    //             var newMembers = doc.members.filter(function (value, index, arr) {
+    //                 //console.log('new leader id: ', new_leader_id)
+    //                 return value !== new_leader_id;
+    //             })
+    //             //console.log('new member:', newMembers)
+    //             doc.members = newMembers;
+    //             //console.log('current leader id: ', cur_leader_id)
+    //             doc.members.push(cur_leader_id);
+    //             //console.log('add cur leader id:', doc.members)
 
-                doc.save().then(() => {
-                    io.emit('promoted-to-leader', user)
-                });
-            })
-        })
-    })
+    //             doc.save().then(() => {
+    //                 io.emit('promoted-to-leader', user)
+    //             });
+    //         })
+    //     })
+    // })
 
-    socket.on('promote-to-treasurer', (club_id, cur_treasurer_id, new_treasurer_id) => {
-        Club.findById(club_id, function (err, doc) {
-            if (err) return;
+    // socket.on('promote-to-treasurer', (club_id, cur_treasurer_id, new_treasurer_id) => {
+    //     Club.findById(club_id, function (err, doc) {
+    //         if (err) return;
 
-            //find new treasurer info
-            User.findById(new_treasurer_id).then(user => {
-                doc.treasurer = user;
+    //         //find new treasurer info
+    //         User.findById(new_treasurer_id).then(user => {
+    //             doc.treasurer = user;
 
-                //exchange new and current treasurer id
-                var newMembers = doc.members.filter(function (value, index, arr) {
-                    return value !== new_treasurer_id;
-                })
-                doc.members = newMembers;
-                //console.log('except new treasurer id:',doc.members)
-                //console.log('current treasurer id: ', cur_treasurer_id)
-                doc.members.push(cur_treasurer_id);
-                //console.log('add cur treasurer id:', doc.members)
+    //             //exchange new and current treasurer id
+    //             var newMembers = doc.members.filter(function (value, index, arr) {
+    //                 return value !== new_treasurer_id;
+    //             })
+    //             doc.members = newMembers;
+    //             //console.log('except new treasurer id:',doc.members)
+    //             //console.log('current treasurer id: ', cur_treasurer_id)
+    //             doc.members.push(cur_treasurer_id);
+    //             //console.log('add cur treasurer id:', doc.members)
 
-                doc.save().then(() => {
-                    io.emit('promoted-to-treasurer', user)
-                });
-            })
-        })
-    })
+    //             doc.save().then(() => {
+    //                 io.emit('promoted-to-treasurer', user)
+    //             });
+    //         })
+    //     })
+    // })
 }
 
 module.exports.verifyclub = async (req, res, next) => {
@@ -299,21 +299,43 @@ module.exports.getList = async (req, res) => {
     if (isAdmin === 'true') {
         query = {}
     } else {
-        query = { $or: [{ members: userId }, { 'leader._id': userId }, { 'treasurer._id': userId }] }
+        query = { $or: [{ members: userId }, { leader: userId }, { treasurer: userId }] }
     }
     //console.log(query)
 
     var clubs = await Club.find(query).populate('leader').populate('treasurer');
 
-    if (clubs) {
+    if (clubs.length) {
         res.status(200).send(ConvertClubs(clubs))
     } else {
-        res.status(404).send()
+        res.status(500).json({ clubs: "none" })
     }
 }
 
 module.exports.getOne = async (req, res) => {
 
+}
+
+module.exports.getMembers = async (req, res) => {
+    const clubId = req.params.clubId;
+
+    Club.findById(clubId).then(club => {
+        User.find({ _id: { $in: club.members } }).then(users => {
+            res.status(200).send(ConvertUsers(users))
+        })
+    })
+}
+
+module.exports.search = async (req, res) => {
+    const searchValue = req.params.searchValue;
+
+    await Club.find({
+        name: { $regex: searchValue },
+    }).populate('leader')
+        .populate('treasurer')
+        .then(clubs => {
+            res.status(200).send(ConvertClubs(clubs))
+        })
 }
 
 module.exports.create = async (req, res) => {
@@ -340,7 +362,7 @@ module.exports.create = async (req, res) => {
         //console.log(result)
     }).catch(err => {
         console.log(err)
-        res.status(400).send({ err })
+        res.status(400).send({ error: err.message })
     })
 }
 
@@ -351,7 +373,7 @@ module.exports.update = async (req, res) => {
 
     await Club.findById(clubId, async function (err, doc) {
         if (err) {
-            res.status(500).send({ err })
+            res.status(500).send({ error: err.message })
             return;
         }
 
@@ -378,6 +400,96 @@ module.exports.update = async (req, res) => {
     })
 }
 
+module.exports.block = async (req, res) => {
+    const clubId = req.params.clubId;
+
+    Club.findById(clubId, function (err, doc) {
+        if (err) {
+            res.status(500).json({error: err.message})
+            return;
+        }
+        doc.isblocked = !doc.isblocked;
+        doc.save().then(updatedClub => {
+            updatedClub.populate('leader')
+                .populate('treasurer')
+                .execPopulate()
+                .then(result => {
+                    res.status(200).send(ConvertClub(result))
+
+                })
+        })
+    })
+}
+
+module.exports.promote = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { position, cur_member_id, new_member_id } = req.body
+
+    Club.findById(clubId, function (err, doc) {
+        if (err) {
+            res.status(500).send()
+            return;
+        }
+
+        //find new leader info
+        User.findById(new_member_id).then(user => {
+            if (position === 'leader') {
+                doc.leader = user;
+            } else if (position === 'treasurer') {
+                doc.treasurer = user;
+            }
+
+            //exchange new and current leader id
+            var newMembers = doc.members.filter(function (value, index, arr) {
+                //console.log('new leader id: ', new_leader_id)
+                return value.toString() !== new_member_id;
+            })
+            console.log('new member:', newMembers)
+            doc.members = newMembers;
+            //console.log('current leader id: ', cur_leader_id)
+            doc.members.push(cur_member_id);
+            //console.log('add cur leader id:', doc.members)
+
+            doc.save().then(() => {
+                res.status(200).send(user)
+            });
+        })
+    })
+}
+
+module.exports.removeMember = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { userId } = req.body;
+
+    Club.findById(clubId, function (err, doc) {
+        if (err) {
+            res.status(500).send({ error: err.message })
+            return;
+        }
+
+        var newMembers = doc.members.filter(function (value, index, arr) {
+            return value.toString() != userId;
+        })
+        doc.members = newMembers;
+        doc.save();
+
+        User.findById(userId, function (err, doc) {
+            if (err) {
+                res.status(500).send({ error: err.message })
+                return;
+            }
+            var newClubs = doc.clubs.filter(function (value, index, arr) {
+                return value.toString() != clubId;
+            })
+            doc.clubs = newClubs;
+            doc.save().then(user => {
+                //io.emit('removed-user-from-club', club_id, ConvertUser(user))
+                res.status(200).send(ConvertUser(user))
+            })
+        })
+    })
+}
+
 module.exports.delete = async (req, res) => {
     const clubId = req.params.clubId;
     const encodedCloudId = req.params.cloudId;
@@ -388,7 +500,7 @@ module.exports.delete = async (req, res) => {
     await Club.findByIdAndDelete(clubId, async function (err, doc) {
         if (err) {
             console.log(err)
-            res.status(500).send({ err })
+            res.status(500).send({ error: err.message })
         }
         else {
             await cloudinary.uploader.destroy(cloudId, function (result) {

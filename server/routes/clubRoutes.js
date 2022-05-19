@@ -5,8 +5,12 @@ const router = Router();
 router.post('/club/create', clubController.create)
 router.get('/club/list/:isAdmin/:userId', clubController.getList)
 router.get('/club/one/:clubId', clubController.getOne)
+router.get('/club/search/:searchValue', clubController.search)
+router.get('/club/members/:clubId', clubController.getMembers)
 router.patch('/club/update/:clubId', clubController.update)
+router.patch('/club/block/:clubId', clubController.block)
+router.patch('/club/promote/:clubId', clubController.promote)
+router.patch('/club/remove/:clubId', clubController.removeMember)
 router.delete('/club/delete/:clubId/:cloudId', clubController.delete)
-
 
 module.exports = router;

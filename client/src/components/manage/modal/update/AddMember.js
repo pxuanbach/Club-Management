@@ -122,11 +122,10 @@ const AddMember = ({ club_id }) => {
         </Tooltip>
       </div>
       <div className='members__body' style={{marginTop: 20}}>
-        <DataGrid
+        <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
           getRowId={(r) => r._id}
           rows={users}
           columns={columns}
-          autoHeight
           pageSize={4}
         />
       </div>
