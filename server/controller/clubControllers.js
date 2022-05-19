@@ -2,7 +2,13 @@ const { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers } = require('../hel
 const Club = require('../models/Club')
 const User = require('../models/User')
 const ChatRoom = require('../models/ChatRoom')
+const Message = require('../models/Message')
+const FundHistory = require('../models/FundHistory')
+const Group = require('../models/Group')
+const Activity = require('../models/Activity')
 const cloudinary = require('../helper/Cloudinary')
+const Buffer = require('buffer').Buffer
+
 
 module.exports = function (socket, io) {
     socket.on('get-clubs', (user_id, isAdmin) => {
@@ -306,6 +312,10 @@ module.exports.getList = async (req, res) => {
     }
 }
 
+module.exports.getOne = async (req, res) => {
+
+}
+
 module.exports.create = async (req, res) => {
     const {
         name, img_url, cloudinary_id, description, leader, treasurer
@@ -324,12 +334,84 @@ module.exports.create = async (req, res) => {
                     user.save();
                 });
             })
-            
+
         ChatRoom.create({ room_id: result._id })
-        res.status(200).send(ConvertClub(result))
+        res.status(201).send(ConvertClub(result))
         //console.log(result)
     }).catch(err => {
         console.log(err)
-        res.status(404).send({err})
+        res.status(400).send({ err })
+    })
+}
+
+module.exports.update = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { name, description, new_img_url, new_cloud_id, cur_cloud_id } = req.body;
+    //console.log(name, description, new_img_url, new_cloud_id, cur_cloud_id)
+
+    await Club.findById(clubId, async function (err, doc) {
+        if (err) {
+            res.status(500).send({ err })
+            return;
+        }
+
+        doc.name = name;
+        doc.description = description;
+
+        if (new_img_url) {
+            await cloudinary.uploader.destroy(cur_cloud_id, function (result) {
+                console.log(result);
+            })
+            doc.img_url = new_img_url;
+            doc.cloudinary_id = new_cloud_id;
+        }
+
+        doc.save().then(updatedClub => {
+            updatedClub.populate('leader')
+                .populate('treasurer')
+                .execPopulate()
+                .then(result => {
+                    res.status(200).send(ConvertClub(result))
+
+                })
+        })
+    })
+}
+
+module.exports.delete = async (req, res) => {
+    const clubId = req.params.clubId;
+    const encodedCloudId = req.params.cloudId;
+    const buff = Buffer.from(encodedCloudId, "base64");
+    const cloudId = buff.toString("utf8");
+    //console.log(cloudId)
+
+    await Club.findByIdAndDelete(clubId, async function (err, doc) {
+        if (err) {
+            console.log(err)
+            res.status(500).send({ err })
+        }
+        else {
+            await cloudinary.uploader.destroy(cloudId, function (result) {
+                console.log(result);
+            })
+            //console.log('Delete club:', doc)
+            //Chat room
+            await ChatRoom.deleteMany({ room_id: clubId })
+            //Message
+            await Message.deleteMany({ room_id: clubId })
+            //Fund History
+            await FundHistory.deleteMany({ club: clubId })
+            //Group
+            await Group.deleteMany({ club: clubId })
+            //Activity
+            await Activity.deleteMany({ club: clubId })
+            //User
+            await User.updateMany(
+                { clubs: clubId },
+                { $pull: { clubs: clubId } }
+            )
+
+            res.status(204).send(clubId)
+        }
     })
 }

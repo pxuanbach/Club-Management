@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     clubs: [{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'club',
     }]
 })
 

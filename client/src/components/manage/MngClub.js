@@ -58,11 +58,6 @@ const ManageClub = () => {
       socket.emit('search-club', search)
   }
 
-  const handleRefresh = (e) => {
-    e.preventDefault();
-    socket.emit('get-clubs', '', true);
-  }
-
   const handleUpdate = (event, param) => {
     event.stopPropagation();
     setClubSelected(param);
@@ -176,17 +171,18 @@ const ManageClub = () => {
     }
   ];
 
-  useEffect(() => {
-    const getListClub = async () => {
-      let isAdmin = user?.username.includes('admin');
-      let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      let data = res.data
-      if (data) {
-        setClubs(data)
-      }
+  const getListClub = async () => {
+    let isAdmin = user?.username.includes('admin');
+    let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    let data = res.data
+    if (data) {
+      setClubs(data)
     }
+  }
+
+  useEffect(() => {
     getListClub()
   }, [])
 
@@ -261,13 +257,14 @@ const ManageClub = () => {
         aria-labelledby="modal-update-title"
         aria-describedby="modal-update-description"
         onClose={(e) => {
-          handleRefresh(e);
           setShowFormUpdate(false);
         }}
       >
         <Box sx={style}>
           <UpdateClub
             club={clubSelected}
+            clubs={clubs} 
+            setClubs={setClubs}
             setShowFormUpdate={setShowFormUpdate}
           />
         </Box>
@@ -276,7 +273,8 @@ const ManageClub = () => {
         open={openDialog}
         setOpen={setOpenDialog}
         club={clubSelected}
-        socket={socket}
+        clubs={clubs}
+        setClubs={setClubs}
       />
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
@@ -306,7 +304,7 @@ const ManageClub = () => {
                 className='btn-refresh'
                 variant="outlined"
                 disableElevation
-                onClick={handleRefresh}>
+                onClick={getListClub}>
                 <RefreshIcon sx={{color: '#1B264D'}}/>
               </Button>
             </Tooltip>

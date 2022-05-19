@@ -4,12 +4,8 @@ import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axiosInstance from '../../../helper/Axios'
-import io from 'socket.io-client';
 import FindMember from './FindMember'
 import { UploadImageClub } from '../../../helper/UploadImage';
-import { ENDPT } from '../../../helper/Helper'
-
-let socket;
 
 const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
     const avatarRef = useRef();
@@ -98,14 +94,6 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
             setClubs([...clubs, data])
             resetState();
         }
-        // socket.emit('create-club',
-        //     values.name,
-        //     img_upload_data.secure_url,
-        //     img_upload_data.public_id,
-        //     values.description,
-        //     leaderSelected,
-        //     treasurerSelected,
-        //     resetState)
     }
 
     const resetState = () => {
@@ -122,15 +110,6 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
     const onExitClick = () => {
         setShowFormAdd(false);
     };
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        //socket.emit('join', { username: values.username, password: values.password})
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
-    }, [ENDPT])
 
     useEffect(() => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)

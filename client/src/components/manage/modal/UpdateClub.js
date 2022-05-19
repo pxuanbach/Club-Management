@@ -35,7 +35,7 @@ TabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-const UpdateClub = ({ setShowFormUpdate, club }) => {
+const UpdateClub = ({ setShowFormUpdate, club, clubs, setClubs }) => {
     const [tabValue, setTabValue] = useState(0);
 
     const handleTabChange = (event, newValue) => {
@@ -64,7 +64,8 @@ const UpdateClub = ({ setShowFormUpdate, club }) => {
                 <General
                     setShowFormUpdate={setShowFormUpdate}
                     club={club}
-                    socket={socket}
+                    clubs={clubs}
+                    setClubs={setClubs}
                 />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>

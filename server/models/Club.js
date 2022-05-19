@@ -27,7 +27,8 @@ const clubSchema = new mongoose.Schema({
         default: false
     },
     members: [{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
     }]
 })
 

@@ -8,14 +8,8 @@ function ConvertClub(data) {
     club.description = data.description;
     club.isblocked = data.isblocked;
     club.fund = data.fund;
-    club.leader = {
-        _id: data.leader._id,
-        name: data.leader.name,
-    };
-    club.treasurer = {
-        _id: data.treasurer._id,
-        name: data.treasurer.name,
-    };
+    club.leader = data.leader;
+    club.treasurer = data.treasurer;
     //Relation field
     club.members_num = 2 + data.members.length; // + ...
 
@@ -35,14 +29,8 @@ function ConvertClubs(data) {
         club.description = elm.description;
         club.isblocked = elm.isblocked;
         club.fund = elm.fund;
-        club.leader = {
-            _id: elm.leader._id,
-            name: elm.leader.name,
-        };
-        club.treasurer = {
-            _id: elm.treasurer._id,
-            name: elm.treasurer.name,
-        };
+        club.leader = elm.leader;
+        club.treasurer = elm.treasurer;
         //Relation field
         club.members_num = 2 + elm.members.length; // + ...
 

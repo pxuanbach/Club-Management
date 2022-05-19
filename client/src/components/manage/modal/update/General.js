@@ -4,8 +4,9 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import './General.css'
 import { UploadImageClub } from '../../../../helper/UploadImage'
+import axiosInstance from '../../../../helper/Axios';
 
-const GeneralUpdate = ({ setShowFormUpdate, club, socket }) => {
+const GeneralUpdate = ({ setShowFormUpdate, club, clubs, setClubs }) => {
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
     const [avatarHeight, setAvatarHeight] = useState();
@@ -33,16 +34,40 @@ const GeneralUpdate = ({ setShowFormUpdate, club, socket }) => {
         if (avatarImage) {
             img_upload_data = await UploadImageClub(avatarImage);
         }
-        console.log(img_upload_data)
+        //console.log(img_upload_data)
         //console.log('values', values)
-        socket.emit('update-club-info', 
-            club._id, 
-            values.name, 
-            values.description, 
-            img_upload_data?.secure_url, 
-            img_upload_data?.public_id,
-            club.cloudinary_id, //cur_cloud_id
-            () => setIsLoading(false)) 
+        const res = await axiosInstance.patch(`/club/update/${club._id}`,
+            JSON.stringify({
+                "name": values.name,
+                "description": values.description,
+                "new_img_url": img_upload_data?.secure_url,
+                "new_cloud_id": img_upload_data?.public_id,
+                "cur_cloud_id": club.cloudinary_id,
+            }), {
+                headers: { 'Content-Type': 'application/json' }
+            }
+        )
+
+        const data = res.data;
+        console.log(data)
+
+        if (data) {
+            const updateClubs = clubs.map((elm) => {
+                if (elm._id === data._id) {
+                return {
+                    ...elm,
+                    name: data.name,
+                    description: data.description,
+                    img_url: data.img_url,
+                    cloudinary_id: data.cloudinary_id,
+                }
+                }
+                return elm;
+            });
+            setClubs(updateClubs)
+
+            setIsLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -88,7 +113,7 @@ const GeneralUpdate = ({ setShowFormUpdate, club, socket }) => {
                         size="small"
                     />
                 </div>
-                <div style={{padding: 10}}></div>
+                <div style={{ padding: 10 }}></div>
                 <div className="div-todo">
                     <Button disabled={isLoading}
                         onClick={handleSubmit}
