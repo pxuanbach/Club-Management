@@ -92,7 +92,7 @@ const Home = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAdd={setShowFormAddClub}/>
+          <AddClub setShowFormAdd={setShowFormAddClub} clubs={clubs} setClubs={setClubs}/>
         </Box>
       </Modal>
       <Snackbar
