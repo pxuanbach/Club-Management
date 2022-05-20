@@ -1,6 +1,5 @@
 import { Switch, Route, useParams } from 'react-router-dom';
 import React, { useEffect, useState, useContext } from "react";
-import io from 'socket.io-client';
 import Activity from '../leader-club/activity/Activity';
 import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/member/Member"
@@ -9,11 +8,7 @@ import Fund from "../leader-club/fund/Fund"
 import NavbarClub from "../leader-club/Navbar-Club"
 import axiosInstance from '../../helper/Axios';
 import { UserContext } from '../../UserContext';
-import { ENDPT } from '../../helper/Helper';
-
 import './Club.css'
-
-let socket
 
 const Club = () => {
   const { user, setUser } = useContext(UserContext);
@@ -21,8 +16,6 @@ const Club = () => {
   const [club, setClub] = useState();
 
   useEffect(() => {
-    socket = io(ENDPT);
-    socket.emit('join-club', user?._id)
     const verifyClub = async () => {
       try {
         const res = await axiosInstance.get(`/verifyclub/${club_id}`, { withCredentials: true });
@@ -34,10 +27,6 @@ const Club = () => {
       }
     }
     verifyClub();
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
   }, []);
 
   return (
@@ -57,7 +46,7 @@ const Club = () => {
             <Message club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/member`}>
-            <Member club_id={club_id}/>
+            <Member club={club}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/fund`}>
             <Fund club_id={club_id}/>
