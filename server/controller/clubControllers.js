@@ -155,72 +155,72 @@ module.exports = function (socket, io) {
         })
     })
 
-    socket.on('get-users-not-members', club_id => {
-        Club.findById(club_id).then(club => {
-            User.find({
-                $and: [
-                    { _id: { $nin: club.members } },
-                    { _id: { $nin: [club.leader._id, club.treasurer._id] } },
-                    { username: { $nin: ['admin', 'admin0'] } },
-                ]
-            })
-                .then(users => {
-                    io.emit('output-users-not-members', ConvertUsers(users))
-                })
-        })
+    // socket.on('get-users-not-members', club_id => {
+    //     Club.findById(club_id).then(club => {
+    //         User.find({
+    //             $and: [
+    //                 { _id: { $nin: club.members } },
+    //                 { _id: { $nin: [club.leader._id, club.treasurer._id] } },
+    //                 { username: { $nin: ['admin', 'admin0'] } },
+    //             ]
+    //         })
+    //             .then(users => {
+    //                 io.emit('output-users-not-members', ConvertUsers(users))
+    //             })
+    //     })
 
-    })
+    // })
 
-    socket.on('get-user', (club_id, type) => {
-        Club.findById(club_id).then(club => {
-            //console.log(club)
-            let query = type === 'leader' ? club.leader._id : club.treasurer._id;
-            User.findById(query).then(result => {
-                if (type === 'leader')
-                    io.emit('output-leader', ConvertUser(result))
-                else if (type === 'treasurer')
-                    io.emit('output-treasurer', ConvertUser(result))
-            })
-        })
-    })
+    // socket.on('get-user', (club_id, type) => {
+    //     Club.findById(club_id).then(club => {
+    //         //console.log(club)
+    //         let query = type === 'leader' ? club.leader._id : club.treasurer._id;
+    //         User.findById(query).then(result => {
+    //             if (type === 'leader')
+    //                 io.emit('output-leader', ConvertUser(result))
+    //             else if (type === 'treasurer')
+    //                 io.emit('output-treasurer', ConvertUser(result))
+    //         })
+    //     })
+    // })
 
-    socket.on('add-member', (club_id, user_id) => {
-        Club.findById(club_id, function (err, clubDoc) {
-            if (err) return;
-            clubDoc.members.push(user_id)
-            clubDoc.save().then(result => {
-                User.findById(user_id, function (err, userDoc) {
-                    if (err) return;
-                    userDoc.clubs.push(club_id)
-                    userDoc.save().then(userAdded => {
-                        io.emit('member-added', userAdded, ConvertClub(result))
-                    })
-                })
-            })
-        })
-    })
+    // socket.on('add-member', (club_id, user_id) => {
+    //     Club.findById(club_id, function (err, clubDoc) {
+    //         if (err) return;
+    //         clubDoc.members.push(user_id)
+    //         clubDoc.save().then(result => {
+    //             User.findById(user_id, function (err, userDoc) {
+    //                 if (err) return;
+    //                 userDoc.clubs.push(club_id)
+    //                 userDoc.save().then(userAdded => {
+    //                     io.emit('member-added', userAdded, ConvertClub(result))
+    //                 })
+    //             })
+    //         })
+    //     })
+    // })
 
-    socket.on('remove-user-from-club', (club_id, user_id, callback) => {
-        Club.findById(club_id, function (err, doc) {
-            if (err) return;
-            var newMembers = doc.members.filter(function (value, index, arr) {
-                return value != user_id;
-            })
-            doc.members = newMembers;
-            doc.save();
+    // socket.on('remove-user-from-club', (club_id, user_id, callback) => {
+    //     Club.findById(club_id, function (err, doc) {
+    //         if (err) return;
+    //         var newMembers = doc.members.filter(function (value, index, arr) {
+    //             return value != user_id;
+    //         })
+    //         doc.members = newMembers;
+    //         doc.save();
 
-            User.findById(user_id, function (err, doc) {
-                if (err) return;
-                var newClubs = doc.clubs.filter(function (value, index, arr) {
-                    return value != club_id;
-                })
-                doc.clubs = newClubs;
-                doc.save().then(user => {
-                    io.emit('removed-user-from-club', club_id, ConvertUser(user))
-                })
-            })
-        })
-    })
+    //         User.findById(user_id, function (err, doc) {
+    //             if (err) return;
+    //             var newClubs = doc.clubs.filter(function (value, index, arr) {
+    //                 return value != club_id;
+    //             })
+    //             doc.clubs = newClubs;
+    //             doc.save().then(user => {
+    //                 io.emit('removed-user-from-club', club_id, ConvertUser(user))
+    //             })
+    //         })
+    //     })
+    // })
 
     // socket.on('promote-to-leader', (club_id, cur_leader_id, new_leader_id) => {
     //     Club.findById(club_id, function (err, doc) {
@@ -313,7 +313,16 @@ module.exports.getList = async (req, res) => {
 }
 
 module.exports.getOne = async (req, res) => {
+    const clubId = req.params.clubId;
 
+    Club.findById(clubId)
+        .populate('leader')
+        .populate('treasurer')
+        .then(result => {
+            res.status(200).send(ConvertClubs(clubs))
+        }).catch(err => {
+            res.status(500).json({ error: err.message })
+        })
 }
 
 module.exports.getMembers = async (req, res) => {
@@ -322,7 +331,34 @@ module.exports.getMembers = async (req, res) => {
     Club.findById(clubId).then(club => {
         User.find({ _id: { $in: club.members } }).then(users => {
             res.status(200).send(ConvertUsers(users))
+        }).catch(err => {
+            res.status(500).json({ error: err.message })
         })
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}
+
+module.exports.getUsersNotMembers = async (req, res) => {
+    const clubId = req.params.clubId;
+
+    Club.findById(clubId).then(club => {
+        User.find({
+            $and: [
+                { _id: { $nin: club.members } },
+                { _id: { $nin: [club.leader, club.treasurer] } },
+                { username: { $nin: ['admin', 'admin0'] } },
+            ]
+        }).limit(20)
+            .then(users => {
+                res.status(200).send(ConvertUsers(users))
+            }).catch(err => {
+                console.log(err)
+                res.status(500).send({ error: err.message })
+            })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).send({ error: err.message })
     })
 }
 
@@ -366,6 +402,33 @@ module.exports.create = async (req, res) => {
     })
 }
 
+module.exports.addMembers = async (req, res) => {
+    const {
+        clubId, users
+    } = req.body
+    console.log(users)
+
+    await Club.findById(clubId, function (err, doc) {
+        if (err) {
+            res.status(400).send({ error: err.message })
+            return;
+        }
+
+        users.forEach(user => {
+            doc.members.push(user._id)
+        })
+
+        doc.save().then(updatedClub => {
+            updatedClub.populate('leader')
+                .populate('treasurer')
+                .execPopulate()
+                .then(result => {
+                    res.status(200).send(ConvertClub(result))
+                })
+        })
+    })
+}
+
 module.exports.update = async (req, res) => {
     const clubId = req.params.clubId;
     const { name, description, new_img_url, new_cloud_id, cur_cloud_id } = req.body;
@@ -405,7 +468,7 @@ module.exports.block = async (req, res) => {
 
     Club.findById(clubId, function (err, doc) {
         if (err) {
-            res.status(500).json({error: err.message})
+            res.status(500).json({ error: err.message })
             return;
         }
         doc.isblocked = !doc.isblocked;

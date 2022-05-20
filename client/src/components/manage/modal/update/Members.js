@@ -7,9 +7,6 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import axiosInstance from '../../../../helper/Axios'
 import './Members.css'
 
-
-let socket
-
 const Members = ({ club, clubs, setClubs }) => {
   const [leader, setLeader] = useState(club.leader)
   const [treasurer, setTreasurer] = useState(club.treasurer)
@@ -95,44 +92,6 @@ const Members = ({ club, clubs, setClubs }) => {
   useEffect(() => {
     getMembers()
   }, [])
-
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [])
-
-  // useEffect(() => {
-  //   //console.log('leader', club.leader._id)
-  //   socket.emit('get-user', club._id, 'leader')
-  //   socket.emit('get-user', club._id, 'treasurer')
-  //   socket.on('output-leader', res => {
-  //     setLeader(res)
-  //   })
-  //   socket.on('output-treasurer', res => {
-  //     setTreasurer(res)
-  //   })
-  //   socket.on('promoted-to-leader', new_leader => {
-  //     setLeader(new_leader)
-  //     socket.emit('get-members', club._id)
-  //   })
-  //   socket.on('promoted-to-treasurer', new_treasurer => {
-  //     setTreasurer(new_treasurer)
-  //     socket.emit('get-members', club._id)
-  //   })
-  // }, [])
-
-  // useEffect(() => {
-  //   socket.emit('get-members', club._id)
-  //   socket.on('output-members', users => {
-  //     setUsers(users)
-  //   })
-  //   socket.on('removed-user-from-club', (club_id, user) => {
-  //     setUsers(users.filter(u => u._id !== user._id))
-  //   })
-  // }, [users])
 
   const columns = [
     {
@@ -244,7 +203,7 @@ const Members = ({ club, clubs, setClubs }) => {
       <Divider sx={{ marginBottom: 2 }} />
       <div className='members__body'>
         <h2>Thành viên</h2>
-        <DataGrid sx={{ height: 52 * 3 + 56 + 55 }}
+        <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
           getRowId={(r) => r._id}
           rows={members}
           columns={columns}

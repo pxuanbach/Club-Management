@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Avatar, Divider, Button, Tooltip, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
-import io from 'socket.io-client'
-import { ENDPT } from '../../../../helper/Helper'
-
-let socket;
+import axiosInstance from '../../../../helper/Axios'
+import './AddMember.css'
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -18,9 +15,11 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const AddMember = ({ club_id }) => {
+const AddMember = ({ club_id, clubs, setClubs }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState();
   const [users, setUsers] = useState([]);
+  const [usersSelected, setUsersSelected] = useState([])
 
   const handleChangeSearch = event => {
     setSearch(event.target.value)
@@ -31,27 +30,65 @@ const AddMember = ({ club_id }) => {
 
   }
 
-  const handleAddMember = (event, param) => {
-    event.stopPropagation();
-    //console.log(param)
-    socket.emit('add-member', club_id, param._id)
-    setUsers(users.filter(user => user._id !== param._id))
+  const handleAddMembers = async (e) => {
+    e.preventDefault();
+    if (usersSelected.length > 0) {
+      setIsLoading(true)
+      const res = await axiosInstance.post('/club/addmembers', JSON.stringify({
+        'clubId': club_id,
+        'users': usersSelected,
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      })
+  
+      const data = res.data
+  
+      if (data) {
+        //setUsers(users.filter(user => user._id !== data._id))
+        const updateClubs = clubs.map((elm) => {
+          if (elm._id === data._id) {
+            return {
+              ...elm,
+              members_num: data.members_num,
+            }
+          }
+          return elm;
+        });
+        setClubs(updateClubs)
+        getUsersNotMembers()
+        setIsLoading(false)
+      }
+    }
+  }
+
+  const getUsersNotMembers = async () => {
+    const res = await axiosInstance.get(`/club/usersnotmembers/${club_id}`)
+
+    const data = res.data
+
+    if (data) {
+      setUsers(data)
+    }
   }
 
   useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
-  }, [ENDPT])
-
-  useEffect(() => {
-    socket.emit('get-users-not-members', club_id)
-    socket.on('output-users-not-members', users => {
-      setUsers(users)
-    })
+    getUsersNotMembers()
   }, [])
+
+  // useEffect(() => {
+  //   socket = io(ENDPT);
+  //   return () => {
+  //     socket.emit('disconnect');
+  //     socket.off();
+  //   }
+  // }, [ENDPT])
+
+  // useEffect(() => {
+  //   socket.emit('get-users-not-members', club_id)
+  //   socket.on('output-users-not-members', users => {
+  //     setUsers(users)
+  //   })
+  // }, [])
 
   const columns = [
     {
@@ -79,30 +116,10 @@ const AddMember = ({ club_id }) => {
     { field: 'username', headerName: 'Tài khoản', flex: 1 },
     { field: 'name', headerName: 'Tên', flex: 1.5 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
-    {
-      field: 'btn-add',
-      headerName: '',
-      align: 'center',
-      flex: 0.4,
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (value) => {
-        return (
-          <Tooltip title="Thêm vào câu lạc bộ" placement="right-start">
-            <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
-              handleAddMember(event, value.row)
-              //console.log('block?', value.row.isblocked)
-            }}>
-              <AddIcon/>
-            </Button>
-          </Tooltip>
-        )
-      }
-    },
   ];
 
   return (
-    <div>
+    <div className='addmember-modal'>
       <div className='stack-left'>
         <CustomTextField
           id="search-field"
@@ -121,15 +138,30 @@ const AddMember = ({ club_id }) => {
           </Button>
         </Tooltip>
       </div>
-      <div className='members__body' style={{marginTop: 20}}>
+      <div className='members__body'>
         <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
+          checkboxSelection
           getRowId={(r) => r._id}
           rows={users}
           columns={columns}
           pageSize={4}
+          onSelectionModelChange={(ids) => {
+            const selectedIDs = new Set(ids)
+            const selectedRows = users.filter((row) =>
+              selectedIDs.has(row._id),
+            );
+            setUsersSelected(selectedRows)
+          }}
         />
       </div>
-
+      <div className="stack-right">
+        <Button disabled={isLoading}
+          onClick={handleAddMembers}
+          variant="contained"
+          disableElevation>
+          Lưu
+        </Button>
+      </div>
     </div>
   )
 }
