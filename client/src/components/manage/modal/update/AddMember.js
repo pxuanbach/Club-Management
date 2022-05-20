@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Avatar, Divider, Button, Tooltip, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import axiosInstance from '../../../../helper/Axios'
 import './AddMember.css'
@@ -25,9 +26,19 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
     setSearch(event.target.value)
   }
 
-  const handleSearch = event => {
+  const handleSearch = async (event) => {
     event.preventDefault();
+    if (search) {
+      const res = await axiosInstance.get(`/club/searchusersnotmembers/${club_id}/${search}`)
 
+      const data = res.data
+  
+      if (data) {
+        setUsers(data)
+      }
+    } else {
+      getUsersNotMembers()
+    }
   }
 
   const handleAddMembers = async (e) => {
@@ -75,21 +86,6 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
     getUsersNotMembers()
   }, [])
 
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [ENDPT])
-
-  // useEffect(() => {
-  //   socket.emit('get-users-not-members', club_id)
-  //   socket.on('output-users-not-members', users => {
-  //     setUsers(users)
-  //   })
-  // }, [])
-
   const columns = [
     {
       field: '_id',
@@ -128,6 +124,7 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
           value={search}
           onChange={handleChangeSearch}
           size='small'
+          onKeyPress={event => event.key === 'Enter' ? handleSearch(event) : null}
         />
         <Tooltip title='Tìm kiếm' placement='right-start'>
           <Button
@@ -137,6 +134,15 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
             <SearchIcon sx={{ color: '#1B264D' }} />
           </Button>
         </Tooltip>
+        <Tooltip title='Làm mới' placement='right-start'>
+              <Button sx={{ borderColor: '#1B264D' }}
+                className='btn-refresh'
+                variant="outlined"
+                disableElevation
+                onClick={getUsersNotMembers}>
+                <RefreshIcon sx={{color: '#1B264D'}}/>
+              </Button>
+            </Tooltip>
       </div>
       <div className='members__body'>
         <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}

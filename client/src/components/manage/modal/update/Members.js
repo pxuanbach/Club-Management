@@ -178,8 +178,8 @@ const Members = ({ club, clubs, setClubs }) => {
 
   return (
     <div>
-      <div className='members__head'>
-        <div className='members__card'>
+      <div className='update-members__head'>
+        <div className='update-members__card'>
           <h3>Trưởng câu lạc bộ</h3>
           <div className='member-selected'>
             <Avatar alt={leader?.name} src={leader?.img_url} />
@@ -189,7 +189,7 @@ const Members = ({ club, clubs, setClubs }) => {
             </div>
           </div>
         </div>
-        <div className='members__card'>
+        <div className='update-members__card'>
           <h3>Thủ quỹ</h3>
           <div className='member-selected'>
             <Avatar alt={treasurer?.name} src={treasurer?.img_url} />
@@ -201,7 +201,7 @@ const Members = ({ club, clubs, setClubs }) => {
         </div>
       </div>
       <Divider sx={{ marginBottom: 2 }} />
-      <div className='members__body'>
+      <div className='update-members__body'>
         <h2>Thành viên</h2>
         <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
           getRowId={(r) => r._id}

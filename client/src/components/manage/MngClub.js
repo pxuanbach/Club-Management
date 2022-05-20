@@ -199,55 +199,6 @@ const ManageClub = () => {
     getListClub()
   }, [])
 
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   //socket.emit('join', { username: values.username, password: values.password})
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [ENDPT])
-
-  // useEffect(() => {
-  //   socket.emit('get-clubs', '', true)
-  //   socket.on('output-clubs', clbs => {
-  //     setClubs(clbs)
-  //     console.log('clubs', clubs)
-  //   })
-  // }, [])
-
-  // useEffect(() => {
-  //   socket.on('club-created', clb => {
-  //     setClubs([...clubs, clb])
-  //   })
-  //   socket.on('club-updated', clb => {
-  //     const updateClubs = clubs.map((elm) => {
-  //       if (elm._id === clb._id) {
-  //         return {
-  //           ...elm,
-  //           name: clb.name,
-  //           description: clb.description,
-  //           img_url: clb.img_url,
-  //           cloudinary_id: clb.cloudinary_id,
-  //         }
-  //       }
-  //       return elm;
-  //     });
-
-  //     setClubs(updateClubs)
-  //   })
-  //   socket.on('club-deleted', clb => {
-  //     var deleteClubs = clubs.filter(function (value, index, arr) {
-  //       return value._id !== clb._id;
-  //     })
-
-  //     setClubs(deleteClubs)
-  //   })
-  //   socket.on('club-searched', clbs => {
-  //     setClubs(clbs);
-  //   })
-  // }, [clubs])
-
   if (!user) {
     return <Redirect to='/login' />
   }

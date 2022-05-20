@@ -59,31 +59,6 @@ const ManageAccount = () => {
   const handleOpenAdd = () => setOpenModalAdd(true);
   const handleCloseAdd = () => setOpenModalAdd(false);
 
-  useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
-  }, [ENDPT])
-
-  useEffect(() => {
-    socket.emit('get-users')
-    socket.on('output-users', users => {
-      setUsers(users)
-      //console.log('users', users)
-    })
-  }, [])
-
-  useEffect(() => {
-    socket.on('new-user', newUser => {
-      setUsers([...users, newUser])
-    })
-    socket.on('output-search-user', users => {
-      setUsers(users)
-    })
-  }, [users])
-
   const handleBlockOrUnblock = (event, param) => {
     event.stopPropagation();
     socket.emit('block-unblock-account', param._id)
@@ -105,6 +80,31 @@ const ManageAccount = () => {
     setUserSelected(param)
     setOpenDialog(true)
   }
+
+  // useEffect(() => {
+  //   socket = io(ENDPT);
+  //   return () => {
+  //     socket.emit('disconnect');
+  //     socket.off();
+  //   }
+  // }, [ENDPT])
+
+  // useEffect(() => {
+  //   socket.emit('get-users')
+  //   socket.on('output-users', users => {
+  //     setUsers(users)
+  //     //console.log('users', users)
+  //   })
+  // }, [])
+
+  // useEffect(() => {
+  //   socket.on('new-user', newUser => {
+  //     setUsers([...users, newUser])
+  //   })
+  //   socket.on('output-search-user', users => {
+  //     setUsers(users)
+  //   })
+  // }, [users])
 
   const columns = [
     {

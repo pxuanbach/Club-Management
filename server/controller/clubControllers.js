@@ -19,11 +19,11 @@ module.exports = function (socket, io) {
     //     })
     // })
 
-    socket.on('get-club', ({ club_id }) => {
-        Club.findById(club_id).then(result => {
-            io.emit('output-club', result)
-        })
-    })
+    // socket.on('get-club', ({ club_id }) => {
+    //     Club.findById(club_id).then(result => {
+    //         io.emit('output-club', result)
+    //     })
+    // })
 
     // socket.on('search-club', search => {
     //     //create search index in mongoDB
@@ -407,6 +407,37 @@ module.exports.searchMembers = async (req, res) => {
     })
 }
 
+module.exports.searchUsersNotMembers = async (req, res) => {
+    const clubId = req.params.clubId;
+    const searchValue = req.params.searchValue;
+
+    Club.findById(clubId).then(club => {
+        User.find({
+            $and: [
+                { _id: { $nin: club.members } },
+                { _id: { $nin: [club.leader, club.treasurer] } },
+                { username: { $nin: ['admin', 'admin0'] } },
+                {
+                    $or: [
+                        { username: { $regex: searchValue } },
+                        { name: { $regex: searchValue } },
+                        { email: { $regex: searchValue } }
+                    ]
+                }
+            ]
+        }).limit(20)
+            .then(users => {
+                res.status(200).send(ConvertUsers(users))
+            }).catch(err => {
+                console.log(err)
+                res.status(500).send({ error: err.message })
+            })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).send({ error: err.message })
+    })
+}
+
 module.exports.create = async (req, res) => {
     const {
         name, img_url, cloudinary_id, description, leader, treasurer
@@ -427,7 +458,15 @@ module.exports.create = async (req, res) => {
             })
 
         ChatRoom.create({ room_id: result._id })
-        res.status(201).send(ConvertClub(result))
+        result.populate('leader')
+            .populate('treasurer')
+            .execPopulate()
+            .then(club => {
+                res.status(201).send(ConvertClub(club))
+            }).catch(err => {
+                console.log(err)
+                res.status(400).send({ error: err.message })
+            })
         //console.log(result)
     }).catch(err => {
         console.log(err)
