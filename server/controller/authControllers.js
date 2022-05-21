@@ -1,5 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('../helper/Cloudinary')
+const fs = require('fs');
+const { ConvertUser } = require('../helper/ConvertDataHelper');
 const maxAge = 5 * 24 * 60 * 60;
 const createJWT = id => {
     return jwt.sign({ id }, 'club secret', {
@@ -46,11 +49,27 @@ const alertError = (err) => {
 }
 
 module.exports.signup = async (req, res) => {
-    const { username, password, img_url, cloudinary_id, name, email } = req.body;
-    console.log(req.body)
+    const files = req.files
+    const { username, password, name, email } = req.body;
+
+    const { path } = files[0]
+
+    const newPath = await cloudinary.uploader.upload(path, {
+        resource_type: 'auto',
+        folder: 'Club-Management/User-Avatar'
+    }).catch(error => {
+        console.log(error)
+        res.status(400).json({
+            error
+        })
+    })
+    fs.unlinkSync(path)
+    const img_url = newPath.url;
+    const cloudinary_id = newPath.public_id;
+
     try {
         const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
-        res.status(201).json({user});
+        res.status(201).json(ConvertUser(user));
     } catch (error) {
         let errors = alertError(error);
         console.log('This is ERROR', error.message)

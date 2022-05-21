@@ -480,14 +480,19 @@ module.exports.addMembers = async (req, res) => {
     } = req.body
     console.log(users)
 
-    await Club.findById(clubId, function (err, doc) {
+    await Club.findById(clubId, async function (err, doc) {
         if (err) {
             res.status(400).send({ error: err.message })
             return;
         }
 
-        users.forEach(user => {
-            doc.members.push(user._id)
+        users.forEach(async (user) => {
+            doc.members.push(user)
+            await User.findById(user, function (err, userDoc) {
+                if (err) return;
+                userDoc.clubs.push(clubId)
+                userDoc.save()
+            })
         })
 
         doc.save().then(updatedClub => {

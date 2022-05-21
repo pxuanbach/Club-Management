@@ -10,6 +10,7 @@ import io from 'socket.io-client'
 import { ENDPT } from '../../helper/Helper';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
+import axiosInstance from '../../helper/Axios';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -48,31 +49,37 @@ const ManageAccount = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    socket.emit('search-user', search)
+    //socket.emit('search-user', search)
   }
 
   const handleRefresh = (e) => {
     e.preventDefault();
-    socket.emit('get-users')
+    getUsers()
   }
 
   const handleOpenAdd = () => setOpenModalAdd(true);
   const handleCloseAdd = () => setOpenModalAdd(false);
 
-  const handleBlockOrUnblock = (event, param) => {
+  const handleBlockOrUnblock = async (event, param) => {
     event.stopPropagation();
-    socket.emit('block-unblock-account', param._id)
-    const updateUsers = users.map((elm) => {
-      if (elm._id === param._id) {
-        return {
-          ...elm,
-          isblocked: !param.isblocked
-        }
-      }
-      return elm;
-    });
 
-    setUsers(updateUsers)
+    const res = await axiosInstance.patch(`/user/block/${param._id}`)
+
+    const data = res.data
+
+    if (data) {
+      const updateUsers = users.map((elm) => {
+        if (elm._id === data._id) {
+          return {
+            ...elm,
+            isblocked: data.isblocked
+          }
+        }
+        return elm;
+      });
+
+      setUsers(updateUsers)
+    }
   }
 
   const handleDeleteUser = (event, param) => {
@@ -80,6 +87,20 @@ const ManageAccount = () => {
     setUserSelected(param)
     setOpenDialog(true)
   }
+
+  const getUsers = async () => {
+    const res = await axiosInstance.get('/user/list')
+
+    const data = res.data
+
+    if (data) {
+      setUsers(data)
+    }
+  }
+
+  useEffect(() => {
+    getUsers()
+  }, [])
 
   // useEffect(() => {
   //   socket = io(ENDPT);
@@ -168,7 +189,11 @@ const ManageAccount = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <AddAccount handleClose={handleCloseAdd} />
+          <AddAccount
+            handleClose={handleCloseAdd}
+            users={users}
+            setUsers={setUsers}
+          />
         </Box>
       </Modal>
       <div className='mng__header'>

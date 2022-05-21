@@ -32,7 +32,7 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
       const res = await axiosInstance.get(`/club/searchusersnotmembers/${club_id}/${search}`)
 
       const data = res.data
-  
+
       if (data) {
         setUsers(data)
       }
@@ -51,9 +51,9 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
       }), {
         headers: { 'Content-Type': 'application/json' }
       })
-  
+
       const data = res.data
-  
+
       if (data) {
         //setUsers(users.filter(user => user._id !== data._id))
         const updateClubs = clubs.map((elm) => {
@@ -135,14 +135,14 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
           </Button>
         </Tooltip>
         <Tooltip title='Làm mới' placement='right-start'>
-              <Button sx={{ borderColor: '#1B264D' }}
-                className='btn-refresh'
-                variant="outlined"
-                disableElevation
-                onClick={getUsersNotMembers}>
-                <RefreshIcon sx={{color: '#1B264D'}}/>
-              </Button>
-            </Tooltip>
+          <Button sx={{ borderColor: '#1B264D' }}
+            className='btn-refresh'
+            variant="outlined"
+            disableElevation
+            onClick={getUsersNotMembers}>
+            <RefreshIcon sx={{ color: '#1B264D' }} />
+          </Button>
+        </Tooltip>
       </div>
       <div className='members__body'>
         <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
@@ -151,13 +151,8 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
           rows={users}
           columns={columns}
           pageSize={4}
-          onSelectionModelChange={(ids) => {
-            const selectedIDs = new Set(ids)
-            const selectedRows = users.filter((row) =>
-              selectedIDs.has(row._id),
-            );
-            setUsersSelected(selectedRows)
-          }}
+          onSelectionModelChange={setUsersSelected}
+          selectionModel={usersSelected}
         />
       </div>
       <div className="stack-right">

@@ -56,3 +56,26 @@ module.exports = function (socket, io) {
         })
     })
 }
+
+module.exports.getList = (req, res) => {
+    User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
+        res.status(200).send(ConvertUsers(result))
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}
+
+module.exports.block = async (req, res) => {
+    const userId = req.params.userId;
+
+    User.findById(userId, function (err, doc) {
+        if (err) {
+            res.status(500).json({ error: err.message })
+            return;
+        }
+        doc.isblocked = !doc.isblocked;
+        doc.save().then(result => {
+            res.status(200).send(ConvertUser(result))
+        })
+    })
+}

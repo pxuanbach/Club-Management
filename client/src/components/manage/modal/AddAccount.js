@@ -13,7 +13,7 @@ import { UploadImageUser } from '../../../helper/UploadImage'
 
 let socket;
 
-const AddAccount = ({ handleClose }) => {
+const AddAccount = ({ handleClose, users, setUsers }) => {
     const [avatarHeight, setAvatarHeight] = useState(150);
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
@@ -51,26 +51,38 @@ const AddAccount = ({ handleClose }) => {
         setShowPassword(!showPassword)
     };
 
+    const resetState = () => {
+        setAvatarImage(null)
+        setValues({
+            name: '',
+            username: '',
+            password: '',
+            email: '',
+        })
+    }
+
     const handleSave = async event => {
         event.preventDefault();
         setUsernameErr('')
         setPasswordErr('');
         setNameErr('');
         setEmailErr('');
+
+        var formData = new FormData();
+        formData.append("file", avatarImage);
+        formData.append("username", values.username)
+        formData.append("password", values.password)
+        formData.append("name", values.name)
+        formData.append("email", values.email)
+        
         try {
             setIsSuccess(true);
             const res = await axiosInstance.post('/signup',
-                JSON.stringify({
-                    'username': values.username,
-                    'password': values.password,
-                    'img_url': '',
-                    'name': values.name,
-                    'email': values.email,
-                }), {
+                formData, {
                 withCredentials: true,
                 headers: {
                     "Content-Type": "application/json",
-                }
+                },
             })
             const data = res.data;
             //console.log('signup response', data)
@@ -79,30 +91,16 @@ const AddAccount = ({ handleClose }) => {
                 setPasswordErr(data.errors.password);
                 setNameErr(data.errors.name);
                 setEmailErr(data.errors.email);
-                setIsSuccess(false);
+                
             } else {
-                let img_upload_data = await UploadImageUser(avatarImage)
-                    .catch(err => console.log(err));
-
-                socket.emit('account-created',
-                    data.user._id,
-                    img_upload_data.secure_url,
-                    img_upload_data.public_id,
-                    handleClose);
+                setUsers([...users, data])
+                resetState();
             }
-
+            setIsSuccess(false);
         } catch (error) {
             console.log(error)
         }
     }
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
-    }, [ENDPT])
 
     useEffect(() => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
@@ -128,6 +126,7 @@ const AddAccount = ({ handleClose }) => {
                 </div>
                 <form className='modal-form'>
                     <TextField
+                        value={values.name}
                         size="small"
                         label="Họ và tên"
                         variant='outlined'
@@ -137,6 +136,7 @@ const AddAccount = ({ handleClose }) => {
                         error={nameErr}
                     />
                     <TextField
+                        value={values.username}
                         size="small"
                         label="Tài khoản"
                         variant='outlined'
@@ -170,6 +170,7 @@ const AddAccount = ({ handleClose }) => {
                         <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
                     <TextField
+                        value={values.email}
                         size="small"
                         label="Email"
                         variant='outlined'
