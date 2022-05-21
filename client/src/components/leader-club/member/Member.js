@@ -62,7 +62,7 @@ export default function BasicTabs({club}) {
 
       </TabPanel>
       <TabPanel className='body-member' value={value} index={1}>
-        <TabGroup club_id={club._id}></TabGroup>
+        <TabGroup club_id={club?._id}></TabGroup>
       </TabPanel>
       </div>
     </Box>

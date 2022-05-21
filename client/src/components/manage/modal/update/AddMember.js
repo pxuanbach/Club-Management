@@ -6,6 +6,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import axiosInstance from '../../../../helper/Axios'
 import './AddMember.css'
+import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -29,10 +30,10 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
   const handleSearch = async (event) => {
     event.preventDefault();
     if (search) {
-      const res = await axiosInstance.get(`/club/searchusersnotmembers/${club_id}/${search}`)
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/club/searchusersnotmembers/${club_id}/${encodedSearch}`)
 
       const data = res.data
-
       if (data) {
         setUsers(data)
       }
@@ -53,7 +54,6 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
       })
 
       const data = res.data
-
       if (data) {
         //setUsers(users.filter(user => user._id !== data._id))
         const updateClubs = clubs.map((elm) => {
@@ -76,7 +76,6 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
     const res = await axiosInstance.get(`/club/usersnotmembers/${club_id}`)
 
     const data = res.data
-
     if (data) {
       setUsers(data)
     }
@@ -160,7 +159,7 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
           onClick={handleAddMembers}
           variant="contained"
           disableElevation>
-          Lưu
+          Thêm
         </Button>
       </div>
     </div>

@@ -41,7 +41,6 @@ const { addUser, removeUser } = require('./helper/ChatRoomHelper');
 io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/clubControllers')(socket, io);
-    require('./controller/userControllers')(socket, io);
     require('./controller/chatRoomControllers')(socket, io);
     require('./controller/groupControllers')(socket, io);
     require('./controller/fundControllers')(socket, io);

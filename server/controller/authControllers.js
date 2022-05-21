@@ -51,21 +51,25 @@ const alertError = (err) => {
 module.exports.signup = async (req, res) => {
     const files = req.files
     const { username, password, name, email } = req.body;
+    let img_url = '';
+    let cloudinary_id = '';
 
-    const { path } = files[0]
+    if (files.length > 0) {
+        const { path } = files[0]
 
-    const newPath = await cloudinary.uploader.upload(path, {
-        resource_type: 'auto',
-        folder: 'Club-Management/User-Avatar'
-    }).catch(error => {
-        console.log(error)
-        res.status(400).json({
-            error
+        const newPath = await cloudinary.uploader.upload(path, {
+            resource_type: 'auto',
+            folder: 'Club-Management/User-Avatar'
+        }).catch(error => {
+            console.log(error)
+            res.status(400).json({
+                error
+            })
         })
-    })
-    fs.unlinkSync(path)
-    const img_url = newPath.url;
-    const cloudinary_id = newPath.public_id;
+        fs.unlinkSync(path)
+        img_url = newPath.url;
+        cloudinary_id = newPath.public_id;
+    }
 
     try {
         const user = await User.create({ username, password, img_url, cloudinary_id, name, email });

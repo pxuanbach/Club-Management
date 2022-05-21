@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const authController = require('../controller/authControllers');
 const clubController = require('../controller/clubControllers');
-const upload = require('../helper/multer')
+const upload = require('../helper/multer');
 const router = Router();
 
 router.post('/signup', upload.array('file'), authController.signup)

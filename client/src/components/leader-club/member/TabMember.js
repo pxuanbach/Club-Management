@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import { UserContext } from '../../../UserContext'
+import { Buffer } from 'buffer';
 import AddMember from '../../manage/modal/update/AddMember'
 import axiosInstance from '../../../helper/Axios';
 import './TabMember.css'
-import { borderColor } from '@mui/system';
+
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -42,10 +42,21 @@ const TabMember = ({ club }) => {
   const [membersSelected, setMembersSelected] = useState([])
   let haveSelected = membersSelected.length <= 0;
 
-  const handleRemoveMembersFromClub = (event) => {
+  const handleRemoveMembersFromClub = async (event) => {
     event.preventDefault();
-    //socket.emit('remove-user-from-club', club_id, param._id)
-    console.log(membersSelected)
+
+    const res = await axiosInstance.patch(`/club/removemembers/${club._id}`,
+      JSON.stringify({
+        'members': membersSelected,
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+
+    const data = res.data
+    if (data) {
+      getMembers();
+    }
   }
 
   const handleChangeSearch = (event) => {
@@ -57,17 +68,17 @@ const TabMember = ({ club }) => {
     setMembersSelected([])
 
     if (search) {
-      const res = await axiosInstance.get(`/club/searchmembers/${club._id}/${search}`)
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/club/searchmembers/${club._id}/${encodedSearch}`)
 
       const data = res.data
-  
       if (data) {
         setMembers(data)
       }
     } else {
       getMembers();
     }
-    
+
   }
 
   const getMembers = async () => {
@@ -226,26 +237,26 @@ const TabMember = ({ club }) => {
             </Tooltip>
             {isLeader
               ? (<div className='stack-right'>
-              <Button
-                onClick={() => {
-                  setShowFormAdd(true)
-                }}
-                className='btn-add-tabmember'
-                variant="contained"
-                disableElevation
-                style={{ background: '#1B264D' }}>
-                Thêm thành viên
-              </Button>
-              <Button disabled={haveSelected}
-              onClick={handleRemoveMembersFromClub}
-                variant="contained"
-                disableElevation
-                style={{ 
-                  background: haveSelected ? 'transparent' : '#1B264D',
-                  border: haveSelected ? ' 1px solid #1B264D' : ''
+                <Button
+                  onClick={() => {
+                    setShowFormAdd(true)
+                  }}
+                  className='btn-add-tabmember'
+                  variant="contained"
+                  disableElevation
+                  style={{ background: '#1B264D' }}>
+                  Thêm thành viên
+                </Button>
+                <Button disabled={haveSelected}
+                  onClick={handleRemoveMembersFromClub}
+                  variant="contained"
+                  disableElevation
+                  style={{
+                    background: haveSelected ? 'transparent' : '#1B264D',
+                    border: haveSelected ? ' 1px solid #1B264D' : ''
                   }}>
-                Đuổi thành viên
-              </Button>
+                  Đuổi thành viên
+                </Button>
               </div>) : <></>}
           </div>
         </div>

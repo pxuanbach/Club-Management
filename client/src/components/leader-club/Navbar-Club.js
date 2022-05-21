@@ -4,10 +4,6 @@ import './Navbar-Club.css'
 import Tooltip from '@mui/material/Tooltip'
 import { useParams, Link } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
-import io from 'socket.io-client'
-import {ENDPT} from '../../helper/Helper'
-
-let socket;
 
 const NavbarClub = ({club}) => {
     let { club_id, club_name } = useParams();

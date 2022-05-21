@@ -7,6 +7,7 @@ const FundHistory = require('../models/FundHistory')
 const Group = require('../models/Group')
 const Activity = require('../models/Activity')
 const cloudinary = require('../helper/Cloudinary')
+const fs = require('fs');
 const Buffer = require('buffer').Buffer
 
 
@@ -364,7 +365,9 @@ module.exports.getUsersNotMembers = async (req, res) => {
 }
 
 module.exports.search = async (req, res) => {
-    const searchValue = req.params.searchValue;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
 
     await Club.find({
         name: { $regex: searchValue },
@@ -380,7 +383,9 @@ module.exports.search = async (req, res) => {
 
 module.exports.searchMembers = async (req, res) => {
     const clubId = req.params.clubId;
-    const searchValue = req.params.searchValue;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
 
     Club.findById(clubId).then(club => {
         User.find({
@@ -409,7 +414,9 @@ module.exports.searchMembers = async (req, res) => {
 
 module.exports.searchUsersNotMembers = async (req, res) => {
     const clubId = req.params.clubId;
-    const searchValue = req.params.searchValue;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
 
     Club.findById(clubId).then(club => {
         User.find({
@@ -439,10 +446,29 @@ module.exports.searchUsersNotMembers = async (req, res) => {
 }
 
 module.exports.create = async (req, res) => {
+    const files = req.files
     const {
-        name, img_url, cloudinary_id, description, leader, treasurer
-    } = req.body
-    //console.log(name, img_url, cloudinary_id, description, leader, treasurer);
+        name, description, leader, treasurer
+    } = req.body;
+    let img_url = '';
+    let cloudinary_id = '';
+
+    if (files.length > 0) {
+        const { path } = files[0]
+
+        const newPath = await cloudinary.uploader.upload(path, {
+            resource_type: 'auto',
+            folder: 'Club-Management/Club-Avatar'
+        }).catch(error => {
+            console.log(error)
+            res.status(400).json({
+                error
+            })
+        })
+        fs.unlinkSync(path)
+        img_url = newPath.url;
+        cloudinary_id = newPath.public_id;
+    }
 
     const club = new Club({
         name, img_url, cloudinary_id, description, leader, treasurer
@@ -501,6 +527,9 @@ module.exports.addMembers = async (req, res) => {
                 .execPopulate()
                 .then(result => {
                     res.status(200).send(ConvertClub(result))
+                }).catch(err => {
+                    console.log(err)
+                    res.status(400).send({ error: err.message })
                 })
         })
     })
@@ -535,6 +564,9 @@ module.exports.update = async (req, res) => {
                 .then(result => {
                     res.status(200).send(ConvertClub(result))
 
+                }).catch(err => {
+                    console.log(err)
+                    res.status(400).send({ error: err.message })
                 })
         })
     })
@@ -555,7 +587,9 @@ module.exports.block = async (req, res) => {
                 .execPopulate()
                 .then(result => {
                     res.status(200).send(ConvertClub(result))
-
+                }).catch(err => {
+                    console.log(err)
+                    res.status(400).send({ error: err.message })
                 })
         })
     })
@@ -592,8 +626,17 @@ module.exports.promote = async (req, res) => {
 
             doc.save().then(() => {
                 res.status(200).send(user)
-            });
+            }).catch(err => {
+                console.log(err)
+                res.status(400).send({ error: err.message })
+            })
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send({ error: err.message })
         })
+    }).catch(err => {
+        console.log(err)
+        res.status(400).send({ error: err.message })
     })
 }
 
@@ -608,7 +651,7 @@ module.exports.removeMember = async (req, res) => {
         }
 
         var newMembers = doc.members.filter(function (value, index, arr) {
-            return value.toString() != userId;
+            return value.toString() !== userId;
         })
         doc.members = newMembers;
         doc.save();
@@ -625,8 +668,40 @@ module.exports.removeMember = async (req, res) => {
             doc.save().then(user => {
                 //io.emit('removed-user-from-club', club_id, ConvertUser(user))
                 res.status(200).send(ConvertUser(user))
+            }).catch(err => {
+                console.log(err)
+                res.status(500).send({ error: err.message })
             })
+        }).catch(err => {
+s
+            res.status(500).send({ error: err.message })
         })
+    }).catch(err => {
+        console.log(err)
+        res.status(400).send({ error: err.message })
+    })
+}
+
+module.exports.removeMembers = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { members } = req.body;
+    //console.log(members)
+    Club.updateOne(
+        { _id: clubId },
+        { $pull: { members: { $in: members } } }
+    ).then(() => {
+        User.updateMany(
+            { _id: { $in: members } },
+            { $pull: { clubs: clubId } }
+        ).then(users => {
+            res.status(200).send(users)
+        }).catch(err => {
+            console.log(err)
+            res.status(500).send({ error: err.message })
+        })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).send({ error: err.message })
     })
 }
 
@@ -663,7 +738,7 @@ module.exports.delete = async (req, res) => {
                 { $pull: { clubs: clubId } }
             )
 
-            res.status(204).send(clubId)
+            res.status(200).send(clubId)
         }
     })
 }

@@ -55,7 +55,7 @@ const Members = ({ club, clubs, setClubs }) => {
   const handleRemoveFromClub = async (event, param) => {
     event.stopPropagation();
     //socket.emit('remove-user-from-club', club._id, param._id)
-    const res = await axiosInstance.patch(`/club/remove/${club._id}`,
+    const res = await axiosInstance.patch(`/club/removemember/${club._id}`,
       JSON.stringify({
         "userId": param._id
       }), {

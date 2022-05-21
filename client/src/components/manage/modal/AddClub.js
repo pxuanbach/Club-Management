@@ -5,7 +5,6 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axiosInstance from '../../../helper/Axios'
 import FindMember from './FindMember'
-import { UploadImageClub } from '../../../helper/UploadImage';
 
 const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
     const avatarRef = useRef();
@@ -71,29 +70,25 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
         }
 
         //send request to server
-        let img_upload_data = {};
-        if (avatarImage) {
-            img_upload_data = await UploadImageClub(avatarImage)
-                .catch(err => console.log(err));;
-        }
-        
-        const res = await axiosInstance.post('/club/create', JSON.stringify({
-            'name': values.name,
-            'img_url': img_upload_data.secure_url,
-            'cloudinary_id': img_upload_data.public_id,
-            'description': values.description,
-            'leader': leaderSelected._id,
-            'treasurer': treasurerSelected._id
-        }), {
+        var formData = new FormData();
+        formData.append('file', avatarImage)
+        formData.append('name', values.name)
+        formData.append('description', values.description)
+        formData.append('leader', leaderSelected._id)
+        formData.append('treasurer', treasurerSelected._id)
+
+        const res = await axiosInstance.post('/club/create', 
+        formData, {
             headers: { 'Content-Type': 'application/json' }
         })
 
         const data = res.data
-        
+
         if (data) {
             setClubs([...clubs, data])
             resetState();
         }
+
     }
 
     const resetState = () => {

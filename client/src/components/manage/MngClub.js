@@ -8,14 +8,11 @@ import { styled } from '@mui/material/styles';
 import AddClub from './modal/AddClub'
 import UpdateClub from './modal/UpdateClub'
 import DeleteClub from './modal/DeleteClub';
-import io from 'socket.io-client'
 import './Mng.css';
-import { ENDPT } from '../../helper/Helper';
 import axiosInstance from '../../helper/Axios';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
-
-let socket;
+import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -55,13 +52,16 @@ const ManageClub = () => {
     e.preventDefault();
     //console.log(search)
     if (search) {
-      const res = await axiosInstance.get(`/club/search/${search}`)
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/club/search/${encodedSearch}`)
 
       const data = res.data;
       //console.log(data)
       if (data) {
         setClubs(data)
       }
+    } else {
+      getListClub()
     }
   }
 

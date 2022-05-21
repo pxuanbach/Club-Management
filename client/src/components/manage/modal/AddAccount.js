@@ -67,7 +67,7 @@ const AddAccount = ({ handleClose, users, setUsers }) => {
         setPasswordErr('');
         setNameErr('');
         setEmailErr('');
-
+        
         var formData = new FormData();
         formData.append("file", avatarImage);
         formData.append("username", values.username)

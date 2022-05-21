@@ -6,11 +6,10 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './modal/AddAccount';
-import io from 'socket.io-client'
-import { ENDPT } from '../../helper/Helper';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 import axiosInstance from '../../helper/Axios';
+import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -33,8 +32,6 @@ const style = {
   p: 4,
 };
 
-let socket;
-
 const ManageAccount = () => {
   const { user, setUser } = useContext(UserContext);
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -47,9 +44,20 @@ const ManageAccount = () => {
     setSearch(e.target.value)
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    //socket.emit('search-user', search)
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/user/search/${encodedSearch}`)
+
+      const data = res.data;
+      //console.log(data)
+      if (data) {
+        setUsers(data)
+      }
+    } else {
+      getUsers()
+    }
   }
 
   const handleRefresh = (e) => {
@@ -62,11 +70,9 @@ const ManageAccount = () => {
 
   const handleBlockOrUnblock = async (event, param) => {
     event.stopPropagation();
-
     const res = await axiosInstance.patch(`/user/block/${param._id}`)
 
     const data = res.data
-
     if (data) {
       const updateUsers = users.map((elm) => {
         if (elm._id === data._id) {
@@ -77,7 +83,6 @@ const ManageAccount = () => {
         }
         return elm;
       });
-
       setUsers(updateUsers)
     }
   }
@@ -101,31 +106,6 @@ const ManageAccount = () => {
   useEffect(() => {
     getUsers()
   }, [])
-
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [ENDPT])
-
-  // useEffect(() => {
-  //   socket.emit('get-users')
-  //   socket.on('output-users', users => {
-  //     setUsers(users)
-  //     //console.log('users', users)
-  //   })
-  // }, [])
-
-  // useEffect(() => {
-  //   socket.on('new-user', newUser => {
-  //     setUsers([...users, newUser])
-  //   })
-  //   socket.on('output-search-user', users => {
-  //     setUsers(users)
-  //   })
-  // }, [users])
 
   const columns = [
     {
