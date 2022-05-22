@@ -163,15 +163,24 @@
     
 }
 .div-image{
-    width: 290px;
-    margin-left: 180px;
-    padding-top: 30px;
-    
+    display: flex;
+    flex-direction: column;
+    width: 96%;
+    margin: 20px;
+    margin-left: 0;
+    background-color: #1B264D;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+}
+.name-logo{
+    color: white;
+    padding-bottom: 15px;
 }
 .imageInfo{
-    width: 80%;
-    border-radius: 50%;
-    
+    width: 40%;
+    padding-top: 10px;
+    margin-right: 30px;
 }
 
 

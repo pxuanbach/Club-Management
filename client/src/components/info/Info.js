@@ -2,7 +2,8 @@ import React from 'react'
 import Button from '@mui/material/Button';
 import './Info.css'
 import KeyIcon from '@mui/icons-material/Key';
-import ImageInfo from '../../assets/imageInfo.png'
+// import ImageInfo from '../../assets/imageInfo.png'
+import ImageInfo from '../../assets/logoweb.png'
 const Info = () => {
   const showhideFunction = () => {
     var actionList = document.getElementById("listButton");    
@@ -146,8 +147,8 @@ const showhideFunction2 = () => {
       </div>
       <div style={{flex: 1}}>
         <div className='div-image'>
-          <img className='imageInfo' src={ImageInfo} />
-        
+          <img className='imageInfo' src={ImageInfo} alt="ảnh logo"/>
+          <h1 className='name-logo'>School Club Management</h1>
         </div>
         <div style={{border: "1px solid #ccc", borderRadius: 5, margin: 20,marginLeft:0,marginTop:20, height: "50vh", backgroundColor:'white'}}>
           <div style={{display:"flex", borderBottom: "1px solid #ccc", alignItems:"center" }}>

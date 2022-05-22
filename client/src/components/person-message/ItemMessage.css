@@ -1,0 +1,44 @@
+.item-message{
+    display: flex;
+    width: 95%;
+    padding: 15px;
+    padding-right: 0;
+    border-radius: 10px;
+    gap: 10px;
+}
+.item-message:hover{
+    background-color: #C6E2FF;
+}
+.avata-message{
+    width: 60px;
+    height: 60px;
+    background-color: #c4c4c4;
+    border-radius: 50%;
+}
+.content-message{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.content > h3 {
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: normal;
+    margin-bottom: 2px;
+}
+
+.latest-message{
+    color: #333;
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
