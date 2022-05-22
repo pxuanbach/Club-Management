@@ -321,7 +321,7 @@ module.exports.getOne = async (req, res) => {
         .populate('leader')
         .populate('treasurer')
         .then(result => {
-            res.status(200).send(ConvertClubs(clubs))
+            res.status(200).send(ConvertClub(result))
         }).catch(err => {
             res.status(500).json({ error: err.message })
         })

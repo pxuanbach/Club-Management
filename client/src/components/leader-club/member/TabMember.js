@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 import { UserContext } from '../../../UserContext'
 import { Buffer } from 'buffer';
-import AddMember from '../../manage/modal/update/AddMember'
+import AddMembers from './AddMembers'
 import axiosInstance from '../../../helper/Axios';
 import './TabMember.css'
 
@@ -24,7 +24,7 @@ const style = {
   top: '45%',
   left: '50%',
   transform: 'translate(-30%, -45%)',
-  width: 700,
+  width: 750,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -36,8 +36,6 @@ const TabMember = ({ club }) => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [search, setSearch] = useState()
-  const [leader, setLeader] = useState(club.leader)
-  const [treasurer, setTreasurer] = useState(club.treasurer)
   const [members, setMembers] = useState([])
   const [membersSelected, setMembersSelected] = useState([])
   let haveSelected = membersSelected.length <= 0;
@@ -49,8 +47,8 @@ const TabMember = ({ club }) => {
       JSON.stringify({
         'members': membersSelected,
       }), {
-        headers: { 'Content-Type': 'application/json' }
-      }
+      headers: { 'Content-Type': 'application/json' }
+    }
     )
 
     const data = res.data
@@ -78,7 +76,6 @@ const TabMember = ({ club }) => {
     } else {
       getMembers();
     }
-
   }
 
   const getMembers = async () => {
@@ -94,47 +91,6 @@ const TabMember = ({ club }) => {
   useEffect(() => {
     getMembers()
   }, [])
-
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   socket.emit('get-user', club_id, 'leader')
-  //   socket.emit('get-user', club_id, 'treasurer')
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [ENDPT])
-
-  // useEffect(() => {
-  //   socket.emit('get-members', user?._id, club_id)
-  // }, [user])
-
-  // useEffect(() => {
-  //   //console.log('club id', club_id)
-
-  //   socket.on('output-leader', res => {
-  //     setLeader(res)
-  //   })
-  //   socket.on('output-treasurer', res => {
-  //     setTreasurer(res)
-  //   })
-  //   //console.log(user._id === leader._id)
-  // }, [])
-
-  // useEffect(() => {
-  //   socket.on('output-members', users => {
-  //     setMembers(users)
-  //   })
-  //   socket.on('searched-member-in-club', (users) => {
-  //     setMembers(users)
-  //   })
-  //   socket.on('removed-user-from-club', (club_id, user) => {
-  //     setMembers(members.filter(u => u._id !== user._id))
-  //   })
-  //   socket.on('member-added', (userAdded, club) => {
-  //     setMembers([...members, userAdded])
-  //   })
-  // }, [members])
 
   const columns = [
     {
@@ -169,7 +125,7 @@ const TabMember = ({ club }) => {
   ];
 
   if (user) {
-    isLeader = user._id === leader?._id;
+    isLeader = user._id === club.leader._id;
   }
   return (
     <div className='div-tabmember'>
@@ -182,27 +138,31 @@ const TabMember = ({ club }) => {
         }}
       >
         <Box sx={style}>
-          <AddMember club_id={club._id} setShowFormAdd={setShowFormAdd} />
+          <AddMembers
+            club_id={club._id}
+            setShowFormAdd={setShowFormAdd}
+            getMembers={getMembers}
+          />
         </Box>
       </Modal>
       <div className='members__head'>
         <div className='members__card'>
           <h3>Trưởng câu lạc bộ</h3>
           <div className='member-selected'>
-            <Avatar src={leader.img_url} />
+            <Avatar src={club.leader.img_url} />
             <div className='selected-info'>
-              <span>{leader.name}</span>
-              <span>{leader.email}</span>
+              <span>{club.leader.name}</span>
+              <span>{club.leader.email}</span>
             </div>
           </div>
         </div>
         <div className='members__card'>
           <h3>Thủ quỹ</h3>
           <div className='member-selected'>
-            <Avatar src={treasurer.img_url} />
+            <Avatar src={club.treasurer.img_url} />
             <div className='selected-info'>
-              <span>{treasurer.name}</span>
-              <span>{treasurer.email}</span>
+              <span>{club.treasurer.name}</span>
+              <span>{club.treasurer.email}</span>
             </div>
           </div>
         </div>
