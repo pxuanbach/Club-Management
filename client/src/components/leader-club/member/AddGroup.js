@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Avatar, TextField, Button, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import io from 'socket.io-client'
-import { ENDPT } from '../../../helper/Helper';
+import axiosInstance from '../../../helper/Axios';
 import './AddGroup.css'
 
-let socket
-
-const AddGroup = ({ club_id, setShow }) => {
+const AddGroup = ({ club_id, setShow, groups, setGroups }) => {
     const [name, setName] = useState();
     const [nameErr, setNameErr] = useState('');
     const [members, setMembers] = useState([]);
@@ -17,40 +14,43 @@ const AddGroup = ({ club_id, setShow }) => {
         setShow(false)
     }
 
-    const handleSave = (event) => {
+    const handleSave = async (event) => {
         event.preventDefault();
         //console.log(members)
         setNameErr('')
         if (name) {
-            console.log(club_id, name, membersSelected)
-            socket.emit('create-group',
-                {
-                    club_id: club_id,
-                    name: name,
-                    members: membersSelected
-                }
-            )
-            handleClose();
+            //console.log(club_id, name, membersSelected)
+            const res = await axiosInstance.post('group/create',
+                JSON.stringify({
+                    "clubId": club_id,
+                    "name": name,
+                    "members": membersSelected
+                }), {
+                headers: { 'Content-Type': 'application/json' }
+            })
+
+            const data = res.data
+            if (data) {
+                setGroups([...groups, data])
+                handleClose();
+            }
         } else {
             setNameErr('Tên nhóm trống')
         }
     }
 
-    useEffect(() => {
-        socket = io(ENDPT);
-        socket.emit('get-members-leader-treasurer', club_id)
-        return () => {
-            setMembersSelected([])
-            socket.emit('disconnect');
-            socket.off();
+    const getMemberLeaderTreasurer = async () => {
+        const res = await axiosInstance.get(`/group/membersleadertreasurer/${club_id}`)
+
+        const data = res.data
+        if (data) {
+            setMembers(data)
         }
-    }, [])
+    }
 
     useEffect(() => {
-        socket.on('output-members-leader-treasurer', users => {
-            setMembers(users)
-        })
-    }, [members])
+        getMemberLeaderTreasurer();
+    }, [])
 
     const columns = [
         {
@@ -111,13 +111,8 @@ const AddGroup = ({ club_id, setShow }) => {
                         columns={columns}
                         pageSize={4}
                         rowsPerPageOptions={[4]}
-                        onSelectionModelChange={(ids) => {
-                            const selectedIDs = new Set(ids)
-                            const selectedRows = members.filter((row) =>
-                                selectedIDs.has(row._id),
-                            );
-                            setMembersSelected(selectedRows)
-                        }}
+                        onSelectionModelChange={setMembersSelected}
+                        selectionModel={membersSelected}
                     />
                     <div className='stack-right'>
                         <Button
