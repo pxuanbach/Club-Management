@@ -17,7 +17,7 @@
 .header-left > h2{
     font-size: 28px;
     color: #1B264D;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 .btn-icon-create{
     width: 38px;
@@ -55,7 +55,7 @@
     box-sizing: border-box;
     width: 100%;
     padding: 10px;
-    padding-left: 20px;
+    padding-left: 15px;
     outline: none;
     border-radius: 30px;
     
@@ -71,7 +71,7 @@
     margin-top: 30px;
     align-items: center;
     overflow-y:scroll;
-    border-top: 1px solid #b4b0b0;
+    border-top: 1px solid #cccaca;
 }
 
 ::-webkit-scrollbar {

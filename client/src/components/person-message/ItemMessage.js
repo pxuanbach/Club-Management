@@ -23,10 +23,10 @@ const ItemMessage = () => {
     };
     return (
         <div className="item-message">
-            <Avatar sx={{width: 60, height: 60}}/>
+            <Avatar sx={{width: 58, height: 58}}/>
             <div className="content-message">
                 <div className='content'>
-                    <h3>Nguyễn Tiến Đạt đẹp trai bro có người yêu</h3>
+                    <h3>Nguyễn Tiến Đạt</h3>
                     <p className="latest-message">Hôm nay trời đẹp quá mà mưa cmnr huhu</p>
                 </div>
                 <div className='div-menu-item-mess'>
