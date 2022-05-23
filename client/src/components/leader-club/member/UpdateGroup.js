@@ -7,24 +7,24 @@ import { ENDPT } from '../../../helper/Helper';
 let socket
 
 const UpdateGroup = ({ club_id, group, setShow }) => {
-    const [name, setName] = useState(group?.name);
+    const [name, setName] = useState(group.name);
     const [nameErr, setNameErr] = useState('');
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState(group.members);
     const [membersSelected, setMembersSelected] = useState([])
 
     const handleClose = () => {
         setShow(false)
     }
 
-    const handleSave = (e) => {
+    const handleConfirm = (e) => {
         e.preventDefault();
         setNameErr('')
         if (name) {
-            socket.emit('update-group', {
-                group_id: group._id,
-                name: name,
-                members: membersSelected
-            })
+            // socket.emit('update-group', {
+            //     group_id: group._id,
+            //     name: name,
+            //     members: membersSelected
+            // })
             handleClose();
         } else {
             setNameErr('Tên nhóm trống')
@@ -32,20 +32,24 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
     }
 
     useEffect(() => {
-        socket = io(ENDPT);
-        socket.emit('get-members-not-in-group', club_id, group.members)
-        return () => {
-            setMembersSelected([])
-            socket.emit('disconnect');
-            socket.off();
-        }
+
     }, [])
 
-    useEffect(() => {
-        socket.on('output-members-not-in-group', users => {
-            setMembers(users)
-        })
-    }, [members])
+    // useEffect(() => {
+    //     socket = io(ENDPT);
+    //     socket.emit('get-members-not-in-group', club_id, group.members)
+    //     return () => {
+    //         setMembersSelected([])
+    //         socket.emit('disconnect');
+    //         socket.off();
+    //     }
+    // }, [])
+
+    // useEffect(() => {
+    //     socket.on('output-members-not-in-group', users => {
+    //         setMembers(users)
+    //     })
+    // }, [members])
 
     const columns = [
         {
@@ -98,29 +102,25 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
                         helperText={nameErr}
                         error={nameErr}
                     />
-                    <h3>Thêm thành viên mới</h3>
-                    <DataGrid
-                        getRowId={(r) => r._id}
-                        checkboxSelection
-                        autoHeight
-                        rows={members}
-                        columns={columns}
-                        pageSize={4}
-                        rowsPerPageOptions={[4]}
-                        onSelectionModelChange={(ids) => {
-                            const selectedIDs = new Set(ids)
-                            const selectedRows = members.filter((row) =>
-                                selectedIDs.has(row._id),
-                            );
-                            setMembersSelected(selectedRows)
-                        }}
-                    />
+                    <span>Chọn thành viên để xóa khỏi nhóm</span>
+                    <div style={{ height: 52 * 3 + 56 + 55 }}>
+                        <DataGrid
+                            getRowId={(r) => r._id}
+                            checkboxSelection
+                            rows={members}
+                            columns={columns}
+                            pageSize={4}
+                            rowsPerPageOptions={[4]}
+                            onSelectionModelChange={setMembersSelected}
+                            selectionModel={membersSelected}
+                        />
+                    </div>
                     <div className='stack-right'>
                         <Button
                             variant="contained"
                             disableElevation
-                            onClick={handleSave}>
-                            Lưu
+                            onClick={handleConfirm}>
+                            Xác nhận
                         </Button>
                         <Button
                             variant="outlined"

@@ -169,7 +169,7 @@ module.exports.searchGroupInClub = (req, res) => {
         })
 }
 
-module.exports.getMembersLeaderTreasurer = (req, res) => {
+module.exports.getAll = (req, res) => {
     const clubId = req.params.clubId;
 
     Club.findById(clubId).then(club => {
@@ -182,6 +182,36 @@ module.exports.getMembersLeaderTreasurer = (req, res) => {
                 $in: arrId
             }
         }).then(users => {
+            res.status(200).send(users)
+        }).catch(err => {
+            res.status(500).json({ error: err.message })
+        })
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}
+
+module.exports.searchAll = (req, res) => {
+    const clubId = req.params.clubId;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
+
+    Club.findById(clubId).then(club => {
+        let arrId = club.members
+        arrId.push(club.leader)
+        arrId.push(club.treasurer)
+        //console.log(arrId)
+        User.find({$and: [
+            {_id: { $in: arrId }},
+            {
+                $or: [
+                    { username: { $regex: searchValue } },
+                    { name: { $regex: searchValue } },
+                    { email: { $regex: searchValue } }
+                ]
+            }
+        ]}).then(users => {
             res.status(200).send(users)
         }).catch(err => {
             res.status(500).json({ error: err.message })

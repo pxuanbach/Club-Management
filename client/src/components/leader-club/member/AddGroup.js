@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, TextField, Button, Tooltip } from '@mui/material';
+import { Avatar, TextField, Button, Tooltip, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import SearchIcon from '@mui/icons-material/Search';
+import { styled } from '@mui/material/styles';
+import { Buffer } from 'buffer';
 import axiosInstance from '../../../helper/Axios';
 import './AddGroup.css'
 
+const CustomTextField = styled(TextField)({
+    '& label.Mui-focused': {
+        color: '#1B264D',
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#1B264D',
+    },
+});
+
 const AddGroup = ({ club_id, setShow, groups, setGroups }) => {
+    const [search, setSearch] = useState();
     const [name, setName] = useState();
     const [nameErr, setNameErr] = useState('');
     const [members, setMembers] = useState([]);
@@ -12,6 +25,21 @@ const AddGroup = ({ club_id, setShow, groups, setGroups }) => {
 
     const handleClose = () => {
         setShow(false)
+    }
+
+    const handleSearchMembersLeaderTreasurer = async (e) => {
+        e.preventDefault();
+        if (search) {
+            const encodedSearch = new Buffer(search).toString('base64');
+            const res = await axiosInstance.get(`/group/searchallmembers/${club_id}/${encodedSearch}`)
+
+            const data = res.data;
+            if (data) {
+                setMembers(data)
+            }
+        } else {
+            getMemberLeaderTreasurer()
+        }
     }
 
     const handleSave = async (event) => {
@@ -40,7 +68,7 @@ const AddGroup = ({ club_id, setShow, groups, setGroups }) => {
     }
 
     const getMemberLeaderTreasurer = async () => {
-        const res = await axiosInstance.get(`/group/membersleadertreasurer/${club_id}`)
+        const res = await axiosInstance.get(`/group/allmembers/${club_id}`)
 
         const data = res.data
         if (data) {
@@ -103,17 +131,49 @@ const AddGroup = ({ club_id, setShow, groups, setGroups }) => {
                         helperText={nameErr}
                         error={nameErr}
                     />
-                    <DataGrid
-                        getRowId={(r) => r._id}
-                        checkboxSelection
-                        autoHeight
-                        rows={members}
-                        columns={columns}
-                        pageSize={4}
-                        rowsPerPageOptions={[4]}
-                        onSelectionModelChange={setMembersSelected}
-                        selectionModel={membersSelected}
-                    />
+                    <div className='stack-left'>
+                        <Box
+                            component="form"
+                            sx={{
+                                '& > :not(style)': { width: '30ch' },
+                            }}>
+                            <CustomTextField
+                                value={search}
+                                id="search-field-tabmember"
+                                label="Tìm kiếm thành viên"
+                                variant="standard"
+                                onChange={(e) => {
+                                    setSearch(e.target.value)
+                                }}
+                                onKeyPress={event =>
+                                    event.key === 'Enter'
+                                        ? handleSearchMembersLeaderTreasurer(event)
+                                        : null
+                                }
+                            />
+                        </Box>
+                        <Tooltip title='Tìm kiếm' placement='right-start'>
+                            <Button
+                                className='btn-search3'
+                                variant="text"
+                                disableElevation
+                                onClick={handleSearchMembersLeaderTreasurer}
+                            >
+                                <SearchIcon sx={{ color: '#1B264D' }} />
+                            </Button>
+                        </Tooltip>
+                    </div>
+                    <div style={{ height: 52 * 3 + 56 + 55 }}>
+                        <DataGrid
+                            getRowId={(r) => r._id}
+                            checkboxSelection
+                            rows={members}
+                            columns={columns}
+                            pageSize={3}
+                            onSelectionModelChange={setMembersSelected}
+                            selectionModel={membersSelected}
+                        />
+                    </div>
                     <div className='stack-right'>
                         <Button
                             variant="contained"
