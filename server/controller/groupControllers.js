@@ -116,3 +116,16 @@ module.exports = function (socket, io) {
             })
     })
 }
+
+module.exports.getList = (req, res) => {
+    const clubId = req.params.clubId
+
+    Group.find({ club: clubId })
+    .sort({ name: 1 })
+    .populate('members')
+    .then(result => {
+        res.status(200).send(result)
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}

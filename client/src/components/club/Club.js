@@ -1,4 +1,4 @@
-import { Switch, Route, useParams } from 'react-router-dom';
+import { Switch, Route, useParams, Redirect } from 'react-router-dom';
 import React, { useEffect, useState, useContext } from "react";
 import Activity from '../leader-club/activity/Activity';
 import Calendar from "../leader-club/calendar/Calendar"
@@ -29,6 +29,9 @@ const Club = () => {
     verifyClub();
   }, []);
 
+  if (!user) {
+    return <Redirect to='/login'/>
+  }
   return (
     <div className='club'>
       <div className='div-left-club'>

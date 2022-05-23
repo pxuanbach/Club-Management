@@ -7,8 +7,7 @@ import AddGroup from './AddGroup'
 import UpdateGroup from './UpdateGroup';
 import DeleteGroup from './DeleteGroup';
 import { UserContext } from '../../../UserContext'
-import io from 'socket.io-client'
-import { ENDPT } from '../../../helper/Helper';
+import axiosInstance from '../../../helper/Axios'
 import './TabGroup.css'
 
 let socket
@@ -34,13 +33,13 @@ const style = {
   p: 4,
 };
 
-const TabGroup = ({ club_id }) => {
+const TabGroup = ({ club }) => {
   let isLeader = false;
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [leader, setLeader] = useState();
+
   const [groups, setGroups] = useState([]);
   const [groupSelected, setGroupSelected] = useState();
   const [search, setSearch] = useState();
@@ -59,67 +58,67 @@ const TabGroup = ({ club_id }) => {
 
   const handleSearchGroups = (event) => {
     event.preventDefault();
-    socket.emit('search-groups', club_id, search)
+    //socket.emit('search-groups', club_id, search)
   }
 
-  useEffect(() => {
-    socket = io(ENDPT);
-    socket.emit('get-user', club_id, 'leader')
-    socket.emit('get-groups', club_id)
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
-  }, [])
+  // useEffect(() => {
+  //   socket = io(ENDPT);
+  //   socket.emit('get-user', club_id, 'leader')
+  //   socket.emit('get-groups', club_id)
+  //   return () => {
+  //     socket.emit('disconnect');
+  //     socket.off();
+  //   }
+  // }, [])
 
-  useEffect(() => {
-    socket.on('output-leader', res => {
-      setLeader(res)
-    })
-  }, [leader])
+  // useEffect(() => {
+  //   socket.on('output-leader', res => {
+  //     setLeader(res)
+  //   })
+  // }, [leader])
 
-  useEffect(() => {
-    socket.on('output-groups', grs => {
-      setGroups(grs)
-    })
-    socket.on('group-created', newGroup => {
-      setGroups([...groups, newGroup])
-    })
-    socket.on('group-deleted', delGroup => {
-      setGroups(groups.filter(group => group._id !== delGroup._id))
-    })
-    socket.on('deleted-member-from-group', gr => {
-      const updateGroups = groups.map((elm) => {
-        if (elm._id === gr._id) {
-          return {
-            ...elm,
-            members: gr.members
-          }
-        }
-        return elm;
-      });
-      setGroups(updateGroups)
-    })
-    socket.on('group-updated', gr => {
-      const updateGroups = groups.map((elm) => {
-        if (elm._id === gr._id) {
-          return {
-            ...elm,
-            name: gr.name,
-            members: gr.members
-          }
-        }
-        return elm;
-      });
-      setGroups(updateGroups)
-    })
-    socket.on('groups-searched', grs => {
-      setGroups(grs)
-    })
-  }, [groups])
+  // useEffect(() => {
+  //   socket.on('output-groups', grs => {
+  //     setGroups(grs)
+  //   })
+  //   socket.on('group-created', newGroup => {
+  //     setGroups([...groups, newGroup])
+  //   })
+  //   socket.on('group-deleted', delGroup => {
+  //     setGroups(groups.filter(group => group._id !== delGroup._id))
+  //   })
+  //   socket.on('deleted-member-from-group', gr => {
+  //     const updateGroups = groups.map((elm) => {
+  //       if (elm._id === gr._id) {
+  //         return {
+  //           ...elm,
+  //           members: gr.members
+  //         }
+  //       }
+  //       return elm;
+  //     });
+  //     setGroups(updateGroups)
+  //   })
+  //   socket.on('group-updated', gr => {
+  //     const updateGroups = groups.map((elm) => {
+  //       if (elm._id === gr._id) {
+  //         return {
+  //           ...elm,
+  //           name: gr.name,
+  //           members: gr.members
+  //         }
+  //       }
+  //       return elm;
+  //     });
+  //     setGroups(updateGroups)
+  //   })
+  //   socket.on('groups-searched', grs => {
+  //     setGroups(grs)
+  //   })
+  // }, [groups])
 
   if (user) {
-    isLeader = user._id === leader?._id;
+    isLeader = user._id === club.leader._id;
   }
   return (
     <div className='div-tabgroup'>
@@ -132,7 +131,7 @@ const TabGroup = ({ club_id }) => {
         }}
       >
         <Box sx={style}>
-          <AddGroup club_id={club_id} setShow={setShowFormAdd} />
+          <AddGroup club_id={club._id} setShow={setShowFormAdd} />
         </Box>
       </Modal>
       <Modal
@@ -144,7 +143,7 @@ const TabGroup = ({ club_id }) => {
         }}
       >
         <Box sx={style}>
-          <UpdateGroup club_id={club_id} group={groupSelected} setShow={setShowFormUpdate} />
+          <UpdateGroup club_id={club._id} group={groupSelected} setShow={setShowFormUpdate} />
         </Box>
       </Modal>
       <DeleteGroup

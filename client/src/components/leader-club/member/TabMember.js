@@ -82,7 +82,6 @@ const TabMember = ({ club }) => {
     const res = await axiosInstance.get(`/club/members/${club._id}`)
 
     const data = res.data;
-
     if (data) {
       setMembers(data)
     }
