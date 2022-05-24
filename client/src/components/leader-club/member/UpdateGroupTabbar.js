@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Box, Tab, Tabs } from '@mui/material';
 import PropTypes from 'prop-types';
-import General from './update/General'
-import Members from './update/Members'
-import AddMember from './update/AddMember'
+import UpdateGroupInfo from './update/UpdateGroupInfo';
+import AddMembers from './update/AddMembers'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -31,7 +30,7 @@ TabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-const UpdateClub = ({ setShowFormUpdate, club, clubs, setClubs }) => {
+const UpdateGroup = ({ group, groups, setGroups, setShow }) => {
     const [tabValue, setTabValue] = useState(0);
 
     const handleTabChange = (event, newValue) => {
@@ -44,34 +43,26 @@ const UpdateClub = ({ setShowFormUpdate, club, clubs, setClubs }) => {
                 value={tabValue}
                 onChange={handleTabChange}
             >
-                <Tab value={0} label="Thông tin chung" />
-                <Tab value={1} label="Thành viên" />
-                <Tab value={2} label="Thêm thành viên" />
+                <Tab value={0} label="Cập nhật thông tin nhóm" />
+                <Tab value={1} label="Thêm thành viên" />
             </Tabs>
             <TabPanel value={tabValue} index={0}>
-                <General
-                    setShowFormUpdate={setShowFormUpdate}
-                    club={club}
-                    clubs={clubs}
-                    setClubs={setClubs}
+                <UpdateGroupInfo
+                    group={group}
+                    groups={groups}
+                    setGroups={setGroups}
+                    setShow={setShow}
                 />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                <Members
-                    club={club}
-                    clubs={clubs}
-                    setClubs={setClubs}
-                />
-            </TabPanel>
-            <TabPanel value={tabValue} index={2}>
-                <AddMember
-                    club_id={club._id}
-                    clubs={clubs}
-                    setClubs={setClubs}
+                <AddMembers
+                    group={group}
+                    groups={groups}
+                    setGroups={setGroups}
                 />
             </TabPanel>
         </div>
     )
 }
 
-export default UpdateClub
+export default UpdateGroup

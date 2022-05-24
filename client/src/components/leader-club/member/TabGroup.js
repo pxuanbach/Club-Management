@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import { Buffer } from 'buffer';
 import Group from './Group'
 import AddGroup from './AddGroup'
-import UpdateGroup from './UpdateGroup';
+import UpdateGroupTabbar from './UpdateGroupTabbar';
 import DeleteGroup from './DeleteGroup';
 import { UserContext } from '../../../UserContext'
 import axiosInstance from '../../../helper/Axios'
@@ -29,7 +29,7 @@ const style = {
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
-  p: 4,
+  p: 2,
 };
 
 const TabGroup = ({ club }) => {
@@ -67,7 +67,6 @@ const TabGroup = ({ club }) => {
     } else {
       getGroups();
     }
-    //socket.emit('search-groups', club_id, search)
   }
 
   const getGroups = async () => {
@@ -82,62 +81,6 @@ const TabGroup = ({ club }) => {
   useEffect(() => {
     getGroups();
   }, [])
-
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   socket.emit('get-user', club_id, 'leader')
-  //   socket.emit('get-groups', club_id)
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [])
-
-  // useEffect(() => {
-  //   socket.on('output-leader', res => {
-  //     setLeader(res)
-  //   })
-  // }, [leader])
-
-  // useEffect(() => {
-  //   socket.on('output-groups', grs => {
-  //     setGroups(grs)
-  //   })
-  //   socket.on('group-created', newGroup => {
-  //     setGroups([...groups, newGroup])
-  //   })
-  //   socket.on('group-deleted', delGroup => {
-  //     setGroups(groups.filter(group => group._id !== delGroup._id))
-  //   })
-  //   socket.on('deleted-member-from-group', gr => {
-  //     const updateGroups = groups.map((elm) => {
-  //       if (elm._id === gr._id) {
-  //         return {
-  //           ...elm,
-  //           members: gr.members
-  //         }
-  //       }
-  //       return elm;
-  //     });
-  //     setGroups(updateGroups)
-  //   })
-  //   socket.on('group-updated', gr => {
-  //     const updateGroups = groups.map((elm) => {
-  //       if (elm._id === gr._id) {
-  //         return {
-  //           ...elm,
-  //           name: gr.name,
-  //           members: gr.members
-  //         }
-  //       }
-  //       return elm;
-  //     });
-  //     setGroups(updateGroups)
-  //   })
-  //   socket.on('groups-searched', grs => {
-  //     setGroups(grs)
-  //   })
-  // }, [groups])
 
   if (user) {
     isLeader = user._id === club.leader._id;
@@ -170,9 +113,10 @@ const TabGroup = ({ club }) => {
         }}
       >
         <Box sx={style}>
-          <UpdateGroup
-            club_id={club._id}
+          <UpdateGroupTabbar
             group={groupSelected}
+            groups={groups}
+            setGroups={setGroups}
             setShow={setShowFormUpdate}
           />
         </Box>
@@ -181,6 +125,8 @@ const TabGroup = ({ club }) => {
         open={showDialog}
         setOpen={setShowDialog}
         group={groupSelected}
+        groups={groups}
+        setGroups={setGroups}
       />
       <div className='div-header-tabgroup'>
         <div className='div-search-tabgroup'>

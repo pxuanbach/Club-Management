@@ -1,55 +1,64 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, TextField, Button, Tooltip } from '@mui/material';
+import { Avatar, TextField, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import io from 'socket.io-client'
-import { ENDPT } from '../../../helper/Helper';
+import axiosInstance from '../../../../helper/Axios'
 
-let socket
-
-const UpdateGroup = ({ club_id, group, setShow }) => {
-    const [name, setName] = useState(group.name);
+const UpdateGroupInfo = ({group, groups, setGroups, setShow }) => {
+    const [name, setName] = useState('');
     const [nameErr, setNameErr] = useState('');
-    const [members, setMembers] = useState(group.members);
+    const [members, setMembers] = useState([]);
     const [membersSelected, setMembersSelected] = useState([])
 
     const handleClose = () => {
         setShow(false)
     }
 
-    const handleConfirm = (e) => {
+    const handleConfirm = async (e) => {
         e.preventDefault();
         setNameErr('')
         if (name) {
-            // socket.emit('update-group', {
-            //     group_id: group._id,
-            //     name: name,
-            //     members: membersSelected
-            // })
-            handleClose();
+            const res = await axiosInstance.patch(`/group/update/${group._id}`,
+                JSON.stringify({
+                    'newName': name,
+                    'membersRemove': membersSelected,
+                }), {
+                headers: { 'Content-Type': 'application/json' }
+            })
+
+            const data = res.data
+            if (data) {
+                setMembersSelected([])
+                setMembers(data.members)
+                const updateGroups = groups.map((elm) => {
+                    if (elm._id === data._id) {
+                        return {
+                            ...elm,
+                            name: data.name,
+                            members: data.members
+                        }
+                    }
+                    return elm;
+                });
+                setGroups(updateGroups)
+            }
         } else {
             setNameErr('Tên nhóm trống')
         }
     }
 
+    const getGroup = async () => {
+        const res = await axiosInstance.get(`/group/one/${group._id}`)
+
+        const data = res.data
+        if (data) {
+            setName(data.name)
+            setMembers(data.members)
+        }
+    }
+
     useEffect(() => {
-
+        getGroup()
     }, [])
-
-    // useEffect(() => {
-    //     socket = io(ENDPT);
-    //     socket.emit('get-members-not-in-group', club_id, group.members)
-    //     return () => {
-    //         setMembersSelected([])
-    //         socket.emit('disconnect');
-    //         socket.off();
-    //     }
-    // }, [])
-
-    // useEffect(() => {
-    //     socket.on('output-members-not-in-group', users => {
-    //         setMembers(users)
-    //     })
-    // }, [members])
 
     const columns = [
         {
@@ -84,9 +93,6 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
 
     return (
         <div>
-            <h2 id="modal-modal-title">
-                Cập nhật thông tin nhóm
-            </h2>
             <div id="modal-modal-description">
                 <div className='addgroup-modal'>
                     <TextField
@@ -103,7 +109,7 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
                         error={nameErr}
                     />
                     <span>Chọn thành viên để xóa khỏi nhóm</span>
-                    <div style={{ height: 52 * 3 + 56 + 55 }}>
+                    <div style={{ height: 52 * 4 + 111 }}>
                         <DataGrid
                             getRowId={(r) => r._id}
                             checkboxSelection
@@ -135,4 +141,4 @@ const UpdateGroup = ({ club_id, group, setShow }) => {
     )
 }
 
-export default UpdateGroup
+export default UpdateGroupInfo
