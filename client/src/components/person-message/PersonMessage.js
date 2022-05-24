@@ -36,12 +36,11 @@ const PersonMessage = () => {
             <div className='div-message-body'>
                 <div className='div-mess'>
                     <div className='header-mess'>
-                    <Avatar sx={{width: 45, height: 45}}/>
+                    <Avatar sx={{width: 43, height: 43}}/>
                     <div className='name-mess'>Nguyễn Tiến Đạt</div>
                     <div id="todoicon" className='todo-icon'>
                         <i class="fa-solid fa-phone"></i>
                         <i class="fa-solid fa-video"></i>
-                        <i class="fa-solid fa-circle-info" ></i>
                     </div>
                     </div>
                     <div className='body-mess'>
@@ -59,9 +58,7 @@ const PersonMessage = () => {
 
                     </div>
                 </div>
-                {/* <div id="extend" className="extendOff">
-                    <MessageOption></MessageOption>
-                </div> */}
+
             </div>
         </div>
     </div>
