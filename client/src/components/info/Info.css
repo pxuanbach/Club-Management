@@ -1,0 +1,197 @@
+.div-infor{
+    flex: 2;
+    margin: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    border-radius: 5px;
+    /* box-shadow: 1px 2px 10px rgb(0 0 0 / 25%); */
+    border: 1px solid #ccc;
+    background-color: white;
+}
+.title-profile{
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    color: #1B264D;
+    padding: 20px;
+    font-size: 1.6rem;
+    font-family: Noto Sans Vietnamese,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+}
+.title-profile-1{
+    color: #1B264D;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-family: Noto Sans Vietnamese,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+    font-weight: bold;
+}
+.container-info{
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+}
+.div-action-image{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 40px;
+}
+.image{
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.header-title-info{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.header-title-info > h5 {
+    color: #1976d2;
+    font-weight: lighter;
+    cursor: pointer;
+    padding: 20px;
+    font-size: 1.0rem;
+
+}
+.div-text-profile{
+    padding-bottom: 20px;
+    display: flex;
+    width: 100%;
+    padding-left: 40px;
+}
+.div-text-profile > input {
+    margin-left: 15px;
+    display: none;
+    border-radius: 5px;
+    width: 50%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    outline: none;
+    margin-top: -5px;
+}
+.div-text-profile > textarea {
+    display: none;
+    width: 95%;
+    padding: 20px;
+    outline: none;
+    font-size: 15px;
+    font-family: arial;
+    border-radius: 5px;
+    resize: none;
+    margin-left: -5px;
+    border: 1px solid #ccc; 
+}
+
+.div-text-profile > label {
+    width: 120px;
+    color: #1B264D;
+    font-weight: 500;
+    font-size: 1.0rem;
+    font-family: Noto Sans Vietnamese,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+}
+.div-text-profile > select {
+    padding: 10px;
+    margin-left: 15px;
+    margin-top: -5px;
+    display: none;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+.div-text-profile > p{
+    width: 50%;
+    padding-right: 10px;
+    padding-left: 20px;
+    font-size: 1.0rem;
+    font-family: Noto Sans Vietnamese,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+}
+.list-action-profile{
+
+    display: none;
+}
+.display-list-button > Button{
+    margin-right: 10px;
+    text-transform: none;
+    
+}
+.display-list-button{
+    display: flex;
+    justify-content: right;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+
+.title-reset-pass{
+    
+    color: #1B264D;
+    font-size: 1.2rem;
+    font-family: Noto Sans Vietnamese,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+    font-weight: 500;
+}
+.div-text-password{
+    padding-top: 20px;
+    display: flex;
+    width: 100%;
+    padding-left: 50px;
+}
+.div-text-password > label {
+    width: 180px;
+    text-align: right;
+    margin-top: 6px;
+    color: #1B264D;
+    font-weight: 500;
+    font-size: 1.0rem;
+    font-family: Noto Sans Vietnamese,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;
+}
+.div-text-password > input {
+    margin-left: 15px;
+    border-radius: 5px;
+    width: 40%;
+    border: 1px solid #ccc;
+    padding: 8px;
+    outline: none;
+    
+}
+.list-action-password{
+    display: flex;
+    justify-content: right;
+    padding: 15px;
+    padding-right: 20px;
+    
+}
+.div-image{
+    display: flex;
+    flex-direction: column;
+    width: 96%;
+    margin: 20px;
+    margin-left: 0;
+    background-color: #1B264D;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+}
+.name-logo{
+    color: white;
+    padding-bottom: 15px;
+}
+.imageInfo{
+    width: 40%;
+    padding-top: 10px;
+    margin-right: 30px;
+}
+
+
+
+@media only screen and (max-width: 63.9375em) {
+    .page-infor{
+        flex-direction: column;
+        padding: 0;
+    }
+    .div-infor{
+        width: 100%;
+        margin: 0;
+    }
+}

@@ -15,6 +15,11 @@ const SignedInMenu = ({ logout }) => {
                         <i class="fa-solid fa-users"></i>
                     </Link>
                 </Tooltip>
+                <Tooltip title="Tin nhắn" placement="right-start">
+                    <Link to="/message">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    </Link>
+                </Tooltip>
                 {user.username.includes('admin') ?
                     <>
                         <Tooltip title="Quản lý các câu lạc bộ" placement="right-start">
@@ -28,6 +33,7 @@ const SignedInMenu = ({ logout }) => {
                             </Link>
                         </Tooltip>
                     </> : null}
+
             </div>
             <div className='avatar-logout'>
                 <Tooltip title="Thông tin cá nhân" placement="right-start">
