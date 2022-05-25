@@ -24,4 +24,20 @@ module.exports.create = (req, res) => {
         startDate,
         endDate
     });
+
+    activity.save().then(result => {
+        res.status(201).send(result)
+    }).catch(err => {
+        res.status(400).json({ error: err.message })
+    })
+}
+
+module.exports.getList = (req, res) => {
+    const clubId = req.params.clubId;
+
+    Activity.find({club: clubId}).then(result => {
+        res.status(200).send(result)
+    }).catch(err => {
+        res.status(500).send({ error: err.message })
+    })
 }

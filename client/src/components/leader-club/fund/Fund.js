@@ -129,52 +129,6 @@ const Fund = ({ club_id }) => {
     getFundHistories()
   }, [])
 
-  // useEffect(() => {
-  //   socket = io(ENDPT);
-  //   socket.emit('get-club', { club_id })
-  //   socket.emit('get-fundHistory', club_id)
-  //   socket.emit('get-col-pay-in-month', club_id)
-  //   socket.on('output-col-pay-in-month', (col, pay) => {
-  //     setCollectInMonth(col)
-  //     setPayInMonth(pay)
-  //   })
-  //   return () => {
-  //     socket.emit('disconnect');
-  //     socket.off();
-  //   }
-  // }, [])
-
-  // useEffect(() => {
-  //   socket.on('output-club', res => {
-  //     //console.log(res)
-  //     setClub(res)
-  //   })
-  // }, [club])
-
-  // useEffect(() => {
-  //   socket.on('output-fundHistory', res => {
-  //     setFundHistorys(res)
-  //   })
-
-  //   socket.on('fundHistory-created', (newFundHistory, fund) => {
-  //     //console.log('created')
-  //     setClub(prevClub => ({
-  //       ...prevClub,
-  //       fund: fund
-  //     }))
-  //     if (newFundHistory.type === 'Thu') {
-  //       setCollectInMonth(collectInMonth + newFundHistory.total)
-  //     } else {
-  //       setPayInMonth(payInMonth + newFundHistory.total)
-  //     }
-  //     setFundHistorys([...fundHistorys, newFundHistory])
-  //   })
-
-  //   socket.on('fundHistory-searched', res => {
-  //     setFundHistorys(res)
-  //   })
-  // }, [fundHistorys])
-
   if (user) {
     isTreasurer = user._id === club?.treasurer._id
   }

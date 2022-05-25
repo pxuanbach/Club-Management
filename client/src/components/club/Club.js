@@ -20,7 +20,7 @@ const Club = () => {
       try {
         const res = await axiosInstance.get(`/verifyclub/${club_id}`, { withCredentials: true });
         const data = res.data;
-        console.log('club', data)
+        //console.log('club', data)
         setClub(data);
       } catch (error) {
         console.log(error)

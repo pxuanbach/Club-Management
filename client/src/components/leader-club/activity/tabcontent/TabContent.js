@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Tooltip, Modal, TextField } from '@mui/material';
+import { Box, Button, Tooltip, Modal, TextField, Snackbar, Alert } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
-import { Link } from 'react-router-dom';
-import io from 'socket.io-client';
+import { Link, useRouteMatch } from 'react-router-dom';
+import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
-import { ENDPT } from '../../../../helper/Helper'
 import './TabContent.css';
 
 const CustomTextField = styled(TextField)({
@@ -30,21 +29,48 @@ const style = {
   p: 3,
 };
 
-let socket
-
 const TabContent = ({ match, club_id }) => {
+  const {path} = useRouteMatch();
   const [showFormAdd, setShowFormAdd] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showSnackbar = (message) => {
+    setAlertMessage(message)
+    setOpenSnackbar(true);
+  }
+
+  const acitivityCreated = (data) => {
+    setActivities([...activities, data]);
+  }
+
+  const getActivity = () => {
+    axiosInstance.get(`/activity/list/${club_id}`)
+      .then(response => {
+        //response.data
+        console.log(response.data)
+        setActivities(response.data)
+      }).catch(err => {
+        //err.response.data.error
+        showSnackbar(err.response.data.error)
+      })
+  }
 
   useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
+    getActivity()
   }, [])
 
   return (
     <div>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
       <Modal
         open={showFormAdd}
         aria-labelledby="modal-add-title"
@@ -56,8 +82,9 @@ const TabContent = ({ match, club_id }) => {
         <Box sx={style}>
           <AddActivity
             setShow={setShowFormAdd}
-            socket={socket}
             club_id={club_id}
+            acitivityCreated={acitivityCreated}
+            showSnackbar={showSnackbar}
           />
         </Box>
       </Modal>
@@ -99,12 +126,11 @@ const TabContent = ({ match, club_id }) => {
           </div>
         </div>
         <div className='div-body-content' >
-          <div className='item-work' onClick={() => { }}>
-            <Link to={match + '/chaongaymoi'}>
-              <ActivityItem></ActivityItem>
+          {activities && activities.map(activity => (
+            <Link key={activity._id} to={path + '/' + activity.content} className='item-work'>
+              <ActivityItem activity={activity}/>
             </Link>
-
-          </div>
+          ))}
         </div>
       </div>
 

@@ -9,7 +9,7 @@ const clubRoutes = require('./routes/clubRoutes');
 const userRoutes = require('./routes/userRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const fundRoutes = require('./routes/fundRoutes');
-const activityRoutes = require('./routes/acivityRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 
 const corsOptions = {
     origin: 'http://localhost:3000',

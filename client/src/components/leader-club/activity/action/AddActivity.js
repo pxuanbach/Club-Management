@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { TextField, Button } from '@mui/material';
-import io from 'socket.io-client'
-import RangeDatePicker from '../utilities/RangeDatePicker'
-import { ENDPT } from '../../../../helper/Helper';
+import RangeDatePicker from '../utilities/RangeDatePicker';
+import axiosInstance from '../../../../helper/Axios';
 
-let socket
-
-const AddActivity = ({ setShow, club_id }) => {
+const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
     const date = new Date();
     const [content, setContent] = useState();
     const [contentErr, setContentErr] = useState('');
@@ -28,24 +25,25 @@ const AddActivity = ({ setShow, club_id }) => {
     const handleSave = (event) => {
         event.preventDefault();
         if (content) {
-            socket.emit('create-activity',
-                club_id,
-                content,
-                validateDate(startDate),
-                validateDate(endDate)
-            )
+            axiosInstance.post(`/activity/create`,
+                JSON.stringify({
+                    "club": club_id,
+                    "content": content,
+                    "startDate": validateDate(startDate),
+                    "endDate": validateDate(endDate)
+                }), {
+                headers: { 'Content-Type': 'application/json' }
+            }).then(response => {
+                //response.data
+                acitivityCreated(response.data)
+              }).catch(err => {
+                //err.response.data.error
+                showSnackbar(err.response.data.error)
+              })
         } else {
             setContentErr('Tên hoạt động trống')
         }
     }
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
-    }, [])
 
     return (
         <div>
