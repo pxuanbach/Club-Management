@@ -29,18 +29,18 @@ const Login = () => {
         setPasswordErr('')
         try {
             axiosInstance.post('/login', JSON.stringify({ username, password }),
-                {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then(response => {
-                    setUser(response.data.user);
-                }).catch(err => {
-                    //console.log(err.response.data)
-                    setUsernameErr(err.response.data.errors.username);
-                    setPasswordErr(err.response.data.errors.password);
-                })
+            {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then(response => {
+                setUser(response.data.user);
+            }).catch(err => {
+                //console.log(err.response.data)
+                setUsernameErr(err.response.data.errors.username);
+                setPasswordErr(err.response.data.errors.password);
+            })
         } catch (error) {
             console.log(error)
         }

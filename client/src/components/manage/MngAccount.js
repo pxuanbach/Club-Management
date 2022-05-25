@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
-import { Avatar, TextField, Button, Tooltip, Box, Modal } from '@mui/material';
+import {
+  Avatar, TextField, Button, Tooltip, Box, Modal, Alert, Snackbar
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
@@ -39,6 +41,8 @@ const ManageAccount = () => {
   const [search, setSearch] = useState();
   const [userSelected, setUserSelected] = useState();
   const [users, setUsers] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -70,21 +74,24 @@ const ManageAccount = () => {
 
   const handleBlockOrUnblock = async (event, param) => {
     event.stopPropagation();
-    const res = await axiosInstance.patch(`/user/block/${param._id}`)
-
-    const data = res.data
-    if (data) {
-      const updateUsers = users.map((elm) => {
-        if (elm._id === data._id) {
-          return {
-            ...elm,
-            isblocked: data.isblocked
+    axiosInstance.patch(`/user/block/${param._id}`)
+      .then(response => {
+        const updateUsers = users.map((elm) => {
+          if (elm._id === response.data._id) {
+            return {
+              ...elm,
+              isblocked: response.data.isblocked
+            }
           }
-        }
-        return elm;
-      });
-      setUsers(updateUsers)
-    }
+          return elm;
+        });
+        setUsers(updateUsers)
+
+      }).catch(err => {
+        //console.log(err.response.data)
+        setAlertMessage(err.response.data.error)
+        setOpenSnackbar(true);
+      })
   }
 
   const handleDeleteUser = (event, param) => {
@@ -162,6 +169,14 @@ const ManageAccount = () => {
   }
   return (
     <div className='container'>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
       <Modal
         open={openModalAdd}
         onClose={handleCloseAdd}

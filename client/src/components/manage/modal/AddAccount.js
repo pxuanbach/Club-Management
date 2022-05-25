@@ -6,12 +6,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../Mng.css'
-import io from 'socket.io-client'
 import axiosInstance from '../../../helper/Axios';
-import { ENDPT } from '../../../helper/Helper'
-import { UploadImageUser } from '../../../helper/UploadImage'
-
-let socket;
 
 const AddAccount = ({ handleClose, users, setUsers }) => {
     const [avatarHeight, setAvatarHeight] = useState(150);
@@ -67,35 +62,33 @@ const AddAccount = ({ handleClose, users, setUsers }) => {
         setPasswordErr('');
         setNameErr('');
         setEmailErr('');
-        
+
         var formData = new FormData();
         formData.append("file", avatarImage);
         formData.append("username", values.username)
         formData.append("password", values.password)
         formData.append("name", values.name)
         formData.append("email", values.email)
-        
+
         try {
             setIsSuccess(true);
-            const res = await axiosInstance.post('/signup',
+            axiosInstance.post('/signup',
                 formData, {
                 withCredentials: true,
                 headers: {
                     "Content-Type": "application/json",
                 },
-            })
-            const data = res.data;
-            //console.log('signup response', data)
-            if (data.errors) {
-                setUsernameErr(data.errors.username)
-                setPasswordErr(data.errors.password);
-                setNameErr(data.errors.name);
-                setEmailErr(data.errors.email);
-                
-            } else {
-                setUsers([...users, data])
+            }).then(response => {
+                //response.data
+                setUsers([...users, response.data])
                 resetState();
-            }
+            }).catch(err => {
+                //console.log(err.response.data)
+                setUsernameErr(err.response.data.errors.username);
+                setPasswordErr(err.response.data.errors.password);
+                setNameErr(err.response.data.errors.name);
+                setEmailErr(err.response.data.errors.email);
+            })
             setIsSuccess(false);
         } catch (error) {
             console.log(error)

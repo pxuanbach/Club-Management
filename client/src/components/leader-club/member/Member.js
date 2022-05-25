@@ -74,7 +74,7 @@ export default function BasicTabs() {
           </Tabs>
         </Box>
         {isLoading ?
-          <Box sx={{ display: 'flex' }}>
+          <Box className='loading-temp'>
             <CircularProgress />
           </Box>
           : <div>

@@ -59,6 +59,7 @@ const UpdateGroup = ({ group, groups, setGroups, setShow }) => {
                     group={group}
                     groups={groups}
                     setGroups={setGroups}
+                    setShow={setShow}
                 />
             </TabPanel>
         </div>

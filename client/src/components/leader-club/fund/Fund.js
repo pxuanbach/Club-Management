@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Modal, Button, Tooltip, Box, TextField, styled } from '@mui/material';
+import {
+  Modal, Button, Tooltip, Box, TextField, styled,
+  Alert, Snackbar, CircularProgress
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import io from 'socket.io-client'
 import { UserContext } from '../../../UserContext';
-import { ENDPT } from '../../../helper/Helper';
 import AddFund from './AddFund';
 import PaymentList from "./PaymentList"
 import NumberFormat from 'react-number-format';
+import axiosInstance from '../../../helper/Axios'
 import "./Fund.css"
 import "../../../assets/css/grid.css"
 import '../../manage/Mng.css'
-
-let socket
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -38,12 +38,15 @@ const Fund = ({ club_id }) => {
   let date = new Date();
   let isTreasurer = false;
   const { user, setUser } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState();
   const [club, setClub] = useState();
   const [fundHistorys, setFundHistorys] = useState([])
   const [showFormAddFund, setShowFormAddFund] = useState(false);
   const [collectInMonth, setCollectInMonth] = useState(0);
   const [payInMonth, setPayInMonth] = useState(0);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleChangeSearch = (event) => {
     setSearch(event.target.value)
@@ -51,60 +54,112 @@ const Fund = ({ club_id }) => {
 
   const handleSearchFund = (e) => {
     e.preventDefault();
-    socket.emit('search-fundHistory', club_id, search)
+    //socket.emit('search-fundHistory', club_id, search)
+  }
+
+  const getColPayInMonth = (club_id) => {
+    axiosInstance.get(`/fund/colpayinmonth/${club_id}`)
+    .then(response => {
+      //response.data
+      setCollectInMonth(response.data.collect)
+      setPayInMonth(response.data.pay)
+    }).catch(err => {
+      //err.response.data.error
+      setAlertMessage(err.response.data.error)
+      setOpenSnackbar(true);
+    })
+  }
+
+  const getClub = (club_id) => {
+    axiosInstance.get(`/club/one/${club_id}`)
+    .then(response => {
+      //response.data
+      setClub(response.data)
+      setIsLoading(false)
+    }).catch(err => {
+      //err.response.data.error
+      setAlertMessage(err.response.data.error)
+      setOpenSnackbar(true);
+    })
+  }
+
+  const getFundHistories = () => {
+    axiosInstance.get(`/fund/list/${club_id}`)
+      .then(response => {
+        //response.data
+        setFundHistorys(response.data)
+      }).catch(err => {
+        //err.response.data.error
+        setAlertMessage(err.response.data.error)
+        setOpenSnackbar(true);
+      })
   }
 
   useEffect(() => {
-    socket = io(ENDPT);
-    socket.emit('get-club', { club_id })
-    socket.emit('get-fundHistory', club_id)
-    socket.emit('get-col-pay-in-month', club_id)
-    socket.on('output-col-pay-in-month', (col, pay) => {
-      setCollectInMonth(col)
-      setPayInMonth(pay)
-    })
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
+    getClub(club_id)
+    getColPayInMonth(club_id)
+    getFundHistories()
   }, [])
 
-  useEffect(() => {
-    socket.on('output-club', res => {
-      //console.log(res)
-      setClub(res)
-    })
-  }, [club])
+  // useEffect(() => {
+  //   socket = io(ENDPT);
+  //   socket.emit('get-club', { club_id })
+  //   socket.emit('get-fundHistory', club_id)
+  //   socket.emit('get-col-pay-in-month', club_id)
+  //   socket.on('output-col-pay-in-month', (col, pay) => {
+  //     setCollectInMonth(col)
+  //     setPayInMonth(pay)
+  //   })
+  //   return () => {
+  //     socket.emit('disconnect');
+  //     socket.off();
+  //   }
+  // }, [])
 
-  useEffect(() => {
-    socket.on('output-fundHistory', res => {
-      setFundHistorys(res)
-    })
+  // useEffect(() => {
+  //   socket.on('output-club', res => {
+  //     //console.log(res)
+  //     setClub(res)
+  //   })
+  // }, [club])
 
-    socket.on('fundHistory-created', (newFundHistory, fund) => {
-      //console.log('created')
-      setClub(prevClub => ({
-        ...prevClub,
-        fund: fund
-      }))
-      if (newFundHistory.type === 'Thu') {
-        setCollectInMonth(collectInMonth + newFundHistory.total)
-      } else {
-        setPayInMonth(payInMonth + newFundHistory.total)
-      }
-      setFundHistorys([...fundHistorys, newFundHistory])
-    })
+  // useEffect(() => {
+  //   socket.on('output-fundHistory', res => {
+  //     setFundHistorys(res)
+  //   })
 
-    socket.on('fundHistory-searched', res => {
-      setFundHistorys(res)
-    })
-  }, [fundHistorys])
+  //   socket.on('fundHistory-created', (newFundHistory, fund) => {
+  //     //console.log('created')
+  //     setClub(prevClub => ({
+  //       ...prevClub,
+  //       fund: fund
+  //     }))
+  //     if (newFundHistory.type === 'Thu') {
+  //       setCollectInMonth(collectInMonth + newFundHistory.total)
+  //     } else {
+  //       setPayInMonth(payInMonth + newFundHistory.total)
+  //     }
+  //     setFundHistorys([...fundHistorys, newFundHistory])
+  //   })
+
+  //   socket.on('fundHistory-searched', res => {
+  //     setFundHistorys(res)
+  //   })
+  // }, [fundHistorys])
 
   if (user) {
     isTreasurer = user._id === club?.treasurer._id
   }
   return (
     <div className='div-fund'>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
       <Modal
         open={showFormAddFund}
         aria-labelledby="modal-modal-title"
@@ -116,120 +171,124 @@ const Fund = ({ club_id }) => {
         <Box sx={style}>
           <AddFund
             setShowFormAdd={setShowFormAddFund}
-            socket={socket}
             club_id={club_id}
             user={user}
           />
         </Box>
       </Modal>
-      <div>
-        <h2 className='title-header'>Tổng quan</h2>
-        <div className="dashboard-overview">
-          <div className="dashboard-overview-row">
-            <div className="dashboard-overview-row-cell">
-              <div className='status-card'>
-                <div className='status-card_icon'>
-                  {/* <PaidIcon /> */}
+      {isLoading ?
+        <Box className='loading-temp'>
+          <CircularProgress />
+        </Box> :
+        <>
+          <div>
+            <h2 className='title-header'>Tổng quan</h2>
+            <div className="dashboard-overview">
+              <div className="dashboard-overview-row">
+                <div className="dashboard-overview-row-cell">
+                  <div className='status-card'>
+                    <div className='status-card_icon'>
+                      {/* <PaidIcon /> */}
+                    </div>
+                    <div className='status-card_info'>
+                      <h4>Tổng quỹ</h4>
+                      <h3>
+                        <NumberFormat
+                          displayType='text'
+                          value={club.fund}
+                          thousandSeparator="."
+                          decimalSeparator=","
+                        />
+                      </h3>
+                    </div>
+                  </div>
                 </div>
-                <div className='status-card_info'>
-                  <h4>Tổng quỹ</h4>
-                  <h3>
-                    <NumberFormat
-                      displayType='text'
-                      value={club?.fund}
-                      thousandSeparator="."
-                      decimalSeparator=","
-                    />
-                  </h3>
+                <div className="dashboard-overview-row-cell">
+                  <div className='status-card'>
+                    <div className='status-card_icon'>
+
+                    </div>
+                    <div className='status-card_info'>
+                      <h4>{"Tiền thu tháng " + (date.getMonth() + 1)}</h4>
+                      <h3>
+                        <NumberFormat
+                          displayType='text'
+                          value={collectInMonth}
+                          thousandSeparator="."
+                          decimalSeparator=","
+                        />
+                      </h3>
+                    </div>
+                  </div>
                 </div>
+                <div className="dashboard-overview-row-cell">
+                  <div className='status-card'>
+                    <div className='status-card_icon'>
+
+                    </div>
+                    <div className='status-card_info'>
+                      <h4>{"Tiền chi tháng " + (date.getMonth() + 1)}</h4>
+                      <h3>
+                        <NumberFormat
+                          displayType='text'
+                          value={payInMonth}
+                          thousandSeparator="."
+                          decimalSeparator=","
+                        />
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
-            <div className="dashboard-overview-row-cell">
-              <div className='status-card'>
-                <div className='status-card_icon'>
-
-                </div>
-                <div className='status-card_info'>
-                  <h4>{"Tiền thu tháng " + (date.getMonth() + 1)}</h4>
-                  <h3>
-                    <NumberFormat
-                      displayType='text'
-                      value={collectInMonth}
-                      thousandSeparator="."
-                      decimalSeparator=","
-                    />
-                  </h3>
-                </div>
-              </div>
-            </div>
-            <div className="dashboard-overview-row-cell">
-              <div className='status-card'>
-                <div className='status-card_icon'>
-
-                </div>
-                <div className='status-card_info'>
-                  <h4>{"Tiền chi tháng " + (date.getMonth() + 1)}</h4>
-                  <h3>
-                    <NumberFormat
-                      displayType='text'
-                      value={payInMonth}
-                      thousandSeparator="."
-                      decimalSeparator=","
-                    />
-                  </h3>
-                </div>
-              </div>
-            </div>
-
           </div>
-        </div>
-      </div>
-
-      <div>
-        <div className='div-title-search'>
-          <h2 className='title-header2'>Lịch sử thu chi</h2>
-          <div className='div-search-tabmember'>
-            <Box
-              sx={{
-                '& > :not(style)': { width: '30ch' },
-              }}
-            >
-              <CustomTextField
-                value={search}
-                onChange={handleChangeSearch}
-                id="search-field-tabmember"
-                label="Tìm kiếm phiếu thu/chi"
-                variant="standard"
-                onKeyPress={event => event.key === 'Enter' ? handleSearchFund(event) : null}
-              />
-            </Box>
-            <Tooltip title='Tìm kiếm' placement='right-start'>
-              <Button
-                className='btn-search3'
-                variant="text"
-                disableElevation
-                onClick={handleSearchFund}
-              >
-                <SearchIcon sx={{ color: '#1B264D' }} />
-              </Button>
-            </Tooltip>
-            {isTreasurer ?
-              (<Button
-                onClick={() => {
-                  setShowFormAddFund(true)
-                }}
-                className='btn-add-tabmember'
-                variant="contained"
-                disableElevation
-                style={{ background: '#1B264D' }}>
-                Thêm phiếu
-              </Button>) : <></>}
+          <div>
+            <div className='div-title-search'>
+              <h2 className='title-header2'>Lịch sử thu chi</h2>
+              <div className='div-search-tabmember'>
+                <Box
+                  sx={{
+                    '& > :not(style)': { width: '30ch' },
+                  }}
+                >
+                  <CustomTextField
+                    value={search}
+                    onChange={handleChangeSearch}
+                    id="search-field-tabmember"
+                    label="Tìm kiếm phiếu thu/chi"
+                    variant="standard"
+                    onKeyPress={event => event.key === 'Enter' ? handleSearchFund(event) : null}
+                  />
+                </Box>
+                <Tooltip title='Tìm kiếm' placement='right-start'>
+                  <Button
+                    className='btn-search3'
+                    variant="text"
+                    disableElevation
+                    onClick={handleSearchFund}
+                  >
+                    <SearchIcon sx={{ color: '#1B264D' }} />
+                  </Button>
+                </Tooltip>
+                {isTreasurer ?
+                  (<Button
+                    onClick={() => {
+                      setShowFormAddFund(true)
+                    }}
+                    className='btn-add-tabmember'
+                    variant="contained"
+                    disableElevation
+                    style={{ background: '#1B264D' }}>
+                    Thêm phiếu
+                  </Button>) : <></>}
+              </div>
+            </div>
+            <div className='table-paymentlist'>
+              <PaymentList rows={fundHistorys} />
+            </div>
           </div>
-        </div>
-        <div className='table-paymentlist'>
-          <PaymentList rows={fundHistorys} />
-        </div>
-      </div>
+        </>}
     </div>
   )
 }

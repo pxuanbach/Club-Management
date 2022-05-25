@@ -8,6 +8,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const clubRoutes = require('./routes/clubRoutes');
 const userRoutes = require('./routes/userRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const fundRoutes = require('./routes/fundRoutes');
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -24,11 +25,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
+//use route
 app.use(authRoutes);
 app.use(uploadRoutes);
 app.use('/club', clubRoutes);
 app.use('/user', userRoutes);
 app.use('/group', groupRoutes)
+app.use('/fund', fundRoutes)
 
 //Connect DB
 mongoose
@@ -46,7 +49,6 @@ const { addUser, removeUser } = require('./helper/ChatRoomHelper');
 io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/chatRoomControllers')(socket, io);
-    require('./controller/groupControllers')(socket, io);
     require('./controller/fundControllers')(socket, io);
     require('./controller/activityControllers')(socket, io);
 

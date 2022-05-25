@@ -89,3 +89,51 @@ module.exports = function (socket, io) {
             })
     })
 }
+
+module.exports.create = (req, res) => {
+
+}
+
+module.exports.getList = (req, res) => {
+    const clubId = req.params.clubId;
+
+    FundHistory.find({ club: clubId })
+        .populate('author')
+        .then(result => {
+            res.status(200).send(result)
+        }).catch(err => {
+            res.status(500).json({ error: err.message })
+        })
+}
+
+module.exports.getColPayInMonth = (req, res) => {
+    const clubId = req.params.clubId;
+    const date = new Date();
+    firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
+    lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+
+    FundHistory.find({
+        $and: [
+            { club: clubId },
+            {
+                createdAt: {
+                    $gt: firstDay,
+                    $lte: lastDay
+                }
+            }
+        ]
+    }).then(result => {
+        let collect = 0;
+        let pay = 0;
+        result.forEach((fh) => {
+            if (fh.type === "Thu") {
+                collect += fh.total
+            } else {
+                pay += fh.total
+            }
+        })
+        res.status(200).send({ collect, pay })
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}

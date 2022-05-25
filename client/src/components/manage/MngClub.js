@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import {Avatar, TextField, Button, Tooltip, Box, Modal} from '@mui/material';
+import {
+  Avatar, TextField, Button, Tooltip, Box, Modal, Alert, Snackbar
+} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -41,8 +43,10 @@ const ManageClub = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
-  const [search, setSearch] = useState()
-  const [clubs, setClubs] = useState([])
+  const [search, setSearch] = useState();
+  const [clubs, setClubs] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -75,6 +79,23 @@ const ManageClub = () => {
     event.stopPropagation();
     //socket.emit('block-unblock-club', param._id)
     const res = await axiosInstance.patch(`/club/block/${param._id}`)
+    .then(response => {
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === response.data._id) {
+          return {
+            ...elm,
+            isblocked: response.data.isblocked
+          }
+        }
+        return elm;
+      });
+  
+      setClubs(updateClubs)
+    }).catch(err => {
+      //console.log(err.response.data)
+      setAlertMessage(err.response.data.error)
+      setOpenSnackbar(true);
+    })
 
     const data = res.data;
 
@@ -204,6 +225,14 @@ const ManageClub = () => {
   }
   return (
     <div className='container'>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
       <Modal
         open={showFormAdd}
         aria-labelledby="modal-add-title"
