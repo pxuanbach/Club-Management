@@ -28,22 +28,19 @@ const Login = () => {
         setUsernameErr('')
         setPasswordErr('')
         try {
-            const res = await axiosInstance.post('/login', JSON.stringify({ username, password }),
+            axiosInstance.post('/login', JSON.stringify({ username, password }),
                 {
                     withCredentials: true,
                     headers: {
                         "Content-Type": "application/json",
-                      },
+                    },
+                }).then(response => {
+                    setUser(response.data.user);
+                }).catch(err => {
+                    //console.log(err.response.data)
+                    setUsernameErr(err.response.data.errors.username);
+                    setPasswordErr(err.response.data.errors.password);
                 })
-            const data = await res.data;
-            console.log(data)
-            if (data.errors) {
-                setUsernameErr(data.errors.username);
-                setPasswordErr(data.errors.password);
-            }
-            if (data.user) {
-                setUser(data.user);
-            }
         } catch (error) {
             console.log(error)
         }

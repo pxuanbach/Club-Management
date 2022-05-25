@@ -29,9 +29,6 @@ const Club = () => {
     verifyClub();
   }, []);
 
-  if (!user) {
-    return <Redirect to='/login'/>
-  }
   return (
     <div className='club'>
       <div className='div-left-club'>
