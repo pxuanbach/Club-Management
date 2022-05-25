@@ -8,7 +8,8 @@ import { UserContext } from '../../../UserContext';
 import AddFund from './AddFund';
 import PaymentList from "./PaymentList"
 import NumberFormat from 'react-number-format';
-import axiosInstance from '../../../helper/Axios'
+import { Buffer } from 'buffer';
+import axiosInstance from '../../../helper/Axios';
 import "./Fund.css"
 import "../../../assets/css/grid.css"
 import '../../manage/Mng.css'
@@ -54,7 +55,37 @@ const Fund = ({ club_id }) => {
 
   const handleSearchFund = (e) => {
     e.preventDefault();
-    //socket.emit('search-fundHistory', club_id, search)
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      axiosInstance.get(`/fund/search/${club_id}/${encodedSearch}`)
+      .then(response => {
+        //response.data
+        setFundHistorys(response.data)
+      }).catch(err => {
+        //err.response.data.error
+        showSnackbar(err.response.data.error)
+      })
+    } else {
+      getFundHistories()
+    }
+  }
+
+  const showSnackbar = (message) => {
+    setAlertMessage(message)
+    setOpenSnackbar(true);
+  }
+
+  const fundHistoryCreated = (data) => {
+    setClub(prevClub => ({
+      ...prevClub,
+      fund: data.fund
+    }))
+    if (data.fundHistory.type === 'Thu') {
+      setCollectInMonth(collectInMonth + data.fundHistory.total)
+    } else {
+      setPayInMonth(payInMonth + data.fundHistory.total)
+    }
+    setFundHistorys([...fundHistorys, data.fundHistory])
   }
 
   const getColPayInMonth = (club_id) => {
@@ -65,8 +96,7 @@ const Fund = ({ club_id }) => {
       setPayInMonth(response.data.pay)
     }).catch(err => {
       //err.response.data.error
-      setAlertMessage(err.response.data.error)
-      setOpenSnackbar(true);
+      showSnackbar(err.response.data.error)
     })
   }
 
@@ -78,8 +108,7 @@ const Fund = ({ club_id }) => {
       setIsLoading(false)
     }).catch(err => {
       //err.response.data.error
-      setAlertMessage(err.response.data.error)
-      setOpenSnackbar(true);
+      showSnackbar(err.response.data.error)
     })
   }
 
@@ -90,8 +119,7 @@ const Fund = ({ club_id }) => {
         setFundHistorys(response.data)
       }).catch(err => {
         //err.response.data.error
-        setAlertMessage(err.response.data.error)
-        setOpenSnackbar(true);
+        showSnackbar(err.response.data.error)
       })
   }
 
@@ -173,6 +201,8 @@ const Fund = ({ club_id }) => {
             setShowFormAdd={setShowFormAddFund}
             club_id={club_id}
             user={user}
+            fundHistoryCreated={fundHistoryCreated}
+            showSnackbar={showSnackbar}
           />
         </Box>
       </Modal>

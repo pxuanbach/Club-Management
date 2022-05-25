@@ -14,3 +14,14 @@ module.exports = function (socket, io) {
         })
     })
 }
+
+module.exports.create = (req, res) => {
+    const {club, content, startDate, endDate} = req.body
+
+    const activity = new Activity({
+        club,
+        content,
+        startDate,
+        endDate
+    });
+}

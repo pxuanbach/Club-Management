@@ -25,10 +25,10 @@ module.exports.create = async (req, res) => {
         const newPath = await cloudinary.uploader.upload(path, {
             resource_type: 'auto',
             folder: 'Club-Management/Club-Avatar'
-        }).catch(error => {
-            console.log(error)
+        }).catch(err => {
+            console.log(err)
             res.status(400).json({
-                error
+                error: err.message
             })
         })
         fs.unlinkSync(path)

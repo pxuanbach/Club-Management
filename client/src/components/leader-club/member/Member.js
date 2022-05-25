@@ -69,8 +69,8 @@ export default function BasicTabs() {
       <Box sx={{ width: '100%', height: '100%', }}>
         <Box className='header-member' sx={{ borderBottom: 'none', borderColor: 'divider' }} >
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
-            <Tab className='name-tab' label="Quản lý thành viên" {...a11yProps(0)} />
-            <Tab label="Quản lý nhóm" {...a11yProps(1)} />
+            <Tab className='name-tab' label="Thành viên" {...a11yProps(0)} />
+            <Tab label="Nhóm" {...a11yProps(1)} />
           </Tabs>
         </Box>
         {isLoading ?

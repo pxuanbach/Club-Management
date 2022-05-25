@@ -1,17 +1,11 @@
 const {Router} = require('express');
-const fundController = require('../controller/fundControllers')
+const fundController = require('../controller/fundControllers');
+const upload = require('../helper/multer');
 const router = Router();
 
-router.post('/create', fundController.create)
+router.post('/create', upload.array('file'), fundController.create)
 router.get('/list/:clubId', fundController.getList)
 router.get('/colpayinmonth/:clubId', fundController.getColPayInMonth)
-// router.get('/one/:groupId', groupController.getOne)
-// router.get('/search/:clubId/:searchValue', groupController.searchGroupInClub)
-// router.get('/allmembers/:clubId', groupController.getAll)
-// router.get('/allmembersnotingroup/:groupId', groupController.getAllNotInGroup)
-// router.get('/searchallmembers/:clubId/:searchValue', groupController.searchAll)
-// router.get('/searchallmembersnotingroup/:groupId/:searchValue', groupController.searchAllNotInGroup)
-// router.patch('/update/:groupId', groupController.update)
-// router.delete('/delete/:groupId', groupController.delete)
+router.get('/search/:clubId/:searchValue', fundController.search)
 
 module.exports = router;
