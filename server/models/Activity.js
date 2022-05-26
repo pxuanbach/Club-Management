@@ -10,8 +10,11 @@ const activitySchema = new mongoose.Schema({
     startDate: Date,
     endDate: Date,
     boards: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ActivityBoard',
+        title: String,
+        cards: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ActivityCard'
+        }]
     }]
 }, {timestamps: true})
 

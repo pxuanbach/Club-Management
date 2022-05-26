@@ -28,6 +28,15 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [isEmail, 'Email không hợp lệ']
     },
+    gender: {
+        type: String,
+        default: 'Khác',
+    },
+    phone: {
+        type: String,
+        unique: [true, 'Số điện thoại đã tồn tại'],
+    },
+    facebook: String,
     description: {
         type: String,
         default: '',

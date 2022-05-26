@@ -1,4 +1,5 @@
 const Activity = require('../models/Activity')
+const ActivityCard = require('../models/ActivityCard')
 
 module.exports = function (socket, io) {
     socket.on('create-activity', (club_id, content, startDate, endDate) => {
@@ -18,11 +19,31 @@ module.exports = function (socket, io) {
 module.exports.create = (req, res) => {
     const {club, content, startDate, endDate} = req.body
 
+    let boards = [
+        {
+            title: "Cần làm",
+            cards: []
+        },
+        {
+            title: "Đang làm",
+            cards: []
+        },
+        {
+            title: "Đã xong",
+            cards: []
+        },
+        {
+            title: "Ghi chú",
+            cards: []
+        }
+    ]
+
     const activity = new Activity({
         club,
         content,
         startDate,
-        endDate
+        endDate,
+        boards
     });
 
     activity.save().then(result => {

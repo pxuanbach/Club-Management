@@ -10,24 +10,20 @@ import 'font-awesome/css/font-awesome.min.css'
 import {Link} from 'react-router-dom'
 
 
-const FormActivity = ({ setShowForm, showHideFunction, match }) => {
+const FormActivity = ({ match }) => {
   const [board, setBoard] = useState({})
   const [columns, setColumns] = useState([])
 
-  useEffect(() => {
-    const boardFromDB = initialData.boards.find(board => board.id === 'board-1')
-    if (boardFromDB) {
-      setBoard(boardFromDB)
-      //sort column
+  // useEffect(() => {
+  //   const boardFromDB = initialData.boards.find(board => board.id === 'board-1')
+  //   if (boardFromDB) {
+  //     setBoard(boardFromDB)
+  //     //sort column
 
 
-      setColumns(mapOrder(boardFromDB.columns, boardFromDB.columnOrder, 'id'))
-    }
-  }, [])
-
-  if (isEmpty(board)) {
-    return <div className='not-found' style={{ 'padding': '60px', 'color': 'blue' }}>Board not found</div>
-  }
+  //     setColumns(mapOrder(boardFromDB.columns, boardFromDB.columnOrder, 'id'))
+  //   }
+  // }, [])
 
   const onColumnDrop = (dropResult) => {
     let newColumns = [...columns]

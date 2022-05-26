@@ -3,7 +3,19 @@ const User = require('../models/User')
 const Buffer = require('buffer').Buffer
 
 module.exports.getList = (req, res) => {
-    User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
+    User.find({ username: { $nin: ['admin', 'admin0'] } })
+    .then(result => {
+        res.status(200).send(ConvertUsers(result))
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}
+
+module.exports.getOne = (req, res) => {
+    const userId = req.params.userId;
+
+    User.findById(userId)
+    .then(result => {
         res.status(200).send(ConvertUsers(result))
     }).catch(err => {
         res.status(500).json({ error: err.message })
