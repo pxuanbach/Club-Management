@@ -1,58 +1,61 @@
 const { ConvertUser, ConvertUsers } = require('../helper/ConvertDataHelper')
 const User = require('../models/User')
+const Buffer = require('buffer').Buffer
 
-module.exports = function (socket, io) {
-    socket.on('get-users', () => {
-        User.find({ username: { $nin: ['admin', 'admin0'] } }).then(result => {
+module.exports.getList = (req, res) => {
+    User.find({ username: { $nin: ['admin', 'admin0'] } })
+    .then(result => {
+        res.status(200).send(ConvertUsers(result))
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}
 
-            socket.emit('output-users', ConvertUsers(result))
-            //console.log(result)
+module.exports.getOne = (req, res) => {
+    const userId = req.params.userId;
+
+    User.findById(userId)
+    .then(result => {
+        res.status(200).send(ConvertUsers(result))
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
+    })
+}
+
+module.exports.block = async (req, res) => {
+    const userId = req.params.userId;
+
+    User.findById(userId, function (err, doc) {
+        if (err) {
+            res.status(500).json({ error: err.message })
+            return;
+        }
+        doc.isblocked = !doc.isblocked;
+        doc.save().then(result => {
+            res.status(200).send(ConvertUser(result))
         })
     })
+}
 
-    socket.on('account-created', (user_id, img_url, cloudinary_id, callback) => {
-        //console.log('user id', user_id)
+module.exports.search = async (req, res) => {
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
 
-        User.findById(user_id, function (err, doc) {
-            if (err) return;
-            if (img_url) {
-                doc.img_url = img_url;
-                doc.cloudinary_id = cloudinary_id;
-                doc.save().then(user => {
-                    io.emit('new-user', ConvertUser(user))
-                })
+    User.find({
+        $and: [
+            { username: { $nin: ['admin', 'admin0'] } },
+            {
+                $or: [
+                    { username: { $regex: searchValue } },
+                    { name: { $regex: searchValue } },
+                    { email: { $regex: searchValue } }
+                ]
             }
-        })
-        callback();
-    })
-
-    socket.on('block-unblock-account', (user_id) => {
-        User.findById(user_id, function (err, doc) {
-            if (err) return;
-            doc.isblocked = !doc.isblocked;
-            doc.save();
-        })
-    })
-
-    socket.on('search-user', (search_value) => {
-        //console.log('search value: ', search_value)
-        User.find({
-            $and: [
-                {
-                    username: {
-                        $nin: ['admin', 'admin0']
-                    }
-                },
-                {
-                    $or: [
-                        { username: { $regex: search_value } },
-                        { name: { $regex: search_value } },
-                        { email: { $regex: search_value } }
-                    ]
-                }
-            ]
-        }).then(result => {
-            io.emit('output-search-user', ConvertUsers(result))
-        })
+        ]
+    }).then(result => {
+        res.status(200).send(ConvertUsers(result))
+    }).catch(err => {
+        res.status(500).json({ error: err.message })
     })
 }

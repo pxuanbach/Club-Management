@@ -58,7 +58,7 @@ function NumberFormatCustom(props) {
     );
 }
 
-const AddFund = ({ setShowFormAdd, socket, club_id, user }) => {
+const AddFund = ({ setShowFormAdd, club_id, user, fundHistoryCreated, showSnackbar }) => {
     const inputFile = useRef(null);
     const [type, setType] = useState('Thu');
     const [file, setFile] = useState();
@@ -115,15 +115,20 @@ const AddFund = ({ setShowFormAdd, socket, club_id, user }) => {
         return isEmpty;
     }
 
-    const handleSave = async (event) => {
+    const handleSave = (event) => {
         event.preventDefault();
         if (!validateEmpty()) {
             setTotalErr('')
             setContentErr('')
             var formData = new FormData();
             formData.append("file", file);
+            formData.append("club", club_id);
+            formData.append("author", user._id);
+            formData.append("type", type);
+            formData.append("total", total);
+            formData.append("content", content);
 
-            const res = await axiosInstance.post("/upload", formData, {
+            axiosInstance.post("/fund/create", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -136,24 +141,19 @@ const AddFund = ({ setShowFormAdd, socket, club_id, user }) => {
                         setProgress(percent)
                     }
                 },
-            })
-            const uploadResult = res.data;
-            console.log(uploadResult)
-            if (uploadResult.error) {
-                setInputFileMessage(uploadResult.error.message)
-                setFile(null)
-            } else {
-                setProgress(100)
-                socket.emit('create-fundHistory',
-                    club_id,
-                    user._id,
-                    type,
-                    total,
-                    content,
-                    uploadResult.data[0].public_id,
-                    uploadResult.data[0].url)
-                //onExitClick()
-            }
+            }).then(response => {
+                //response.data
+                setProgress(100);
+                fundHistoryCreated(response.data);
+                onExitClick();
+              }).catch(err => {
+                  if (err.response.data.file) {
+                    setInputFileMessage(err.response.data.file)
+                    setFile(null)
+                  } else {
+                    showSnackbar(err.response.data.error)
+                  }
+              })
         }
     }
 

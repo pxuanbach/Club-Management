@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
-import { Avatar, TextField, Button, Tooltip, Box, Modal } from '@mui/material';
+import {
+  Avatar, TextField, Button, Tooltip, Box, Modal, Alert, Snackbar
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import './Mng.css'
 import AddAccount from './modal/AddAccount';
-import io from 'socket.io-client'
-import { ENDPT } from '../../helper/Helper';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
+import axiosInstance from '../../helper/Axios';
+import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -32,8 +34,6 @@ const style = {
   p: 4,
 };
 
-let socket;
-
 const ManageAccount = () => {
   const { user, setUser } = useContext(UserContext);
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -41,63 +41,57 @@ const ManageAccount = () => {
   const [search, setSearch] = useState();
   const [userSelected, setUserSelected] = useState();
   const [users, setUsers] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    socket.emit('search-user', search)
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/user/search/${encodedSearch}`)
+
+      const data = res.data;
+      //console.log(data)
+      if (data) {
+        setUsers(data)
+      }
+    } else {
+      getUsers()
+    }
   }
 
   const handleRefresh = (e) => {
     e.preventDefault();
-    socket.emit('get-users')
+    getUsers()
   }
 
   const handleOpenAdd = () => setOpenModalAdd(true);
   const handleCloseAdd = () => setOpenModalAdd(false);
 
-  useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
-  }, [ENDPT])
-
-  useEffect(() => {
-    socket.emit('get-users')
-    socket.on('output-users', users => {
-      setUsers(users)
-      //console.log('users', users)
-    })
-  }, [])
-
-  useEffect(() => {
-    socket.on('new-user', newUser => {
-      setUsers([...users, newUser])
-    })
-    socket.on('output-search-user', users => {
-      setUsers(users)
-    })
-  }, [users])
-
-  const handleBlockOrUnblock = (event, param) => {
+  const handleBlockOrUnblock = async (event, param) => {
     event.stopPropagation();
-    socket.emit('block-unblock-account', param._id)
-    const updateUsers = users.map((elm) => {
-      if (elm._id === param._id) {
-        return {
-          ...elm,
-          isblocked: !param.isblocked
-        }
-      }
-      return elm;
-    });
+    axiosInstance.patch(`/user/block/${param._id}`)
+      .then(response => {
+        const updateUsers = users.map((elm) => {
+          if (elm._id === response.data._id) {
+            return {
+              ...elm,
+              isblocked: response.data.isblocked
+            }
+          }
+          return elm;
+        });
+        setUsers(updateUsers)
 
-    setUsers(updateUsers)
+      }).catch(err => {
+        //console.log(err.response.data)
+        setAlertMessage(err.response.data.error)
+        setOpenSnackbar(true);
+      })
   }
 
   const handleDeleteUser = (event, param) => {
@@ -105,6 +99,20 @@ const ManageAccount = () => {
     setUserSelected(param)
     setOpenDialog(true)
   }
+
+  const getUsers = async () => {
+    const res = await axiosInstance.get('/user/list')
+
+    const data = res.data
+
+    if (data) {
+      setUsers(data)
+    }
+  }
+
+  useEffect(() => {
+    getUsers()
+  }, [])
 
   const columns = [
     {
@@ -161,6 +169,14 @@ const ManageAccount = () => {
   }
   return (
     <div className='container'>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
       <Modal
         open={openModalAdd}
         onClose={handleCloseAdd}
@@ -168,7 +184,11 @@ const ManageAccount = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <AddAccount handleClose={handleCloseAdd} />
+          <AddAccount
+            handleClose={handleCloseAdd}
+            users={users}
+            setUsers={setUsers}
+          />
         </Box>
       </Modal>
       <div className='mng__header'>

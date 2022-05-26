@@ -3,15 +3,10 @@ import "./AddClub.css"
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
-import io from 'socket.io-client';
+import axiosInstance from '../../../helper/Axios'
 import FindMember from './FindMember'
-import { UploadImageClub } from '../../../helper/UploadImage';
-import { ENDPT } from '../../../helper/Helper'
 
-let socket;
-
-const AddClub = ({ setShowFormAdd }) => {
+const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
     const [avatarHeight, setAvatarHeight] = useState(150);
@@ -75,19 +70,25 @@ const AddClub = ({ setShowFormAdd }) => {
         }
 
         //send request to server
-        let img_upload_data = {};
-        if (avatarImage) {
-            img_upload_data = await UploadImageClub(avatarImage)
-                .catch(err => console.log(err));;
+        var formData = new FormData();
+        formData.append('file', avatarImage)
+        formData.append('name', values.name)
+        formData.append('description', values.description)
+        formData.append('leader', leaderSelected._id)
+        formData.append('treasurer', treasurerSelected._id)
+
+        const res = await axiosInstance.post('/club/create', 
+        formData, {
+            headers: { 'Content-Type': 'application/json' }
+        })
+
+        const data = res.data
+
+        if (data) {
+            setClubs([...clubs, data])
+            resetState();
         }
-        socket.emit('create-club',
-            values.name,
-            img_upload_data.secure_url,
-            img_upload_data.public_id,
-            values.description,
-            leaderSelected,
-            treasurerSelected,
-            resetState)
+
     }
 
     const resetState = () => {
@@ -104,15 +105,6 @@ const AddClub = ({ setShowFormAdd }) => {
     const onExitClick = () => {
         setShowFormAdd(false);
     };
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        //socket.emit('join', { username: values.username, password: values.password})
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
-    }, [ENDPT])
 
     useEffect(() => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)

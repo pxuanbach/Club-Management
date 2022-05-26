@@ -2,16 +2,14 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
+import { Buffer } from 'buffer';
 import Group from './Group'
 import AddGroup from './AddGroup'
-import UpdateGroup from './UpdateGroup';
+import UpdateGroupTabbar from './UpdateGroupTabbar';
 import DeleteGroup from './DeleteGroup';
 import { UserContext } from '../../../UserContext'
-import io from 'socket.io-client'
-import { ENDPT } from '../../../helper/Helper';
+import axiosInstance from '../../../helper/Axios'
 import './TabGroup.css'
-
-let socket
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -31,16 +29,15 @@ const style = {
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
-  p: 4,
+  p: 2,
 };
 
-const TabGroup = ({ club_id }) => {
+const TabGroup = ({ club }) => {
   let isLeader = false;
   const { user, setUser } = useContext(UserContext);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [leader, setLeader] = useState();
   const [groups, setGroups] = useState([]);
   const [groupSelected, setGroupSelected] = useState();
   const [search, setSearch] = useState();
@@ -57,69 +54,36 @@ const TabGroup = ({ club_id }) => {
     setShowDialog(true)
   }
 
-  const handleSearchGroups = (event) => {
+  const handleSearchGroups = async (event) => {
     event.preventDefault();
-    socket.emit('search-groups', club_id, search)
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/group/search/${club._id}/${encodedSearch}`)
+
+      const data = res.data
+      if (data) {
+        setGroups(data)
+      }
+    } else {
+      getGroups();
+    }
+  }
+
+  const getGroups = async () => {
+    const res = await axiosInstance.get(`/group/list/${club._id}`)
+
+    const data = res.data
+    if (data) {
+      setGroups(data)
+    }
   }
 
   useEffect(() => {
-    socket = io(ENDPT);
-    socket.emit('get-user', club_id, 'leader')
-    socket.emit('get-groups', club_id)
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
-    }
+    getGroups();
   }, [])
 
-  useEffect(() => {
-    socket.on('output-leader', res => {
-      setLeader(res)
-    })
-  }, [leader])
-
-  useEffect(() => {
-    socket.on('output-groups', grs => {
-      setGroups(grs)
-    })
-    socket.on('group-created', newGroup => {
-      setGroups([...groups, newGroup])
-    })
-    socket.on('group-deleted', delGroup => {
-      setGroups(groups.filter(group => group._id !== delGroup._id))
-    })
-    socket.on('deleted-member-from-group', gr => {
-      const updateGroups = groups.map((elm) => {
-        if (elm._id === gr._id) {
-          return {
-            ...elm,
-            members: gr.members
-          }
-        }
-        return elm;
-      });
-      setGroups(updateGroups)
-    })
-    socket.on('group-updated', gr => {
-      const updateGroups = groups.map((elm) => {
-        if (elm._id === gr._id) {
-          return {
-            ...elm,
-            name: gr.name,
-            members: gr.members
-          }
-        }
-        return elm;
-      });
-      setGroups(updateGroups)
-    })
-    socket.on('groups-searched', grs => {
-      setGroups(grs)
-    })
-  }, [groups])
-
   if (user) {
-    isLeader = user._id === leader?._id;
+    isLeader = user._id === club.leader._id;
   }
   return (
     <div className='div-tabgroup'>
@@ -132,7 +96,12 @@ const TabGroup = ({ club_id }) => {
         }}
       >
         <Box sx={style}>
-          <AddGroup club_id={club_id} setShow={setShowFormAdd} />
+          <AddGroup
+            club_id={club._id}
+            setShow={setShowFormAdd}
+            groups={groups}
+            setGroups={setGroups}
+          />
         </Box>
       </Modal>
       <Modal
@@ -144,14 +113,20 @@ const TabGroup = ({ club_id }) => {
         }}
       >
         <Box sx={style}>
-          <UpdateGroup club_id={club_id} group={groupSelected} setShow={setShowFormUpdate} />
+          <UpdateGroupTabbar
+            group={groupSelected}
+            groups={groups}
+            setGroups={setGroups}
+            setShow={setShowFormUpdate}
+          />
         </Box>
       </Modal>
       <DeleteGroup
         open={showDialog}
         setOpen={setShowDialog}
-        socket={socket}
         group={groupSelected}
+        groups={groups}
+        setGroups={setGroups}
       />
       <div className='div-header-tabgroup'>
         <div className='div-search-tabgroup'>
@@ -168,7 +143,7 @@ const TabGroup = ({ club_id }) => {
               onChange={(e) => {
                 setSearch(e.target.value)
               }}
-              onKeyPress={event => 
+              onKeyPress={event =>
                 event.key === 'Enter' ? handleSearchGroups(event) : null
               }
             />
@@ -202,7 +177,6 @@ const TabGroup = ({ club_id }) => {
           groups.map(group => (
             <Group key={group._id}
               data={group}
-              socket={socket}
               isLeader={isLeader}
               handleDeleteGroup={(event) => {
                 handleDeleteGroup(event, group)
@@ -213,7 +187,7 @@ const TabGroup = ({ club_id }) => {
             />
           )) :
           (<div style={{ textAlign: 'center', marginTop: 100 }}>
-            <span>Câu lạc bộ chưa có nhóm nào...</span>
+            <span>Không có nhóm nào...</span>
           </div>)}
       </div>
     </div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import {Avatar, TextField, Button, Tooltip, Box, Modal} from '@mui/material';
+import {
+  Avatar, TextField, Button, Tooltip, Box, Modal, Alert, Snackbar
+} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -8,13 +10,11 @@ import { styled } from '@mui/material/styles';
 import AddClub from './modal/AddClub'
 import UpdateClub from './modal/UpdateClub'
 import DeleteClub from './modal/DeleteClub';
-import io from 'socket.io-client'
 import './Mng.css';
-import { ENDPT } from '../../helper/Helper';
+import axiosInstance from '../../helper/Axios';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
-
-let socket;
+import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -27,7 +27,7 @@ const CustomTextField = styled(TextField)({
 
 const style = {
   position: 'absolute',
-  top: '45%',
+  top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 750,
@@ -43,23 +43,30 @@ const ManageClub = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
-  const [search, setSearch] = useState()
-  const [clubs, setClubs] = useState([])
+  const [search, setSearch] = useState();
+  const [clubs, setClubs] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     //console.log(search)
-    if (search)
-      socket.emit('search-club', search)
-  }
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/club/search/${encodedSearch}`)
 
-  const handleRefresh = (e) => {
-    e.preventDefault();
-    socket.emit('get-clubs', '', true);
+      const data = res.data;
+      //console.log(data)
+      if (data) {
+        setClubs(data)
+      }
+    } else {
+      getListClub()
+    }
   }
 
   const handleUpdate = (event, param) => {
@@ -68,20 +75,43 @@ const ManageClub = () => {
     setShowFormUpdate(true)
   }
 
-  const handleBlockOrUnblock = (event, param) => {
+  const handleBlockOrUnblock = async (event, param) => {
     event.stopPropagation();
-    socket.emit('block-unblock-club', param._id)
-    const updateClubs = clubs.map((elm) => {
-      if (elm._id === param._id) {
-        return {
-          ...elm,
-          isblocked: !param.isblocked
+    //socket.emit('block-unblock-club', param._id)
+    const res = await axiosInstance.patch(`/club/block/${param._id}`)
+    .then(response => {
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === response.data._id) {
+          return {
+            ...elm,
+            isblocked: response.data.isblocked
+          }
         }
-      }
-      return elm;
-    });
+        return elm;
+      });
+  
+      setClubs(updateClubs)
+    }).catch(err => {
+      //console.log(err.response.data)
+      setAlertMessage(err.response.data.error)
+      setOpenSnackbar(true);
+    })
 
-    setClubs(updateClubs)
+    const data = res.data;
+
+    if (data) {
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === data._id) {
+          return {
+            ...elm,
+            isblocked: data.isblocked
+          }
+        }
+        return elm;
+      });
+  
+      setClubs(updateClubs)
+    }
   }
 
   const handleDelete = (event, param) => {
@@ -175,60 +205,34 @@ const ManageClub = () => {
     }
   ];
 
-  useEffect(() => {
-    socket = io(ENDPT);
-    //socket.emit('join', { username: values.username, password: values.password})
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
+  const getListClub = async () => {
+    let isAdmin = user?.username.includes('admin');
+    let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    let data = res.data
+    if (data) {
+      setClubs(data)
     }
-  }, [ENDPT])
+  }
 
   useEffect(() => {
-    socket.emit('get-clubs', '', true)
-    socket.on('output-clubs', clbs => {
-      setClubs(clbs)
-      console.log('clubs', clubs)
-    })
+    getListClub()
   }, [])
-
-  useEffect(() => {
-    socket.on('club-created', clb => {
-      setClubs([...clubs, clb])
-    })
-    socket.on('club-updated', clb => {
-      const updateClubs = clubs.map((elm) => {
-        if (elm._id === clb._id) {
-          return {
-            ...elm,
-            name: clb.name,
-            description: clb.description,
-            img_url: clb.img_url,
-            cloudinary_id: clb.cloudinary_id,
-          }
-        }
-        return elm;
-      });
-
-      setClubs(updateClubs)
-    })
-    socket.on('club-deleted', clb => {
-      var deleteClubs = clubs.filter(function (value, index, arr) {
-        return value._id !== clb._id;
-      })
-
-      setClubs(deleteClubs)
-    })
-    socket.on('club-searched', clbs => {
-      setClubs(clbs);
-    })
-  }, [clubs])
 
   if (!user) {
     return <Redirect to='/login' />
   }
   return (
     <div className='container'>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
       <Modal
         open={showFormAdd}
         aria-labelledby="modal-add-title"
@@ -238,7 +242,7 @@ const ManageClub = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAdd={setShowFormAdd} />
+          <AddClub setShowFormAdd={setShowFormAdd} clubs={clubs} setClubs={setClubs}/>
         </Box>
       </Modal>
       <Modal
@@ -246,13 +250,14 @@ const ManageClub = () => {
         aria-labelledby="modal-update-title"
         aria-describedby="modal-update-description"
         onClose={(e) => {
-          handleRefresh(e);
           setShowFormUpdate(false);
         }}
       >
         <Box sx={style}>
           <UpdateClub
             club={clubSelected}
+            clubs={clubs} 
+            setClubs={setClubs}
             setShowFormUpdate={setShowFormUpdate}
           />
         </Box>
@@ -261,7 +266,8 @@ const ManageClub = () => {
         open={openDialog}
         setOpen={setOpenDialog}
         club={clubSelected}
-        socket={socket}
+        clubs={clubs}
+        setClubs={setClubs}
       />
       <div className='mng__header'>
         <h2>Quản lý các câu lạc bộ</h2>
@@ -269,7 +275,7 @@ const ManageClub = () => {
           <div className='stack-left'>
             <CustomTextField
               id="search-field"
-              label="Tìm kiếm (Tên CLB, tên trưởng CLB)"
+              label="Tìm kiếm (Tên Câu lạc bộ)"
               variant="standard"
               value={search}
               onChange={handleChangeSearchField}
@@ -291,7 +297,7 @@ const ManageClub = () => {
                 className='btn-refresh'
                 variant="outlined"
                 disableElevation
-                onClick={handleRefresh}>
+                onClick={getListClub}>
                 <RefreshIcon sx={{color: '#1B264D'}}/>
               </Button>
             </Tooltip>

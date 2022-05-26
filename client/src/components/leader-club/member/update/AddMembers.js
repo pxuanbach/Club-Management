@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, Divider, Button, Tooltip, TextField } from '@mui/material';
+import { Avatar, Button, Tooltip, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
 import axiosInstance from '../../../../helper/Axios'
-import './AddMember.css'
 import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
@@ -17,11 +16,15 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const AddMember = ({ club_id, clubs, setClubs }) => {
+const AddMembers = ({ setShow, group, groups, setGroups }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState();
   const [users, setUsers] = useState([]);
   const [usersSelected, setUsersSelected] = useState([])
+
+  const handleClose = () => {
+    setShow(false)
+  }
 
   const handleChangeSearch = event => {
     setSearch(event.target.value)
@@ -31,14 +34,14 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
     event.preventDefault();
     if (search) {
       const encodedSearch = new Buffer(search).toString('base64');
-      const res = await axiosInstance.get(`/club/searchusersnotmembers/${club_id}/${encodedSearch}`)
+      const res = await axiosInstance.get(`/group/searchallmembersnotingroup/${group._id}/${encodedSearch}`)
 
       const data = res.data
       if (data) {
         setUsers(data)
       }
     } else {
-      getUsersNotMembers()
+      getMembersNotInGroup()
     }
   }
 
@@ -46,8 +49,8 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
     e.preventDefault();
     if (usersSelected.length > 0) {
       setIsLoading(true)
-      const res = await axiosInstance.post('/club/addmembers', JSON.stringify({
-        'clubId': club_id,
+      const res = await axiosInstance.post('/group/addmembers', JSON.stringify({
+        'groupId': group._id,
         'users': usersSelected,
       }), {
         headers: { 'Content-Type': 'application/json' }
@@ -55,25 +58,26 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
 
       const data = res.data
       if (data) {
-        //setUsers(users.filter(user => user._id !== data._id))
-        const updateClubs = clubs.map((elm) => {
+        getMembersNotInGroup();
+        const updateGroups = groups.map((elm) => {
           if (elm._id === data._id) {
             return {
               ...elm,
-              members_num: data.members_num,
+              name: data.name,
+              members: data.members
             }
           }
           return elm;
         });
-        setClubs(updateClubs)
-        getUsersNotMembers()
-        setIsLoading(false)
+        setGroups(updateGroups)
+        setIsLoading(false);
       }
     }
   }
 
-  const getUsersNotMembers = async () => {
-    const res = await axiosInstance.get(`/club/usersnotmembers/${club_id}`)
+  const getMembersNotInGroup = async () => {
+    setUsersSelected([])
+    const res = await axiosInstance.get(`/group/allmembersnotingroup/${group._id}`)
 
     const data = res.data
     if (data) {
@@ -82,7 +86,7 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
   }
 
   useEffect(() => {
-    getUsersNotMembers()
+    getMembersNotInGroup()
   }, [])
 
   const columns = [
@@ -118,7 +122,7 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
       <div className='stack-left'>
         <CustomTextField
           id="search-field"
-          label="Tìm kiếm thành viên (Tài khoản)"
+          label="Tìm kiếm thành viên"
           variant="standard"
           value={search}
           onChange={handleChangeSearch}
@@ -138,7 +142,8 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
             className='btn-refresh'
             variant="outlined"
             disableElevation
-            onClick={getUsersNotMembers}>
+            onClick={getMembersNotInGroup}
+          >
             <RefreshIcon sx={{ color: '#1B264D' }} />
           </Button>
         </Tooltip>
@@ -161,9 +166,15 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
           disableElevation>
           Thêm
         </Button>
+        <Button disabled={isLoading}
+          onClick={handleClose}
+          variant="outlined"
+          disableElevation>
+          Hủy
+        </Button>
       </div>
     </div>
   )
 }
 
-export default AddMember
+export default AddMembers

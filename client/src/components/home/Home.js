@@ -3,14 +3,12 @@ import AddClub from '../manage/modal/AddClub';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Snackbar from '@mui/material/Snackbar';
-import io from 'socket.io-client'
 import "./Home.css";
 import ClubItem from './ClubItem';
-import {ENDPT} from '../../helper/Helper';
+import axiosInstance from '../../helper/Axios'
 import { Link, Redirect } from 'react-router-dom'
 import {UserContext} from '../../UserContext'
-
-let socket;
+import { Buffer } from 'buffer';
 
 const style = {
   position: 'absolute',
@@ -28,44 +26,43 @@ const Home = () => {
   const { user, setUser } = useContext(UserContext);
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [search, setSearch] = useState()
   const [clubs, setClubs] = useState([])
 
-  useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
+  const handleChangeSearch = (e) => {
+    setSearch(e.target.value)
+  }
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      const res = await axiosInstance.get(`/club/search/${encodedSearch}`)
+
+      const data = res.data;
+      //console.log(data)
+      if (data) {
+        setClubs(data)
+      }
+    } else {
+      getListClub()
     }
-  }, [ENDPT])
+  }
 
-  useEffect(() => {
+  const getListClub = async () => {
     let isAdmin = user?.username.includes('admin');
-    socket.emit('get-clubs', user?._id, isAdmin)
-  }, [user])
+    let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    let data = res.data
+    if (data) {
+      setClubs(data)
+    }
+  }
 
   useEffect(() => {
-    socket.on('output-clubs', clbs => {
-      setClubs(clbs)
-      console.log('clubs', clubs)
-    })
-    
+    getListClub()
   }, [])
-
-  useEffect(() => {
-    socket.on('club-created', clb => {
-      setClubs([...clubs, clb])
-    })
-    socket.on('member-added', (userAdded, clb) => {
-      if (user._id === userAdded._id) {
-        setClubs([...clubs, clb])
-      }
-    })
-    socket.on('removed-user-from-club', (club_id, userRemoved) => {
-      if (user._id === userRemoved._id) {
-        setClubs(clubs.filter(club => club._id !== club_id))
-      }
-    })
-  }, [clubs])
 
   if (!user) {
     return <Redirect to='/login'/>
@@ -81,7 +78,7 @@ const Home = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAdd={setShowFormAddClub}/>
+          <AddClub setShowFormAdd={setShowFormAddClub} clubs={clubs} setClubs={setClubs}/>
         </Box>
       </Modal>
       <Snackbar
@@ -95,12 +92,13 @@ const Home = () => {
       <div className='div-header'>
         <div className='div-search'>
           <input 
+            value={search}
             type="text"
             placeholder="Tìm kiếm câu lạc bộ"
-
+            onChange={handleChangeSearch}
+            onKeyPress={event => event.key === 'Enter' ? handleSearch(event) : null}
           />
-          <i class="fa-solid fa-magnifying-glass"></i>
-
+          <i onClick={handleSearch} class="fa-solid fa-magnifying-glass"></i>
         </div>
       </div>
       <div className='div-body'>

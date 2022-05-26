@@ -4,10 +4,6 @@ import './Navbar-Club.css'
 import Tooltip from '@mui/material/Tooltip'
 import { useParams, Link } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
-import io from 'socket.io-client'
-import {ENDPT} from '../../helper/Helper'
-
-let socket;
 
 const NavbarClub = ({club}) => {
     let { club_id, club_name } = useParams();
@@ -20,7 +16,7 @@ const NavbarClub = ({club}) => {
                 <div className='div-back'>
                     <Link to='/' className="btn-back">
                         <i class="fa-solid fa-angle-left"></i>
-                        All team</Link>
+                        Tất cả câu lạc bộ</Link>
                 </div>
                 <div className='div-clb'>
                     <Avatar className='logo-team' sx={{ width: 120, height: 120 }} src={club?.img_url}></Avatar>

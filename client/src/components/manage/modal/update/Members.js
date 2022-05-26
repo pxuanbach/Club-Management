@@ -1,74 +1,97 @@
 import React, { useState, useEffect } from 'react'
 import { Avatar, Divider, Button, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import io from 'socket.io-client'
-import './Members.css'
 import ClearIcon from '@mui/icons-material/Clear';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import { ENDPT } from '../../../../helper/Helper';
+import axiosInstance from '../../../../helper/Axios'
+import './Members.css'
 
-let socket
+const Members = ({ club, clubs, setClubs }) => {
+  const [leader, setLeader] = useState(club.leader)
+  const [treasurer, setTreasurer] = useState(club.treasurer)
+  const [members, setMembers] = useState([])
 
-const Members = ({ club }) => {
-  const [leader, setLeader] = useState()
-  const [treasurer, setTreasurer] = useState()
-  const [users, setUsers] = useState([])
-
-  const handlePromotedToLeader = (event, param) => {
+  const handlePromotedToLeader = async (event, param) => {
     event.stopPropagation();
     //console.log('leader')
-    socket.emit('promote-to-leader', club._id, leader._id, param._id)
+    const res = await axiosInstance.patch(`/club/promote/${club._id}`,
+      JSON.stringify({
+        "position": "leader",
+        "cur_member_id": leader._id,
+        "new_member_id": param._id,
+      }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    const data = res.data
+
+    if (data) {
+      setLeader(data);
+      getMembers();
+    }
   }
 
-  const handlePromotedToTreasurer = (event, param) => {
+  const handlePromotedToTreasurer = async (event, param) => {
     event.stopPropagation();
     //console.log('treasurer')
-    socket.emit('promote-to-treasurer', club._id, treasurer._id, param._id)
-  }
+    const res = await axiosInstance.patch(`/club/promote/${club._id}`,
+      JSON.stringify({
+        "position": "treasurer",
+        "cur_member_id": treasurer._id,
+        "new_member_id": param._id,
+      }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
 
-  const handleRemoveFromClub = (event, param) => {
-    event.stopPropagation();
-    socket.emit('remove-user-from-club', club._id, param._id)
-  }
+    const data = res.data
 
-  useEffect(() => {
-    socket = io(ENDPT);
-    return () => {
-      socket.emit('disconnect');
-      socket.off();
+    if (data) {
+      setTreasurer(data);
+      getMembers();
     }
-  }, [])
+  }
+
+  const handleRemoveFromClub = async (event, param) => {
+    event.stopPropagation();
+    //socket.emit('remove-user-from-club', club._id, param._id)
+    const res = await axiosInstance.patch(`/club/removemember/${club._id}`,
+      JSON.stringify({
+        "userId": param._id
+      }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    const data = res.data
+
+    if (data) {
+      setMembers(members.filter(u => u._id !== data._id))
+      const updateClubs = clubs.map((elm) => {
+        if (elm._id === club._id) {
+          return {
+            ...elm,
+            members_num: club.members_num-1,
+          }
+        }
+        return elm;
+      });
+      setClubs(updateClubs)
+    }
+  }
+
+  const getMembers = async () => {
+    const res = await axiosInstance.get(`/club/members/${club._id}`)
+
+    const data = res.data;
+
+    if (data) {
+      setMembers(data)
+    }
+  }
 
   useEffect(() => {
-    //console.log('leader', club.leader._id)
-    socket.emit('get-user', club._id, 'leader')
-    socket.emit('get-user', club._id, 'treasurer')
-    socket.on('output-leader', res => {
-      setLeader(res)
-    })
-    socket.on('output-treasurer', res => {
-      setTreasurer(res)
-    })
-    socket.on('promoted-to-leader', new_leader => {
-      setLeader(new_leader)
-      socket.emit('get-members', club._id)
-    })
-    socket.on('promoted-to-treasurer', new_treasurer => {
-      setTreasurer(new_treasurer)
-      socket.emit('get-members', club._id)
-    })
+    getMembers()
   }, [])
-
-  useEffect(() => {
-    socket.emit('get-members', club._id)
-    socket.on('output-members', users => {
-      setUsers(users)
-    })
-    socket.on('removed-user-from-club', (club_id, user) => {
-      setUsers(users.filter(u => u._id !== user._id))
-    })
-  }, [users])
 
   const columns = [
     {
@@ -155,8 +178,8 @@ const Members = ({ club }) => {
 
   return (
     <div>
-      <div className='members__head'>
-        <div className='members__card'>
+      <div className='update-members__head'>
+        <div className='update-members__card'>
           <h3>Trưởng câu lạc bộ</h3>
           <div className='member-selected'>
             <Avatar alt={leader?.name} src={leader?.img_url} />
@@ -166,7 +189,7 @@ const Members = ({ club }) => {
             </div>
           </div>
         </div>
-        <div className='members__card'>
+        <div className='update-members__card'>
           <h3>Thủ quỹ</h3>
           <div className='member-selected'>
             <Avatar alt={treasurer?.name} src={treasurer?.img_url} />
@@ -178,13 +201,12 @@ const Members = ({ club }) => {
         </div>
       </div>
       <Divider sx={{ marginBottom: 2 }} />
-      <div className='members__body'>
+      <div className='update-members__body'>
         <h2>Thành viên</h2>
-        <DataGrid
+        <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
           getRowId={(r) => r._id}
-          rows={users}
+          rows={members}
           columns={columns}
-          autoHeight
           pageSize={4}
         />
       </div>

@@ -6,14 +6,9 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../Mng.css'
-import io from 'socket.io-client'
 import axiosInstance from '../../../helper/Axios';
-import { ENDPT } from '../../../helper/Helper'
-import { UploadImageUser } from '../../../helper/UploadImage'
 
-let socket;
-
-const AddAccount = ({ handleClose }) => {
+const AddAccount = ({ handleClose, users, setUsers }) => {
     const [avatarHeight, setAvatarHeight] = useState(150);
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
@@ -51,56 +46,54 @@ const AddAccount = ({ handleClose }) => {
         setShowPassword(!showPassword)
     };
 
+    const resetState = () => {
+        setAvatarImage(null)
+        setValues({
+            name: '',
+            username: '',
+            password: '',
+            email: '',
+        })
+    }
+
     const handleSave = async event => {
         event.preventDefault();
         setUsernameErr('')
         setPasswordErr('');
         setNameErr('');
         setEmailErr('');
+
+        var formData = new FormData();
+        formData.append("file", avatarImage);
+        formData.append("username", values.username)
+        formData.append("password", values.password)
+        formData.append("name", values.name)
+        formData.append("email", values.email)
+
         try {
             setIsSuccess(true);
-            const res = await axiosInstance.post('/signup', {
-                credentials: 'include',
-                body: JSON.stringify({
-                    'username': values.username,
-                    'password': values.password,
-                    'img_url': '',
-                    'name': values.name,
-                    'email': values.email,
-                }),
-                headers: { 'Content-Type': 'application/json' }
+            axiosInstance.post('/signup',
+                formData, {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then(response => {
+                //response.data
+                setUsers([...users, response.data])
+                resetState();
+            }).catch(err => {
+                //console.log(err.response.data)
+                setUsernameErr(err.response.data.errors.username);
+                setPasswordErr(err.response.data.errors.password);
+                setNameErr(err.response.data.errors.name);
+                setEmailErr(err.response.data.errors.email);
             })
-            const data = await res.json();
-            //console.log('signup response', data)
-            if (data.errors) {
-                setUsernameErr(data.errors.username)
-                setPasswordErr(data.errors.password);
-                setNameErr(data.errors.name);
-                setEmailErr(data.errors.email);
-                setIsSuccess(false);
-            } else {
-                let img_upload_data = await UploadImageUser(avatarImage)
-                    .catch(err => console.log(err));
-
-                socket.emit('account-created',
-                    data.user._id,
-                    img_upload_data.secure_url,
-                    img_upload_data.public_id,
-                    handleClose);
-            }
-
+            setIsSuccess(false);
         } catch (error) {
             console.log(error)
         }
     }
-
-    useEffect(() => {
-        socket = io(ENDPT);
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
-    }, [ENDPT])
 
     useEffect(() => {
         setAvatarHeight(avatarRef ? avatarRef?.current?.offsetWidth : 150)
@@ -126,6 +119,7 @@ const AddAccount = ({ handleClose }) => {
                 </div>
                 <form className='modal-form'>
                     <TextField
+                        value={values.name}
                         size="small"
                         label="Họ và tên"
                         variant='outlined'
@@ -135,6 +129,7 @@ const AddAccount = ({ handleClose }) => {
                         error={nameErr}
                     />
                     <TextField
+                        value={values.username}
                         size="small"
                         label="Tài khoản"
                         variant='outlined'
@@ -168,6 +163,7 @@ const AddAccount = ({ handleClose }) => {
                         <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
                     </FormControl>
                     <TextField
+                        value={values.email}
                         size="small"
                         label="Email"
                         variant='outlined'

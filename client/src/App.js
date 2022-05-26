@@ -20,7 +20,7 @@ function App() {
       try {
         const res = await axiosInstance.get('/verifyuser', { withCredentials: true });
         const data = res.data;
-        console.log(data)
+        //console.log(data)
         setUser(data);
       } catch (error) {
         console.log(error)

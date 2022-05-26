@@ -1,0 +1,15 @@
+.range-datepicker{
+    display: flex;
+    width: 100%;
+    gap: 50px;
+}
+.range-datepicker__start, .range-datepicker__end{
+    width: 100%;
+}
+.range-datepicker__start h3{
+    margin-bottom: 5px;
+}
+
+.range-datepicker__end h3{
+    margin-bottom: 5px;
+}

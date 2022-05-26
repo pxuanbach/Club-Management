@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, Divider, Button, Tooltip, TextField } from '@mui/material';
+import { Avatar, Button, Tooltip, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
-import axiosInstance from '../../../../helper/Axios'
-import './AddMember.css'
+import axiosInstance from '../../../helper/Axios'
 import { Buffer } from 'buffer';
 
 const CustomTextField = styled(TextField)({
@@ -17,11 +16,15 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const AddMember = ({ club_id, clubs, setClubs }) => {
+const AddMembers = ({ club_id, setShowFormAdd, getMembers }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState();
   const [users, setUsers] = useState([]);
   const [usersSelected, setUsersSelected] = useState([])
+
+    const handleClose = () => {
+        setShowFormAdd(false)
+    }
 
   const handleChangeSearch = event => {
     setSearch(event.target.value)
@@ -55,18 +58,8 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
 
       const data = res.data
       if (data) {
-        //setUsers(users.filter(user => user._id !== data._id))
-        const updateClubs = clubs.map((elm) => {
-          if (elm._id === data._id) {
-            return {
-              ...elm,
-              members_num: data.members_num,
-            }
-          }
-          return elm;
-        });
-        setClubs(updateClubs)
         getUsersNotMembers()
+        getMembers()
         setIsLoading(false)
       }
     }
@@ -161,9 +154,15 @@ const AddMember = ({ club_id, clubs, setClubs }) => {
           disableElevation>
           Thêm
         </Button>
+        <Button disabled={isLoading}
+          onClick={handleClose}
+          variant="outlined"
+          disableElevation>
+          Hủy
+        </Button>
       </div>
     </div>
   )
 }
 
-export default AddMember
+export default AddMembers

@@ -1,20 +1,24 @@
 import React from 'react'
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import {
+    Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+} from '@mui/material';
+import axiosInstance from '../../../helper/Axios'
 
-const DeleteGroup = ({ open, setOpen, group, socket }) => {
+const DeleteGroup = ({ open, setOpen, group, groups, setGroups }) => {
     
     const handleClose = () => {
         setOpen(false)
     }
 
-    const handleAgree = (e) => {
+    const handleAgree = async (e) => {
         e.preventDefault();
-        socket.emit('delete-group', group._id, handleClose)
+        const res = await axiosInstance.delete(`/group/delete/${group._id}`)
+
+        const data = res.data
+        if (data) {
+            setGroups(groups.filter(group => group._id !== data))
+            handleClose()
+        }
     }
 
     return (

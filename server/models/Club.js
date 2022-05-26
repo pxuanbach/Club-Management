@@ -13,19 +13,22 @@ const clubSchema = new mongoose.Schema({
         default: 0,
     },
     leader: {
-        _id: String,
-        name: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
     },
     treasurer: {
-        _id: String,
-        name: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
     },
     isblocked: {
         type: Boolean,
         default: false
     },
     members: [{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
     }]
 })
 
