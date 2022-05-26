@@ -45,7 +45,7 @@ const TabContent = ({ match, club_id }) => {
     setActivities([...activities, data]);
   }
 
-  const getActivity = () => {
+  const getActivities = () => {
     axiosInstance.get(`/activity/list/${club_id}`)
       .then(response => {
         //response.data
@@ -58,7 +58,7 @@ const TabContent = ({ match, club_id }) => {
   }
 
   useEffect(() => {
-    getActivity()
+    getActivities()
   }, [])
 
   return (
@@ -127,7 +127,7 @@ const TabContent = ({ match, club_id }) => {
         </div>
         <div className='div-body-content' >
           {activities && activities.map(activity => (
-            <Link key={activity._id} to={path + '/' + activity.content} className='item-work'>
+            <Link key={activity._id} to={path + '/' + activity._id} className='item-work'>
               <ActivityItem activity={activity}/>
             </Link>
           ))}
