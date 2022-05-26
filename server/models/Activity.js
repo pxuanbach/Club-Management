@@ -9,6 +9,10 @@ const activitySchema = new mongoose.Schema({
     content: String,
     startDate: Date,
     endDate: Date,
+    boards: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ActivityBoard',
+    }]
 }, {timestamps: true})
 
 const Activity = mongoose.model('activities', activitySchema)

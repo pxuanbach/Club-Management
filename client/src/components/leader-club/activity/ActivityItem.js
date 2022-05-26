@@ -7,7 +7,6 @@ import image1 from '../../../assets/anhminhhoa.jpg'
 
 export default function ActivityItem({activity}) {    
   let formatter = new Intl.DateTimeFormat(['ban', 'id'], {
-    hour: 'numeric', minute: 'numeric',
     year: "numeric", month: "numeric", day: "numeric",  
   });
 
