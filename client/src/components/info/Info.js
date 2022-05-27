@@ -3,12 +3,21 @@ import Button from '@mui/material/Button';
 import './Info.css'
 import KeyIcon from '@mui/icons-material/Key';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 // import ImageInfo from '../../assets/imageInfo.png'
 import ImageInfo from '../../assets/logoweb.png'
 import {UserContext} from '../../UserContext'
 const Info = () => {
   const { user, setUser } = useContext(UserContext);
+  const [gender, setGender] = React.useState('');
 
+  const handleChange = (event) => {
+    setGender(event.target.value);
+  };
   const showhideFunction = () => {
     var actionList = document.getElementById("listButton");    
     if (actionList.className === "list-action-profile")    
@@ -95,20 +104,28 @@ const showhideFunction2 = () => {
               <div className='div-text-profile'>
                 <label>Giới tính:</label>
                 <p id='textresult2'>{user.gender}</p>
-                <select id='textinput2' className='input'  placeholder={user.gender}>
-                  <option>Nam</option>
-                  <option>Nữ</option>
-                </select>
+                <Box sx={{ minWidth: 120, marginLeft: 2}} id='textinput2' className='input'>
+                <FormControl fullWidth size='small'  >
+                  <Select
+                    value={gender}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={0}>Nam</MenuItem>
+                    <MenuItem value={1}>Nữ</MenuItem>
+                    <MenuItem value={2}>Khác</MenuItem>
+                  </Select>
+                </FormControl>
+                </Box>
               </div>
               <div className='div-text-profile'>
                 <label>Số điện thoại:</label>
                 <p id='textresult3'>{user.phone}</p>
-                <input id='textinput3' className='input'  placeholder={user.phone}></input>
+                <input id='textinput3' className='input' placeholder={user.phone}></input>
               </div>
               <div className='div-text-profile'>
                 <label>Địa chỉ email:</label>
                 <p id='textresult4'>{user.email}</p>
-                <input id='textinput4' className='input'  placeholder={user.email}></input>
+                <input id='textinput4' className='input' placeholder={user.email}></input>
               </div>
             </div>
           </div>
@@ -125,7 +142,7 @@ const showhideFunction2 = () => {
           </div>
           <div className='div-text-profile'>
             <p id='textresult5' className='text-description-profile'>{user.description}</p>
-            <textarea id="textinput5" className='textarea-description'  placeholder={user.description}></textarea>
+            <textarea id="textinput5" className='textarea-description' placeholder={user.description}></textarea>
           </div>
           <div id='listButton1' className='list-action-profile'>
             <Button variant='outlined' onClick={() => showhideFunction1() }>Hủy</Button>
