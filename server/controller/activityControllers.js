@@ -54,6 +54,10 @@ module.exports.create = (req, res) => {
     })
 }
 
+module.exports.createCard = (req, res) => {
+    const {} = req.body
+}
+
 module.exports.getList = (req, res) => {
     const clubId = req.params.clubId;
 
@@ -73,31 +77,26 @@ module.exports.getOne = (req, res) => {
             async.forEach(result.boards, function (item, callback) {
                 ActivityCard.populate(item, { "path": "cards" }, function (err, output) {
                     if (err) {
-                        console.log(err)
                         res.status(500).send({ error: err.message })
                         return;
                     }
-                    console.log('output', output)
                     callback();
                 })
             }, function (err) {
                 if (err) {
-                    console.log(err)
                     res.status(500).send({ error: err.message })
                     return;
                 }
-                console.log('result', result)
                 res.status(200).send(result)
             })
         }).catch(err => {
-            console.log(err)
             res.status(500).send({ error: err.message })
         })
 }
 
 module.exports.updateBoards = (req, res) => {
     const activityId = req.params.activityId;
-    const { boards } = req.body
+    const { boards } = req.body;
 
     Activity.updateOne({ _id: activityId }, { boards })
         .then(() => {
@@ -122,4 +121,56 @@ module.exports.updateBoards = (req, res) => {
             res.status(400).json({ error: err.message })
         })
 
+}
+
+module.exports.updateColumn = async (req, res) => {
+    const activityId = req.params.activityId;
+    const { column, card } = req.body;
+    //console.log(column, typeof card)
+
+    Activity.findById(activityId, async function(err, doc) {
+        if (err) {
+            res.status(500).send({ error: "Loading err - " + err.message })
+            return;
+        }
+
+        if (card === null) {
+            for (let i = 0; i < doc.boards.length; i++) {
+                if (doc.boards[i]._id.toString() === column._id) {
+                    doc.boards[i].cards = column.cards;
+                }
+            }
+        } else {
+            doc.boards.forEach(col => {
+                if (col._id.toString() === column._id) {
+                    col.cards = column.cards;
+                } else {
+                    var newCards = col.cards.filter(function (value, index, arr) {
+                        return value._id.toString() !== card._id;
+                    })
+                    col.cards = newCards;
+                }
+            })
+        }
+
+        doc.save().then(result => {
+            async.forEach(result.boards, function (item, callback) {
+                ActivityCard.populate(item, { "path": "cards" }, function (err, output) {
+                    if (err) {
+                        res.status(500).send({ error: "Populate err - " + err.message })
+                        return;
+                    }
+                    callback();
+                })
+            }, function (err) {
+                if (err) {
+                    res.status(500).send({ error: "Populate complete err - " + err.message })
+                    return;
+                }
+                res.status(200).send(result)
+            })
+        }).catch(err => {
+            res.status(500).send({ error: "Save err - " + err.message })
+        })
+    })
 }

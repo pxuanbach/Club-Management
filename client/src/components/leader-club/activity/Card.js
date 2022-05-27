@@ -37,13 +37,13 @@ const Card = (props) => {
     
     <div className='card-item' onClick={() => setShowFormCardDetail(true)}>
 
-      {card.cover && 
+      {/* {card?.cover && 
         <img 
           src={card.cover} 
           className='card-cover' 
           alt='hình ảnh minh họa' 
           onMouseDown={e => e.preventDefault()}
-        />}
+        />} */}
       {card.title}
       
     </div>

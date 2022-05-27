@@ -8,9 +8,12 @@ import { Container, Draggable } from 'react-smooth-dnd'
 import './Column.scss'
 import Card from './Card'
 import { cloneDeep } from 'lodash'
+import { useParams } from 'react-router-dom'
+import axiosInstance from '../../../helper/Axios'
 
 const ITEM_HEIGHT = 48;
 const Column = (props) => {
+    const { activityId } = useParams();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -19,7 +22,7 @@ const Column = (props) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const { column, onCardDrop, onUpdateColumn } = props
+    const { column, onCardDrop, onUpdateColumn, handleCreateCard } = props
     const cards = column.cards
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
@@ -43,8 +46,9 @@ const Column = (props) => {
             return
         }
 
+        console.log(column._id, activityId, newCardTitle.trim())
+        handleCreateCard(activityId, column._id, newCardTitle.trim())
         const newCardToAdd = {
-            id: Math.random().toString(36).substr(2, 5),
             boardId: column._id,
             columnId: column._id,
             title: newCardTitle.trim(),
@@ -52,7 +56,6 @@ const Column = (props) => {
         }
         let newColumn = cloneDeep(column)
         newColumn.cards.push(newCardToAdd)
-        newColumn.cardOrder.push(newCardToAdd.id)
 
         onUpdateColumn(newColumn)
         setNewCardTitle('')
