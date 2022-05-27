@@ -54,7 +54,13 @@ const CardDetail = ({ setShowForm }) => {
                     <h5 style={{color:'#1B264D', fontSize: '16px', marginBottom: 5}}>Thành viên</h5>
                     <div className="avatar-display">
                     <Stack direction="row" spacing={0.5}>
-                        <Avatar sx={{width: 38, height: 38, cursor: 'pointer', fontSize:'16px'}}  alt="Remy Sharp" src="/static/images/avatar/1.jpg" onClick={ ()=>setShowCardProfile(true)}/>
+                        <Tooltip title="Nguyễn Tiến Đạt" arrow>
+                            <Avatar 
+                                sx={{width: 38, height: 38, cursor: 'pointer', fontSize:'16px'}}  
+                                alt="Remy Sharp" 
+                                src="/static/images/avatar/1.jpg" 
+                                onClick={ ()=>setShowCardProfile(true)}/>
+                        </Tooltip>
                     </Stack>
                     {showCardProfile?
                     <div className='card-profile'>
