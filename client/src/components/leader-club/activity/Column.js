@@ -31,8 +31,6 @@ const Column = (props) => {
     const [newCardTitle, setNewCardTitle] = useState('')
     const onNewCardTitleChange = (e) => setNewCardTitle(e.target.value)
 
-
-
     useEffect(() => {
         if(newCardTextareaRef && newCardTextareaRef.current){
             newCardTextareaRef.current.focus()
@@ -96,7 +94,6 @@ const Column = (props) => {
                     },
                     }}
                 >
-                   
                     <MenuItem  onClick={handleClose}>
                         Thêm thẻ
                     </MenuItem>
@@ -106,15 +103,13 @@ const Column = (props) => {
                     <MenuItem  onClick={handleClose}>
                         Xóa tất cả thẻ
                     </MenuItem>
-                    
-
                 </Menu>
             </div>
         </header>
         <div className='card-list'>
             <Container
                 groupName="dat-columns"
-                onDrop={dropResult => onCardDrop(column.id, dropResult)}
+                onDrop={dropResult => onCardDrop(column._id, dropResult)}
                 getChildPayload={index => cards[index]}
                 dragClass="card-ghost"
                 dropClass="card-ghost-drop"

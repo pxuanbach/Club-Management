@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^3.2.3",
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.29.0",
     "cookie-parser": "^1.4.5",
