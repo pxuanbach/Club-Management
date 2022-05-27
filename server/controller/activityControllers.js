@@ -73,19 +73,24 @@ module.exports.getOne = (req, res) => {
             async.forEach(result.boards, function (item, callback) {
                 ActivityCard.populate(item, { "path": "cards" }, function (err, output) {
                     if (err) {
+                        console.log(err)
                         res.status(500).send({ error: err.message })
                         return;
                     }
+                    console.log('output', output)
                     callback();
                 })
             }, function (err) {
                 if (err) {
+                    console.log(err)
                     res.status(500).send({ error: err.message })
                     return;
                 }
+                console.log('result', result)
                 res.status(200).send(result)
             })
         }).catch(err => {
+            console.log(err)
             res.status(500).send({ error: err.message })
         })
 }
