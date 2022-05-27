@@ -6,7 +6,7 @@ import TabContent from './tabcontent/TabContent'
 const Activity = ({ match, club_id }) => {
     return (
         <Switch>
-            <Route path={`${match}/:activity_name`}>
+            <Route path={`${match}/:activityId`}>
                 <FormActivity match={match} />
             </Route>
             <Route path={match}>
