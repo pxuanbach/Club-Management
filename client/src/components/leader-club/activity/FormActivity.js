@@ -28,11 +28,13 @@ const FormActivity = ({ match }) => {
     axiosInstance.get(`/activity/one/${activityId}`)
       .then(response => {
         //response.data
+        console.log(response.data)
         setBoard(response.data)
         setColumns(response.data.boards)
       }).catch(err => {
         //err.response.data.error
-        showSnackbar(err.response.data.error)
+        console.log(err)
+        //showSnackbar(err.response.data.error)
       })
   }
 
@@ -45,11 +47,11 @@ const FormActivity = ({ match }) => {
     newColumns = applyDrag(newColumns, dropResult)
     //console.log('new columns', newColumns)
     setIsLoading(true);
-    axiosInstance.patch(`/activity/updateboards/${activityId}`, 
-    JSON.stringify({
-      "boards": newColumns
-    }), {
-      headers: { 'Content-Type': 'application/json'}
+    axiosInstance.patch(`/activity/updateboards/${activityId}`,
+      JSON.stringify({
+        "boards": newColumns
+      }), {
+      headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
         //response.data
@@ -75,15 +77,26 @@ const FormActivity = ({ match }) => {
       if (dropResult.removedIndex !== null && dropResult.addedIndex !== null) {
         //move inside it's columns
         console.log('1')
-        console.log(newColumns)
+        axiosInstance.patch(`/activity/updateboards/${activityId}`,
+          JSON.stringify({
+            "boards": newColumns
+          }), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(response => {
+            //response.data
+            console.log('new board', response.data)
+            setColumns(response.data.boards)
+            setBoard(response.data)
+            setIsLoading(false)
+          }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error)
+          })
       } else {
         //move between two columns
         console.log('2')
       }
-
-      setColumns(newColumns)
-      //console.log(board)
-      setIsLoading(false)
 
     }
   }

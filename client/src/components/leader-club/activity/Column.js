@@ -46,8 +46,8 @@ const Column = (props) => {
 
         const newCardToAdd = {
             id: Math.random().toString(36).substr(2, 5),
-            boardId: column.boardId,
-            columnId: column.id,
+            boardId: column._id,
+            columnId: column._id,
             title: newCardTitle.trim(),
             cover:null
         }
