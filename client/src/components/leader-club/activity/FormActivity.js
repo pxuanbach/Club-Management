@@ -43,29 +43,48 @@ const FormActivity = ({ match }) => {
   const onColumnDrop = (dropResult) => {
     let newColumns = [...columns]
     newColumns = applyDrag(newColumns, dropResult)
-
-    let newBoard = { ...board }
-    newBoard.columnOrder = newColumns.map(c => c.id)
-    newBoard.columns = newColumns
-    setColumns(newColumns)
-    setBoard(newBoard)
+    //console.log('new columns', newColumns)
+    setIsLoading(true);
+    axiosInstance.patch(`/activity/updateboards/${activityId}`, 
+    JSON.stringify({
+      "boards": newColumns
+    }), {
+      headers: { 'Content-Type': 'application/json'}
+    })
+      .then(response => {
+        //response.data
+        console.log('new board', response.data)
+        setColumns(response.data.boards)
+        setBoard(response.data)
+        setIsLoading(false)
+      }).catch(err => {
+        //err.response.data.error
+        showSnackbar(err.response.data.error)
+      })
   }
 
   const onCardDrop = (columnId, dropResult) => {
     if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
       setIsLoading(true)
       let newColumns = [...columns]
-      console.log('Drop result', dropResult)
+      //console.log('Drop result', dropResult)
       let currentColumn = newColumns.find(c => c._id === columnId)
-      console.log('Current column', currentColumn)
+      //console.log('Current column', currentColumn)
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult)
 
-      if (dropResult.addedIndex === 0) {
-        
-        setColumns(newColumns)
-        console.log(board)
-        setIsLoading(false)
+      if (dropResult.removedIndex !== null && dropResult.addedIndex !== null) {
+        //move inside it's columns
+        console.log('1')
+        console.log(newColumns)
+      } else {
+        //move between two columns
+        console.log('2')
       }
+
+      setColumns(newColumns)
+      //console.log(board)
+      setIsLoading(false)
+
     }
   }
 
