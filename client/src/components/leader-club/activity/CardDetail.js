@@ -5,12 +5,14 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import { Button, TextareaAutosize } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import './CardDetail.css'
+import MemberAssgin from './MemberAssign';
 
 const CardDetail = ({ setShowForm }) => {
     const onExitClick = () => {
         setShowForm(false);
     };
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
+    const [show,setShow] = useState(false)
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
 
     const newCardTextareaRef = useRef(null)
@@ -25,7 +27,7 @@ const CardDetail = ({ setShowForm }) => {
 
     const showhideFunction = () => {
         var actionList = document.getElementById("actionOfText");    
-        if (actionList.className == "not-display")    
+        if (actionList.className === "not-display")    
         {    
           actionList.className = "display";    
         } else    
@@ -128,10 +130,13 @@ const CardDetail = ({ setShowForm }) => {
                 </div>
                 <div className='action-2'>
                     <h4 className='title-action'>Thêm vào thẻ</h4>
-                    <button  className='btn-action'>
+                    <button className='btn-action' onClick={ ()=>setShow(true)}>
                         <i class="fa-solid fa-user-plus"></i>
                         Thành viên
                     </button>
+                    {
+                        show?<MemberAssgin/>:null
+                    }
                     <button  className='btn-action'>
                         <i class="fa-solid fa-clipboard-list"></i>
                         Việc cần làm

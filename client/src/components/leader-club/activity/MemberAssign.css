@@ -1,0 +1,10 @@
+.container-memberassign{
+   
+    border: 1px solid black;
+    width: 200px;
+    height: 200px;
+}
+.header-memberassign{
+    display: flex;
+    justify-content: space-between;
+}
