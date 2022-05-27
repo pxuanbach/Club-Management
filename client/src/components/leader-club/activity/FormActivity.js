@@ -80,7 +80,6 @@ const FormActivity = ({ match }) => {
       }).catch(err => {
         //err.response.data.error
         showSnackbar(err.response.data.error)
-        throw Error();
       })
   }
 

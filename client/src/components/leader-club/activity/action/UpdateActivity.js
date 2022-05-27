@@ -3,12 +3,12 @@ import { TextField, Button } from '@mui/material';
 import RangeDatePicker from '../utilities/RangeDatePicker';
 import axiosInstance from '../../../../helper/Axios';
 
-const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
+const UpdateActivity = ({ setShow, activity, activityUpdated, showSnackbar }) => {
     const date = new Date();
-    const [content, setContent] = useState();
+    const [content, setContent] = useState(activity?.content);
     const [contentErr, setContentErr] = useState('');
-    const [startDate, setStartDate] = useState(date.setDate(date.getDate()));
-    const [endDate, setEndDate] = useState(date.setDate(date.getDate() + 14));
+    const [startDate, setStartDate] = useState(Date.parse(activity?.startDate));
+    const [endDate, setEndDate] = useState(Date.parse(activity?.endDate));
 
     const handleClose = () => {
         setShow(false)
@@ -25,9 +25,8 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
     const handleSave = (event) => {
         event.preventDefault();
         if (content) {
-            axiosInstance.post(`/activity/create`,
+            axiosInstance.put(`/activity/update/${activity._id}`,
                 JSON.stringify({
-                    "club": club_id,
                     "content": content,
                     "startDate": validateDate(startDate),
                     "endDate": validateDate(endDate)
@@ -35,7 +34,7 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                 headers: { 'Content-Type': 'application/json' }
             }).then(response => {
                 //response.data
-                acitivityCreated(response.data)
+                activityUpdated(response.data)
                 handleClose()
               }).catch(err => {
                 //err.response.data.error
@@ -49,7 +48,7 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
     return (
         <div>
             <h2 id="modal-modal-title">
-                Thêm hoạt động mới
+                Cập nhật hoạt động
             </h2>
             <div id="modal-modal-description">
                 <div className='addgroup-modal'>
@@ -79,7 +78,7 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                             onClick={handleSave}>
                             Lưu
                         </Button>
-                        <Button
+                        <Button 
                             variant="outlined"
                             disableElevation
                             onClick={handleClose}>
@@ -93,4 +92,4 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
     )
 }
 
-export default AddActivity
+export default UpdateActivity

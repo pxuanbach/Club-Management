@@ -48,16 +48,16 @@ const Column = (props) => {
 
         console.log(column._id, activityId, newCardTitle.trim())
         handleCreateCard(activityId, column._id, newCardTitle.trim())
-        const newCardToAdd = {
-            boardId: column._id,
-            columnId: column._id,
-            title: newCardTitle.trim(),
-            cover: null
-        }
-        let newColumn = cloneDeep(column)
-        newColumn.cards.push(newCardToAdd)
+        // const newCardToAdd = {
+        //     boardId: column._id,
+        //     columnId: column._id,
+        //     title: newCardTitle.trim(),
+        //     cover: null
+        // }
+        // let newColumn = cloneDeep(column)
+        // newColumn.cards.push(newCardToAdd)
 
-        onUpdateColumn(newColumn)
+        // onUpdateColumn(newColumn)
         setNewCardTitle('')
         toggleOpenNewCardForm()
 

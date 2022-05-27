@@ -37,7 +37,7 @@ const Home = () => {
     e.preventDefault();
     if (search) {
       const encodedSearch = new Buffer(search).toString('base64');
-      const res = await axiosInstance.get(`/club/search/${encodedSearch}`)
+      const res = await axiosInstance.get(`/club/usersearch/${user._id}/${encodedSearch}`)
 
       const data = res.data;
       //console.log(data)

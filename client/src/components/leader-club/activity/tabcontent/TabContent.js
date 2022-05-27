@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, Tooltip, Modal, TextField, Snackbar, Alert } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { useRouteMatch } from 'react-router-dom';
 import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
+import UpdateActivity from '../action/UpdateActivity';
+import DeleteActivity from '../action/DeleteActivity';
+import { Buffer } from 'buffer';
 import './TabContent.css';
 
 const CustomTextField = styled(TextField)({
@@ -30,9 +33,13 @@ const style = {
 };
 
 const TabContent = ({ match, club_id }) => {
-  const {path} = useRouteMatch();
+  const { path } = useRouteMatch();
   const [showFormAdd, setShowFormAdd] = useState(false);
+  const [showFormUpdate, setShowFormUpdate] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [activities, setActivities] = useState([]);
+  const [search, setSearch] = useState()
+  const [activitySelected, setActivitySelected] = useState()
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
@@ -45,11 +52,50 @@ const TabContent = ({ match, club_id }) => {
     setActivities([...activities, data]);
   }
 
+  const activityUpdated = (data) => {
+    const activitiesUpdated = activities.map((elm) => {
+      if (elm._id === data._id) {
+        return {
+          ...elm,
+          content: data.content,
+          startDate: data.startDate,
+          endDate: data.endDate
+        }
+      }
+      return elm;
+    });
+    setActivities(activitiesUpdated)
+  }
+
+  const activityDeleted = (data) => {
+    var activitiesDeleted = activities.filter(function (value, index, arr) {
+      return value._id !== data._id;
+    })
+    setActivities(activitiesDeleted)
+  }
+
+  const handleSearchActivities = (e) => {
+    e.preventDefault();
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      axiosInstance.get(`/activity/search/${club_id}/${encodedSearch}`)
+        .then(response => {
+          //response.data
+          setActivities(response.data)
+        }).catch(err => {
+          //err.response.data.error
+          showSnackbar(err.response.data.error)
+        })
+    } else {
+      getActivities()
+    }
+  }
+
   const getActivities = () => {
     axiosInstance.get(`/activity/list/${club_id}`)
       .then(response => {
         //response.data
-        console.log(response.data)
+        //console.log(response.data)
         setActivities(response.data)
       }).catch(err => {
         //err.response.data.error
@@ -88,6 +134,30 @@ const TabContent = ({ match, club_id }) => {
           />
         </Box>
       </Modal>
+      <Modal
+        open={showFormUpdate}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormUpdate(false);
+        }}
+      >
+        <Box sx={style}>
+          <UpdateActivity
+            setShow={setShowFormUpdate}
+            activity={activitySelected}
+            activityUpdated={activityUpdated}
+            showSnackbar={showSnackbar}
+          />
+        </Box>
+      </Modal>
+      <DeleteActivity
+        open={openDialog}
+        setOpen={setOpenDialog}
+        activity={activitySelected}
+        activityDeleted={activityDeleted}
+        showSnackbar={showSnackbar}
+      />
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
@@ -98,9 +168,12 @@ const TabContent = ({ match, club_id }) => {
               }}
             >
               <CustomTextField
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 id="search-field-tabcontent"
-                label="Tìm kiếm thành viên"
+                label="Tìm kiếm hoạt động"
                 variant="standard"
+                onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
               />
 
             </Box>
@@ -108,7 +181,7 @@ const TabContent = ({ match, club_id }) => {
               <Button
                 variant="text"
                 disableElevation
-                onClick={() => { }}
+                onClick={handleSearchActivities}
               >
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
@@ -127,9 +200,15 @@ const TabContent = ({ match, club_id }) => {
         </div>
         <div className='div-body-content' >
           {activities && activities.map(activity => (
-            <Link key={activity._id} to={path + '/' + activity._id} className='item-work'>
-              <ActivityItem activity={activity}/>
-            </Link>
+            <div key={activity._id} className='item-work'>
+              <ActivityItem
+                activity={activity}
+                link={path + '/' + activity._id}
+                setShowFormUpdate={setShowFormUpdate}
+                setOpenDialog={setOpenDialog}
+                setActivitySelected={setActivitySelected}
+              />
+            </div>
           ))}
         </div>
       </div>
