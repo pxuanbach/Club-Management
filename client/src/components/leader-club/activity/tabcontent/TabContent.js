@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Box, Button, Tooltip, Modal, TextField, Snackbar, Alert } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
@@ -9,6 +9,8 @@ import AddActivity from '../action/AddActivity';
 import UpdateActivity from '../action/UpdateActivity';
 import DeleteActivity from '../action/DeleteActivity';
 import { Buffer } from 'buffer';
+import BlockUi from 'react-block-ui';
+import {UserContext} from '../../../../UserContext'
 import './TabContent.css';
 
 const CustomTextField = styled(TextField)({
@@ -33,12 +35,15 @@ const style = {
 };
 
 const TabContent = ({ match, club_id }) => {
+  let isLeader = false;
+  const { user, setUser } = useContext(UserContext);
   const { path } = useRouteMatch();
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState()
+  const [club, setClub] = useState()
   const [activitySelected, setActivitySelected] = useState()
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -91,11 +96,21 @@ const TabContent = ({ match, club_id }) => {
     }
   }
 
+  const getClub = (club_id) => {
+    axiosInstance.get(`/club/one/${club_id}`)
+    .then(response => {
+      //response.data
+      setClub(response.data)
+    }).catch(err => {
+      //err.response.data.error
+      showSnackbar(err.response.data.error)
+    })
+  }
+
   const getActivities = () => {
     axiosInstance.get(`/activity/list/${club_id}`)
       .then(response => {
         //response.data
-        //console.log(response.data)
         setActivities(response.data)
       }).catch(err => {
         //err.response.data.error
@@ -104,9 +119,13 @@ const TabContent = ({ match, club_id }) => {
   }
 
   useEffect(() => {
+    getClub(club_id)
     getActivities()
   }, [])
 
+  if (user && club) {
+    isLeader = user._id === club.leader._id;
+  }
   return (
     <div>
       <Snackbar
@@ -158,7 +177,7 @@ const TabContent = ({ match, club_id }) => {
         activityDeleted={activityDeleted}
         showSnackbar={showSnackbar}
       />
-      <div id='formcontent' className='div-tabcontent'>
+      <BlockUi tag="div" blocking={!club} id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
           <div className='div-search-tabmember'>
@@ -186,7 +205,8 @@ const TabContent = ({ match, club_id }) => {
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            <Button
+            {isLeader ? 
+            (<Button
               onClick={() => {
                 setShowFormAdd(true)
               }}
@@ -195,7 +215,8 @@ const TabContent = ({ match, club_id }) => {
               disableElevation
               style={{ background: '#1B264D' }}>
               Thêm hoạt động
-            </Button>
+            </Button>) : <></>}
+            
           </div>
         </div>
         <div className='div-body-content' >
@@ -211,7 +232,7 @@ const TabContent = ({ match, club_id }) => {
             </div>
           ))}
         </div>
-      </div>
+      </BlockUi>
 
     </div>
   )
