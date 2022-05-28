@@ -43,17 +43,11 @@
   background-color: #1B264D;
   
 }
-.btn-activity{
-    font-size: 10px;
-    color: #1B264D;
-    padding: 20px;
-    text-decoration: none; 
-}
 
 .list-btn-navclub{
   display: flex;
   flex-direction: column;
-  margin-left: 45px;
+  margin-left: 38px;
   margin-top: 10px;
   
   
@@ -61,12 +55,15 @@
 .list-btn-navclub a{
   color: #1B264D;
   font-size: 20px;
-  padding: 20px;
+  padding: 18px;
   text-decoration: none; 
 }
 .list-btn-navclub i{
   margin-right: 10px;
   font-size: 1.3rem;
+}
+.navclub-selected{
+  border-right: 5px solid var(--primary-color);
 }
 
 @keyframes onShow {

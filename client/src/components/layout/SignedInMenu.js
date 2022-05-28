@@ -1,44 +1,51 @@
-import React, { useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { Link } from 'react-router-dom'
 import Avatar from '@mui/material/Avatar';
 import { UserContext } from '../../UserContext'
 
-const SignedInMenu = ({ logout }) => {
+const SignedInMenu = ({ logout, pathName }) => {
     const { user, setUser } = useContext(UserContext);
 
     return (
         <div className='nav-menu'>
             <div className='list-btn'>
                 <Tooltip title="Câu lạc bộ của tôi" placement="right-start">
-                    <Link to="/">
+                    <Link
+                        className={pathName === '' ? 'selected' : ''}
+                        to="/">
                         <i class="fa-solid fa-users"></i>
                     </Link>
                 </Tooltip>
                 <Tooltip title="Tin nhắn" placement="right-start">
-                    <Link to="/message">
-                    <i class="fa-solid fa-comment-dots"></i>
+                    <Link
+                        className={pathName === 'message' ? 'selected' : ''}
+                        to="/message">
+                        <i class="fa-solid fa-comment-dots"></i>
                     </Link>
                 </Tooltip>
                 {user.username.includes('admin') ?
                     <>
                         <Tooltip title="Quản lý các câu lạc bộ" placement="right-start">
-                            <Link to="/mng-club">
+                            <Link
+                                className={pathName === 'mng-club' ? 'selected' : ''}
+                                to="/mng-club">
                                 <i class="fa-solid fa-users-gear"></i>
                             </Link>
                         </Tooltip>
                         <Tooltip title="Quản lý tài khoản" placement="right-start">
-                            <Link to='/mng-account'>
+                            <Link
+                                className={pathName === 'mng-account' ? 'selected' : ''}
+                                to='/mng-account'>
                                 <i class="fa-solid fa-user-gear"></i>
                             </Link>
                         </Tooltip>
                     </> : null}
-
             </div>
             <div className='avatar-logout'>
                 <Tooltip title="Thông tin cá nhân" placement="right-start">
-                    <Link to="/info">
-                        <Avatar src={user.img_url}/>
+                    <Link className={pathName === 'info' ? 'selected' : ''} to="/info">
+                        <Avatar src={user.img_url} />
                     </Link>
                 </Tooltip>
                 <Tooltip title="Đăng xuất" placement='right-start'>

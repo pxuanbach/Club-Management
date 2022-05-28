@@ -7,9 +7,7 @@ import { Button, TextareaAutosize } from '@mui/material'
 import { Container, Draggable } from 'react-smooth-dnd'
 import './Column.scss'
 import Card from './Card'
-import { cloneDeep } from 'lodash'
 import { useParams } from 'react-router-dom'
-import axiosInstance from '../../../helper/Axios'
 
 const ITEM_HEIGHT = 48;
 const Column = (props) => {
@@ -22,7 +20,7 @@ const Column = (props) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const { column, onCardDrop, onUpdateColumn, handleCreateCard } = props
+    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
     const cards = column.cards
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
@@ -48,19 +46,9 @@ const Column = (props) => {
 
         console.log(column._id, activityId, newCardTitle.trim())
         handleCreateCard(activityId, column._id, newCardTitle.trim())
-        // const newCardToAdd = {
-        //     boardId: column._id,
-        //     columnId: column._id,
-        //     title: newCardTitle.trim(),
-        //     cover: null
-        // }
-        // let newColumn = cloneDeep(column)
-        // newColumn.cards.push(newCardToAdd)
 
-        // onUpdateColumn(newColumn)
         setNewCardTitle('')
         toggleOpenNewCardForm()
-
     }
 
 
@@ -121,9 +109,10 @@ const Column = (props) => {
                         className: 'card-drop-preview'
                     }}
                     dropPlaceholderAnimationDuration={200}
+                    shouldAcceptDrop={() => { return isLeader; }}
                 >
                     {cards.map((card, index) => (
-                        <Draggable key={index}>
+                        <Draggable disabled={isLeader} key={index}>
                             <Card card={card} />
                         </Draggable>
                     ))}
@@ -145,19 +134,22 @@ const Column = (props) => {
                 }
             </div>
             <footer>
-                {openNewCardForm &&
-                    <div className='add-new-card-actions'>
-                        <Button variant="contained" onClick={addNewCard}>Thêm thẻ</Button>
-                        <span className='cancel-icon' onClick={toggleOpenNewCardForm}>
-                            <i className="fa fa-trash icon" />
-                        </span>
-                    </div>
-                }
-                {!openNewCardForm &&
-                    <div className='footer-actions' onClick={toggleOpenNewCardForm}>
-                        <i className="fa fa-plus" /> Thêm thẻ khác
-                    </div>
-                }
+                {isLeader ?
+                    <>
+                        {openNewCardForm &&
+                            <div className='add-new-card-actions'>
+                                <Button variant="contained" onClick={addNewCard}>Thêm thẻ</Button>
+                                <span className='cancel-icon' onClick={toggleOpenNewCardForm}>
+                                    <i className="fa fa-trash icon" />
+                                </span>
+                            </div>
+                        }
+                        {!openNewCardForm &&
+                            <div className='footer-actions' onClick={toggleOpenNewCardForm}>
+                                <i className="fa fa-plus" /> Thêm thẻ khác
+                            </div>
+                        }
+                    </> : <></>}
             </footer>
         </div>
     )

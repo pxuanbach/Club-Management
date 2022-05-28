@@ -12,7 +12,7 @@ import axiosInstance from '../../../helper/Axios'
 import { cloneDeep } from 'lodash';
 
 
-const FormActivity = ({ match }) => {
+const FormActivity = ({ match, isLeader }) => {
   const { activityId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [columns, setColumns] = useState([])
@@ -187,6 +187,7 @@ const FormActivity = ({ match }) => {
           {columns.map((column, index) => (
             <Draggable key={index}>
               <Column
+              isLeader={isLeader}
                 column={column}
                 onCardDrop={onCardDrop}
                 onUpdateColumn={onUpdateColumn}

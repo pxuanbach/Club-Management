@@ -35,7 +35,7 @@ const Club = () => {
         <NavbarClub club={club}/>
       </div>
       <div className="div-right-club">
-        <Switch >
+        <Switch>
           <Route path={`/club/${club_id}/${club_name}/activity`}>
             <Activity match={`/club/${club_id}/${club_name}/activity`} club_id={club_id}/>
           </Route>

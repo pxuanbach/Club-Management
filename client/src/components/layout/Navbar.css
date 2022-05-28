@@ -35,14 +35,27 @@ nav {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 8px;
 }
 .list-btn a, .avatar-logout a {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--secondary-color);
   font-size: 28px;
   padding: 6px;
 }
-
+.list-btn a.selected{
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
+}
+.avatar-logout a.selected{
+  background-color: var(--secondary-color);
+}
+.avatar-logout a.selected img{
+  border: 2px solid var(--primary-color);
+}
 .avatar-logout a img {
   width: 36px;
   height: 36px;
