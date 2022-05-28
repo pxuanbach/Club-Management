@@ -3,12 +3,11 @@ import "./Message.css"
 import MessagesList from './Message-List';
 import MessageOption from './MessageOption'
 import Input from './Input';
-import _map from 'lodash/map';
 import io from 'socket.io-client';
 import { ENDPT } from '../../../helper/Helper'
 import { UserContext } from '../../../UserContext'
 
-let socket
+let socket;
 
 const Message = ({ club_id }) => {
   const [message, setMessage] = useState();
@@ -29,7 +28,7 @@ const Message = ({ club_id }) => {
   const sendMessage = (event) => {
     event.preventDefault();
     if (message) {
-      console.log(message)
+      //console.log(message)
       socket.emit('sendMessage', user._id, 'text', message, club_id, () => setMessage(''))
     }
   }
