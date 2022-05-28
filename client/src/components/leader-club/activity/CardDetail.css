@@ -2,11 +2,19 @@
     font-size: 25px;
     font-weight: bold;
     display: flex;
-    color: #1B264D;;
+    color: #1B264D;
+    align-items:center ;
     /* 
     align-items: flex-end;
     justify-content: space-between; */
 }
+.title-card > h3 {
+    margin-left: 10px;
+}
+.title-card > i {
+    font-size: 20px;
+}
+
 
 .button-close{
     position: absolute;
@@ -31,16 +39,86 @@
     flex:1;
     
 }
+.display-member-attend{
+    padding-left: 35px;
+}
+.avatar-display{
+    width: 38px;
+    height: 38px;
+    
+}
+
+.card-profile{
+    width: 330px;
+    height: 215px;
+    background-color: white;
+    border: 1px solid #ccc;
+    position: absolute;
+    box-shadow: 1px 2px 10px rgb(0 0 0 / 25%);
+    border-radius: 5px;
+    
+}
+.card-profile > i{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: white;
+    cursor: pointer;
+}
+.card-profile > i:hover{
+    color: #ccc;
+}
+.container-info-profile{
+    border-bottom: 1px solid #ccc;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    background-color: #0079BF;
+    color: white;
+    border-radius: 5px 5px 0 0px;
+}
+.button-delete{
+    border-top: 1px solid #ccc;
+    border-radius: 0 0 5px 5px;
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 15px;
+}
+.button-delete:hover{
+    background-color: rgb(205, 227, 249);
+    
+}
+.button-info{
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 50px;
+}
+.button-info:hover{
+    background-color: rgb(205, 227, 249);
+    
+}
 .description{
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 20px;
     font-weight: bold;
-    color: #1B264D;;
+    color: #1B264D;
+    flex: 1;
 }
 .description-activity{
-    margin-top: 30px;
+    margin-top: 33px;
     font-size: 20px;
     font-weight: bold;
+    flex: 1
 }
 .description-activity>h4{
     color: #1B264D;;
