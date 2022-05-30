@@ -11,18 +11,6 @@
 .item-message:hover{
     background-color: #C6E2FF;
 }
-.item-message2{
-    display: flex;
-    width: 95%;
-    padding: 7px;
-    padding-left: 8px;
-    padding-right: 0;
-    border-radius: 5px;
-    gap: 10px;
-    cursor: pointer;
-    background-color: #C6E2FF;
-}
-
 .content-message{
     display: flex;
     align-items: center;
