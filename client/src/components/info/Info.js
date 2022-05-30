@@ -104,7 +104,7 @@ const showhideFunction2 = () => {
               <div className='div-text-profile'>
                 <label>Giới tính:</label>
                 <p id='textresult2'>{user.gender}</p>
-                <Box sx={{ minWidth: 120, marginLeft: 2}} id='textinput2' className='input'>
+                <Box sx={{ minWidth: 120, marginLeft: 2, marginTop: -0.75}} id='textinput2' className='input'>
                 <FormControl fullWidth size='small'  >
                   <Select
                     value={gender}
