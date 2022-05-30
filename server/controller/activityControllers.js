@@ -44,6 +44,7 @@ module.exports.createCard = (req, res) => {
     const { activityId, columnId, title } = req.body
 
     const card = new ActivityCard({
+        activity: activityId,
         title
     })
 
@@ -100,6 +101,7 @@ module.exports.getOne = (req, res) => {
     const activityId = req.params.activityId;
 
     Activity.findById(activityId)
+        .populate('club')
         .then(result => {
             async.forEach(result.boards, function (item, callback) {
                 ActivityCard.populate(item, { "path": "cards" }, function (err, output) {

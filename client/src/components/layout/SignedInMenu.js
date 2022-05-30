@@ -19,8 +19,8 @@ const SignedInMenu = ({ logout, pathName }) => {
                 </Tooltip>
                 <Tooltip title="Câu lạc bộ của tôi" placement="right-start">
                     <Link
-                        className={pathName === '' ? 'selected' : ''}
-                        to="/">
+                        className={pathName === 'clubs' ? 'selected' : ''}
+                        to="/clubs">
                         <i class="fa-solid fa-users"></i>
                     </Link>
                 </Tooltip>

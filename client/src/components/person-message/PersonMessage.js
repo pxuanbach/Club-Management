@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Avatar, Divider, Box, CircularProgress } from '@mui/material';
 import io from 'socket.io-client';
+import { Redirect } from 'react-router-dom';
 import './PersonMessage.css'
 import ItemMessage from './ItemMessage'
 import MessagesList from '../leader-club/message/Message-List';
@@ -37,16 +38,16 @@ const PersonMessage = () => {
         socket.emit('join', { user_id: user?._id, room_id: currentRoom?.room_id })
         socket.emit('get-messages-history', currentRoom?.room_id)
         socket.on('output-messages', messages => {
-          //console.log(messages)
-          setMessages(messages)
+            //console.log(messages)
+            setMessages(messages)
         })
     }, [currentRoom])
 
     useEffect(() => {
         socket.on('message', message => {
-          setMessages([...messages, message])
+            setMessages([...messages, message])
         })
-      }, [messages]);
+    }, [messages]);
 
     useEffect(() => {
         if (user) {
@@ -60,6 +61,9 @@ const PersonMessage = () => {
         //socket.emit('join', { user_id: user?._id, room_id: club_id })
     }, [user])
 
+    if (!user) {
+        return <Redirect to='/login' />
+    }
     return (
         <div className='container-private-message'>
             <div className='container-left'>

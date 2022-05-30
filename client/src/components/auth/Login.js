@@ -48,7 +48,7 @@ const Login = () => {
     }
 
     if (user) {
-        return <Redirect to='/' />
+        return <Redirect to='/scheduler' />
     }
     return (
         <div className='div-container-main'>

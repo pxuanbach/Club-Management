@@ -22,7 +22,7 @@ const NavbarClub = ({club}) => {
         <nav className='div-left-nav'>
             <div className="nav-club">
                 <div className='div-back'>
-                    <Link to='/' className="btn-back">
+                    <Link to='/clubs' className="btn-back">
                         <i class="fa-solid fa-angle-left"></i>
                         Tất cả câu lạc bộ</Link>
                 </div>

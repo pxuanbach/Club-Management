@@ -1,0 +1,10 @@
+.activity-detail-title{
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    color: var(--secondary-color);
+}
+.activity-detail-title span{
+    
+    font-size: 36px;
+}

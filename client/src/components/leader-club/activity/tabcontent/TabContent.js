@@ -9,7 +9,6 @@ import AddActivity from '../action/AddActivity';
 import UpdateActivity from '../action/UpdateActivity';
 import DeleteActivity from '../action/DeleteActivity';
 import { Buffer } from 'buffer';
-import BlockUi from 'react-block-ui';
 
 import './TabContent.css';
 

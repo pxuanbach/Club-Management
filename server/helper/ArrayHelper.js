@@ -7,11 +7,22 @@ function isElementInArray(key, array) {
     return false;
 }
 
+function onlyUnique(value, index, self) {
+    return self.indexOf(value) === index;
+  }
+
+function uniqueArray(array) {
+    const unique = array.filter(onlyUnique);
+    return unique;
+}
+
+
 function uniqueIdObjArray(array) {
     return [...new Map(array.map((item) => [item["_id"], item])).values()];
 }
 
 module.exports = {
     isElementInArray,
+    uniqueArray,
     uniqueIdObjArray
 }

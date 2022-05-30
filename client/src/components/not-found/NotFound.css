@@ -1,0 +1,9 @@
+.not-found-content{
+    display: flex;
+    justify-content: center;
+    font-size: 60px;
+    height: 100vh;
+}
+.not-found-content{
+    margin-top: 25vh;
+}

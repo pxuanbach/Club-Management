@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { UserContext } from '../../UserContext'
-import { useHistory } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import './Navbar.css'
 import SignedInMenu from './SignedInMenu'
 import SignedOutMenu from './SignedOutMenu'
@@ -37,9 +37,9 @@ const Navbar = () => {
     return (
         <nav>
             <div className="nav-wrapper">
-                <a href="/" className="brand-logo">
+                <Link to="/scheduler" className="brand-logo">
                     <img src={logo_web} className="logo-web" />
-                </a>
+                </Link>
                 {menu}
             </div>
         </nav>
