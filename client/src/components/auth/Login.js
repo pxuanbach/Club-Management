@@ -8,6 +8,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axiosInstance from '../../helper/Axios';
+import ImageInfo1 from '../../assets/logoweb.png'
 import './Login.css'
 
 const Login = () => {
@@ -50,49 +51,59 @@ const Login = () => {
         return <Redirect to='/' />
     }
     return (
-        <div className='login'>
-            <h1>Đăng nhập</h1>
-            <div className='login-form' onSubmit={handleSubmit}>
-                <TextField
-                    label="Tài khoản"
-                    variant='outlined'
-                    sx={{ width: '100%' }}
-                    onChange={(e) => {
-                        setUsername(e.target.value)
-                    }}
-                    helperText={usernameErr}
-                    error={usernameErr}
-                />
-                <FormControl sx={{ width: '100%' }} variant="outlined" error={passwordErr}>
-                    <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
-                    <OutlinedInput
-                        id="outlined-adornment-password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => {
-                            setPassword(e.target.value)
-                        }}
-                        fullWidth={true}
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword}
-                                    edge="end"
-                                >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        }
-                        label="Password"
-                    />
-                    <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
-                </FormControl>
-                <Button variant='contained'
-                    disableElevation
-                    onClick={handleSubmit}>
-                    Đăng nhập
-                </Button>
+        <div className='div-container-main'>
+            <div className='container-login'>
+                <div>
+                    <h2 className='name-club-login'><font className="style" color="E25648">Club</font>Management</h2>
+                    <div className='login'>
+                        <h1>Đăng nhập</h1>
+                        <div className='login-form' onSubmit={handleSubmit}>
+                            <TextField
+                                label="Tài khoản"
+                                variant='outlined'
+                                sx={{ width: '70%' }}
+                                onChange={(e) => {
+                                    setUsername(e.target.value)
+                                }}
+                                helperText={usernameErr}
+                                error={usernameErr}
+                            />
+                            <FormControl sx={{ width: '70%' }} variant="outlined" error={passwordErr}>
+                                <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={(e) => {
+                                        setPassword(e.target.value)
+                                    }}
+                                    fullWidth={true}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Password"
+                                />
+                                <FormHelperText id="outlined-adornment-password">{passwordErr}</FormHelperText>
+                            </FormControl>
+                            <div className='button-login' onClick={handleSubmit}>
+                                Đăng nhập
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className='div-login-right'>
+                    <img className='imageInfo1' src={ImageInfo1} alt="ảnh logo"/>
+                    <h1>Hello, Friend!</h1>
+                    <p>Hãy tôi luyện thành một chiến binh, đừng khép mình lại.</p>
+                </div>
             </div>
         </div>
     )
