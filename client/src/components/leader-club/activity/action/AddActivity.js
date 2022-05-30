@@ -5,8 +5,8 @@ import axiosInstance from '../../../../helper/Axios';
 
 const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
     const date = new Date();
-    const [content, setContent] = useState();
-    const [contentErr, setContentErr] = useState('');
+    const [title, setTitle] = useState();
+    const [titleErr, setTitleErr] = useState('');
     const [startDate, setStartDate] = useState(date.setDate(date.getDate()));
     const [endDate, setEndDate] = useState(date.setDate(date.getDate() + 14));
 
@@ -24,11 +24,11 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
 
     const handleSave = (event) => {
         event.preventDefault();
-        if (content) {
+        if (title) {
             axiosInstance.post(`/activity/create`,
                 JSON.stringify({
                     "club": club_id,
-                    "content": content,
+                    "title": title,
                     "startDate": validateDate(startDate),
                     "endDate": validateDate(endDate)
                 }), {
@@ -42,7 +42,7 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                 showSnackbar(err.response.data.error)
               })
         } else {
-            setContentErr('Tên hoạt động trống')
+            setTitleErr('Tên hoạt động trống')
         }
     }
 
@@ -54,17 +54,17 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
             <div id="modal-modal-description">
                 <div className='addgroup-modal'>
                     <TextField
-                        value={content}
+                        value={title}
                         size="small"
                         label="Tên hoạt động"
                         variant='outlined'
                         sx={{ width: '100%' }}
                         onChange={(event) => {
-                            setContentErr('')
-                            setContent(event.target.value);
+                            setTitleErr('')
+                            setTitle(event.target.value);
                         }}
-                        helperText={contentErr}
-                        error={contentErr}
+                        helperText={titleErr}
+                        error={titleErr}
                     />
                     <RangeDatePicker
                         startDate={startDate}

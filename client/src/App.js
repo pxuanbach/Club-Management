@@ -10,6 +10,7 @@ import Navbar from "./components/layout/Navbar";
 import Club from './components/club/Club';
 import Login from './components/auth/Login'
 import PersonMessage from "./components/person-message/PersonMessage";
+import SchedulerActivity from "./components/scheduler/SchedulerActivity";
 import axiosInstance from "./helper/Axios";
 
 
@@ -38,6 +39,7 @@ function App() {
             <Route path="/mng-account" component={ManageAccount}/>
             <Route path="/mng-club" component={ManageClub}/>
             <Route path="/message" component={PersonMessage}/>
+            <Route path="/scheduler" component={SchedulerActivity}/>
             <Route path="/info" component={Info}/>
             <Route path="/club/:club_id/:club_name" component={Club}/>
             <Route path='/login' component={Login}/>

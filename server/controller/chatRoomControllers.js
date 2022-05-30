@@ -94,13 +94,3 @@ module.exports = function (socket, io) {
         })
     })
 }
-
-module.exports.getList = (req, res) => {
-    const userId = req.params.userId;
-
-
-}
-
-module.exports.deleteRoom = (req, res) => {
-
-}

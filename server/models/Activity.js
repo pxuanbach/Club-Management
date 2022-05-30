@@ -6,7 +6,7 @@ const activitySchema = new mongoose.Schema({
         ref: 'club',
         required: true
     },
-    content: String,
+    title: String,
     startDate: Date,
     endDate: Date,
     boards: [{
@@ -15,6 +15,10 @@ const activitySchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ActivityCard'
         }]
+    }],
+    collaborators: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
     }]
 }, {timestamps: true})
 

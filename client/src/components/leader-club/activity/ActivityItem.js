@@ -84,7 +84,7 @@ export default function ActivityItem({
       <Link style={{ textDecoration: 'none' }} to={link}>
         <CardContent>
           <Typography className='activity-item-title' gutterBottom variant="h5" component="div">
-            {activity.content}
+            {activity.title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {formatter.format(Date.parse(activity.startDate))} - {formatter.format(Date.parse(activity.endDate))}

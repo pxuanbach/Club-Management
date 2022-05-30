@@ -10,6 +10,13 @@ const SignedInMenu = ({ logout, pathName }) => {
     return (
         <div className='nav-menu'>
             <div className='list-btn'>
+                <Tooltip title="Lịch hoạt động" placement="right-start">
+                    <Link
+                        className={pathName === 'scheduler' ? 'selected' : ''}
+                        to="/scheduler">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </Link>
+                </Tooltip>
                 <Tooltip title="Câu lạc bộ của tôi" placement="right-start">
                     <Link
                         className={pathName === '' ? 'selected' : ''}
@@ -24,6 +31,7 @@ const SignedInMenu = ({ logout, pathName }) => {
                         <i class="fa-solid fa-comment-dots"></i>
                     </Link>
                 </Tooltip>
+
                 {user.username.includes('admin') ?
                     <>
                         <Tooltip title="Quản lý các câu lạc bộ" placement="right-start">

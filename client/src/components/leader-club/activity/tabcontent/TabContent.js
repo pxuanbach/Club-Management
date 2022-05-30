@@ -59,7 +59,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
       if (elm._id === data._id) {
         return {
           ...elm,
-          content: data.content,
+          title: data.title,
           startDate: data.startDate,
           endDate: data.endDate
         }

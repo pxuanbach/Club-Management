@@ -38,7 +38,7 @@ const DeleteActivity = ({ open, setOpen, activity, activityDeleted, showSnackbar
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Bạn có chắc muốn xóa hoạt động <b>{activity ? activity.content : ''}</b> không? <br></br>
+                        Bạn có chắc muốn xóa hoạt động <b>{activity ? activity.title : ''}</b> không? <br></br>
                         Chúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến hoạt động này!
                     </DialogContentText>
                 </DialogContent>

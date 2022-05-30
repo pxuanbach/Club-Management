@@ -3,23 +3,8 @@ const ActivityCard = require('../models/ActivityCard')
 const async = require('async')
 const Buffer = require('buffer').Buffer
 
-module.exports = function (socket, io) {
-    socket.on('create-activity', (club_id, content, startDate, endDate) => {
-        const activity = new Activity({
-            club: club_id,
-            content,
-            startDate,
-            endDate
-        });
-
-        activity.save().then(result => {
-            io.emit('activity-created', result)
-        })
-    })
-}
-
 module.exports.create = (req, res) => {
-    const { club, content, startDate, endDate } = req.body
+    const { club, title, startDate, endDate } = req.body
 
     let boards = [
         {
@@ -42,7 +27,7 @@ module.exports.create = (req, res) => {
 
     const activity = new Activity({
         club,
-        content,
+        title,
         startDate,
         endDate,
         boards
@@ -145,7 +130,7 @@ module.exports.search = (req, res) => {
     Activity.find({
         $and: [
             { club: clubId },
-            { content: { $regex: searchValue } }
+            { title: { $regex: searchValue } }
         ]
     }).then(result => {
         res.status(200).send(result)
@@ -156,12 +141,12 @@ module.exports.search = (req, res) => {
 
 module.exports.update = (req, res) => {
     const activityId = req.params.activityId;
-    const { content, startDate, endDate } = req.body;
+    const { title, startDate, endDate } = req.body;
 
     Activity.updateOne(
         {_id: activityId},
         {
-            content,
+            title,
             startDate,
             endDate
         }

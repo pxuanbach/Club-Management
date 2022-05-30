@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const activityCardSchema = new mongoose.Schema({
+    activity: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Activity'
+    },
     title: {
         type: String,
         required: true
