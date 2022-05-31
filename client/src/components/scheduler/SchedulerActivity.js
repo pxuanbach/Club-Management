@@ -1,7 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Paper, Snackbar, Alert, Tooltip, IconButton } from '@mui/material';
+import {
+  Paper, Snackbar, Alert, Tooltip, styled,
+  IconButton, Box, CircularProgress, Grid
+} from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import {useHistory, Redirect} from 'react-router-dom'
+import GroupsIcon from '@mui/icons-material/Groups';
+import { useHistory, Redirect } from 'react-router-dom'
 import { ViewState } from '@devexpress/dx-react-scheduler';
 import {
   Scheduler,
@@ -14,7 +18,14 @@ import {
 } from '@devexpress/dx-react-scheduler-material-ui';
 import { UserContext } from '../../UserContext';
 import axiosInstance from '../../helper/Axios'
+import applyColor from './ApplyColor';
 import './SchedulerActivity.css';
+
+const StyledGroupIcon = styled(GroupsIcon)(({ theme: { palette } }) => ({
+  [`&.appointment-icon`]: {
+    color: palette.action.active,
+  },
+}));
 
 const Appointment = ({
   children, style, ...restProps
@@ -24,7 +35,7 @@ const Appointment = ({
       {...restProps}
       style={{
         ...style,
-        backgroundColor: '#26A69A',
+        backgroundColor: restProps.data.color,
         borderRadius: '8px',
       }}
     >
@@ -59,9 +70,25 @@ const Header = (({
   )
 });
 
+const Content = (({
+  children, appointmentData, ...restProps
+}) => (
+  <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
+    <Grid container alignItems="center">
+      <Grid item xs={2} sx={{textAlign: 'center'}}>
+        <StyledGroupIcon className='appointment-icon'/>
+      </Grid>
+      <Grid item xs={10}>
+        <span>{appointmentData.club.name}</span>
+      </Grid>
+    </Grid>
+  </AppointmentTooltip.Content>
+));
+
 const SchedulerActivity = () => {
   const date = new Date();
   const { user } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(false);
   const [scheduler, setScheduler] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -72,25 +99,28 @@ const SchedulerActivity = () => {
   }
 
   const getScheduler = (userId) => {
+    setIsLoading(true)
     axiosInstance.get(`/scheduler/list/${userId}`)
       .then(response => {
         //response.data
-        setScheduler(response.data)
+        const newData = applyColor(response.data)
+        setScheduler(newData)
       }).catch(err => {
         //err.response.data.error
+        console.log(err)
         showSnackbar(err.response.data.error)
       })
+      setIsLoading(false)
   }
 
   useEffect(() => {
     if (user) {
       getScheduler(user._id)
-
     }
   }, [user])
 
   if (!user) {
-    return <Redirect to='/login'/>
+    return <Redirect to='/login' />
   }
   return (
     <div>
@@ -105,25 +135,32 @@ const SchedulerActivity = () => {
       <React.Fragment>
         <Paper className='scheduler-content'>
           <h1>Lịch hoạt động</h1>
-          <Scheduler
-            data={scheduler}
-          >
-            <ViewState
-              defaultCurrentDate={date}
-              currentViewName="Month"
-            />
-            <MonthView />
-            <Toolbar />
-            <DateNavigator />
-            <TodayButton />
-            <Appointments
-              appointmentComponent={Appointment}
-            />
-            <AppointmentTooltip
-              headerComponent={Header}
-              showCloseButton
-            />
-          </Scheduler>
+          {/* <button onClick={() => console.log(scheduler)}>Click</button> */}
+          {isLoading ?
+            <Box className='loading-temp'>
+              <CircularProgress />
+            </Box>
+            : (<Scheduler
+              data={scheduler}
+            >
+              <ViewState
+                defaultCurrentDate={date}
+                currentViewName="Month"
+              />
+              <MonthView />
+              <Toolbar />
+              <DateNavigator />
+              <TodayButton />
+              <Appointments
+                appointmentComponent={Appointment}
+              />
+              <AppointmentTooltip
+                headerComponent={Header}
+                contentComponent={Content}
+                showCloseButton
+              />
+            </Scheduler>)}
+
         </Paper>
       </React.Fragment>
     </div>
