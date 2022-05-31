@@ -8,6 +8,7 @@ import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
 import UpdateActivity from '../action/UpdateActivity';
 import DeleteActivity from '../action/DeleteActivity';
+import Collaborators from '../action/Collaborators';
 import { Buffer } from 'buffer';
 
 import './TabContent.css';
@@ -33,10 +34,23 @@ const style = {
   p: 3,
 };
 
+const collaboratorStyle = {
+  position: 'absolute',
+  top: '45%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 750,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 3,
+};
+
 const TabContent = ({ match, club_id, isLeader }) => {
   const { path } = useRouteMatch();
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
+  const [showCollaborators, setShowCollaborators] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState()
@@ -151,6 +165,22 @@ const TabContent = ({ match, club_id, isLeader }) => {
           />
         </Box>
       </Modal>
+      <Modal
+        open={showCollaborators}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowCollaborators(false);
+        }}
+      >
+        <Box sx={collaboratorStyle}>
+          <Collaborators
+            setShow={setShowCollaborators}
+            activity={activitySelected}
+            showSnackbar={showSnackbar}
+          />
+        </Box>
+      </Modal>
       <DeleteActivity
         open={openDialog}
         setOpen={setOpenDialog}
@@ -208,6 +238,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
                 link={path + '/' + activity._id}
                 setShowFormUpdate={setShowFormUpdate}
                 setOpenDialog={setOpenDialog}
+                setShowCollaborators={setShowCollaborators}
                 setActivitySelected={setActivitySelected}
               />
             </div>

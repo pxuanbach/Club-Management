@@ -1,5 +1,7 @@
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
+const User = require('../models/User')
+const Club = require('../models/Club')
 const async = require('async')
 const Buffer = require('buffer').Buffer
 
@@ -123,6 +125,44 @@ module.exports.getOne = (req, res) => {
         })
 }
 
+module.exports.getCollaborators = (req, res) => {
+    const activityId = req.params.activityId
+
+    Activity.findById(activityId)
+        .populate('collaborators')
+        .then(result => {
+            res.status(200).send(result.collaborators)
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
+}
+
+module.exports.getUsersNotCollaborators = (req, res) => {
+    const activityId = req.params.activityId
+
+    Activity.findById(activityId)
+        .populate('club')
+        .then(result => {
+            User.find({
+                $and: [
+                    { _id: { $nin: result.club.members } },
+                    { _id: { $nin: result.collaborators } },
+                    { _id: { $nin: [result.club.leader, result.club.treasurer] } },
+                    { username: { $nin: ['admin', 'admin0'] } },
+                ]
+            }).limit(20)
+                .then(users => {
+                    res.status(200).send(users)
+                }).catch(err => {
+                    console.log(err)
+                    res.status(500).send({ error: err.message })
+                })
+
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
+}
+
 module.exports.search = (req, res) => {
     const clubId = req.params.clubId;
     const encodedSearchValue = req.params.searchValue;
@@ -141,12 +181,78 @@ module.exports.search = (req, res) => {
     })
 }
 
+module.exports.searchCollaborators = (req, res) => {
+    const activityId = req.params.activityId;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
+
+    Activity.findById(activityId)
+        .then(result => {
+            User.find({
+                $and: [
+                    { _id: { $in: result.collaborators } },
+                    { username: { $nin: ['admin', 'admin0'] } },
+                    {
+                        $or: [
+                            { username: { $regex: searchValue } },
+                            { name: { $regex: searchValue } },
+                            { email: { $regex: searchValue } }
+                        ]
+                    }
+                ]
+            }).then(collaborators => {
+                res.status(200).send(collaborators)
+            }).catch(err => {
+                res.status(500).send({ error: "User query err - " + err.message })
+            })
+        }).catch(err => {
+            res.status(500).send({ error: "Activity query err - " + err.message })
+        })
+}
+
+module.exports.searchUsersNotCollaborators = (req, res) => {
+    const activityId = req.params.activityId;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
+
+    Activity.findById(activityId)
+        .populate('club')
+        .then(result => {
+            User.find({
+                $and: [
+                    { _id: { $nin: result.club.members } },
+                    { _id: { $nin: result.collaborators } },
+                    { _id: { $nin: [result.club.leader, result.club.treasurer] } },
+                    { username: { $nin: ['admin', 'admin0'] } },
+                    {
+                        $or: [
+                            { username: { $regex: searchValue } },
+                            { name: { $regex: searchValue } },
+                            { email: { $regex: searchValue } }
+                        ]
+                    }
+                ]
+            }).limit(20)
+                .then(users => {
+                    res.status(200).send(users)
+                }).catch(err => {
+                    console.log(err)
+                    res.status(500).send({ error: err.message })
+                })
+
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
+}
+
 module.exports.update = (req, res) => {
     const activityId = req.params.activityId;
     const { title, startDate, endDate } = req.body;
 
     Activity.updateOne(
-        {_id: activityId},
+        { _id: activityId },
         {
             title,
             startDate,
@@ -244,22 +350,50 @@ module.exports.updateColumn = async (req, res) => {
     })
 }
 
+module.exports.updateCollaborators = (req, res) => {
+    const activityId = req.params.activityId;
+    const { collaborators } = req.body;
+
+    Activity.updateOne(
+        { _id: activityId },
+        { $pull: { collaborators: { $in: collaborators } } }
+    ).then(() => {
+        res.status(200).send()
+    }).catch(err => {
+        res.status(500).send({ error: "Activity update err - " + err.message })
+    })
+}
+
+module.exports.addCollaborators = (req, res) => {
+    const activityId = req.params.activityId;
+    const { users } = req.body;
+
+    Activity.updateOne(
+        { _id: activityId },
+        { $push: { collaborators: { $each: users } } }
+    ).then(() => {
+        res.status(200).send()
+    }).catch(err => {
+        res.status(500).send({ error: "Activity update err - " + err.message })
+    })
+}
+
 module.exports.delete = (req, res) => {
     const activityId = req.params.activityId;
 
-    Activity.findByIdAndDelete(activityId, function(err, doc) {
+    Activity.findByIdAndDelete(activityId, function (err, doc) {
         if (err) {
             res.status(500).send({ error: "Load activity err - " + err.message })
             return;
         }
 
         async.forEach(doc.boards, function (item, callback) {
-            ActivityCard.deleteMany({_id: {$in: item.cards}})
-            .then(() => {
-                callback();
-            }).catch(err => {
-                res.status(500).send({ error: "Card delete err - " + err.message })
-            })
+            ActivityCard.deleteMany({ _id: { $in: item.cards } })
+                .then(() => {
+                    callback();
+                }).catch(err => {
+                    res.status(500).send({ error: "Card delete err - " + err.message })
+                })
         }, function (err) {
             if (err) {
                 res.status(500).send({ error: "Card deleted err - " + err.message })

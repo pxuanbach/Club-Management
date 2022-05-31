@@ -14,7 +14,8 @@ import './ActivityItem.css'
 const ITEM_HEIGHT = 48;
 
 export default function ActivityItem({
-  activity, link, setShowFormUpdate, setOpenDialog, setActivitySelected
+  activity, link, setShowFormUpdate, setOpenDialog, 
+  setActivitySelected, setShowCollaborators
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -55,10 +56,17 @@ export default function ActivityItem({
           PaperProps={{
             style: {
               maxHeight: ITEM_HEIGHT * 4.5,
-              width: '15ch',
+              width: 'max-content',
             },
           }}
         >
+          <MenuItem onClick={() => {
+            setActivitySelected(activity)
+            handleClose()
+            setShowCollaborators(true)
+          }}>
+            Cộng tác viên
+          </MenuItem>
           <MenuItem onClick={() => {
             setActivitySelected(activity)
             handleClose()

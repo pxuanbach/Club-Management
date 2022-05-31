@@ -30,7 +30,7 @@ const DeleteGroup = ({ open, setOpen, group, groups, setGroups }) => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"Xóa câu lạc bộ?"}
+                    {"Xóa nhóm?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
