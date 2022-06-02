@@ -27,10 +27,14 @@ const Info = () => {
       document.getElementById("textinput2").style.display = "block";
       document.getElementById("textinput3").style.display = "block";
       document.getElementById("textinput4").style.display = "block";
+      document.getElementById("textinput5").style.display = "block";
+      document.getElementById("textinput6").style.display = "block";
       document.getElementById("textresult").style.display = "none";
       document.getElementById("textresult2").style.display = "none";
       document.getElementById("textresult3").style.display = "none";
       document.getElementById("textresult4").style.display = "none";
+      document.getElementById("textresult5").style.display = "none";
+      document.getElementById("textresult6").style.display = "none";
     } else    
     {      
       actionList.className = "list-action-profile";  
@@ -38,10 +42,14 @@ const Info = () => {
       document.getElementById("textinput2").style.display = "none";
       document.getElementById("textinput3").style.display = "none";
       document.getElementById("textinput4").style.display = "none";
+      document.getElementById("textinput5").style.display = "none";
+      document.getElementById("textinput6").style.display = "none";
       document.getElementById("textresult").style.display = "block";
       document.getElementById("textresult2").style.display = "block";
       document.getElementById("textresult3").style.display = "block";
       document.getElementById("textresult4").style.display = "block";
+      document.getElementById("textresult5").style.display = "block";
+      document.getElementById("textresult6").style.display = "block";
     } 
 }
 const showhideFunction1 = () => {
@@ -80,7 +88,7 @@ const showhideFunction2 = () => {
         <div className='container-info'>
           <div className='header-title-info'>
             <h4 className='title-profile-1'>Thông tin chung</h4>
-            <h5 onClick={() => showhideFunction() }>Edit</h5>
+            <h5 onClick={() => showhideFunction() }>Chỉnh sửa</h5>
           </div>
           
           <div style={{display:"flex", paddingTop:10}}>
@@ -129,38 +137,28 @@ const showhideFunction2 = () => {
               </div>
             </div>
           </div>
-  
-          <div id='listButton' className='list-action-profile'>
-            <Button variant='outlined' onClick={() => showhideFunction() }>Hủy</Button>
-            <Button variant='outlined'>Lưu</Button>
-          </div>
         </div>
         <div className='container-info'>
           <div className='header-title-info'>
             <h4 className='title-profile-1'>Mô tả bản thân</h4>
-            <h5 onClick={() => showhideFunction1() } >Edit</h5>
           </div>
           <div className='div-text-profile'>
             <p id='textresult5' className='text-description-profile'>{user.description}</p>
             <textarea id="textinput5" className='textarea-description' placeholder={user.description}></textarea>
           </div>
-          <div id='listButton1' className='list-action-profile'>
-            <Button variant='outlined' onClick={() => showhideFunction1() }>Hủy</Button>
-            <Button variant='outlined'>Lưu</Button>
-          </div>
+
         </div>
         <div className='container-info-last'>
           <div className='header-title-info'>
             <h4 className='title-profile-1'>Liên lạc khác</h4>
-            <h5 onClick={() => showhideFunction2() }>Edit</h5>
           </div>
           <div className='div-text-profile'>
             <label>Facebook:</label>
             <p id='textresult6'>{user.facebook}</p>
             <input id="textinput6"  placeholder={user.facebook}></input>
           </div>
-          <div id='listButton2' className='list-action-profile'>
-            <Button variant='outlined' onClick={() => showhideFunction2() }>Hủy</Button>
+          <div id='listButton' className='list-action-profile'>
+            <Button variant='outlined' onClick={() => showhideFunction() }>Hủy</Button>
             <Button variant='outlined'>Lưu</Button>
           </div>
         </div>
