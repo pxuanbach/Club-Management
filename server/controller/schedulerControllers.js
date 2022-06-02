@@ -2,7 +2,7 @@ const User = require('../models/User')
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
 const mongoose = require('mongoose')
-const { isElementInArray, uniqueArray } = require('../helper/ArrayHelper')
+const { uniqueArray } = require('../helper/ArrayHelper')
 
 async function getActivityIdByCardGroupJoin(userId) {
     let activityArr = []

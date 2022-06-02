@@ -1,5 +1,5 @@
-import React,{useState} from 'react'
-import image1 from '../../../assets/anhminhhoa.jpg' 
+import React, { useState } from 'react'
+import image1 from '../../../assets/anhminhhoa.jpg'
 import './Card.scss'
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
@@ -15,11 +15,11 @@ const style = {
   border: 'none',
   boxShadow: 24,
   p: 4,
-  
+
 };
 const Card = (props) => {
   const [showFormCardDetail, setShowFormCardDetail] = useState(false);
-  const {card} = props
+  const { card, isLeader, columnTitle } = props
   return (
     <div>
       <Modal
@@ -31,22 +31,18 @@ const Card = (props) => {
         }}
       >
         <Box sx={style}>
-          <CardDetail  setShowForm={setShowFormCardDetail}/>
+          <CardDetail
+            setShowForm={setShowFormCardDetail}
+            card={card}
+            isLeader={isLeader}
+            columnTitle={columnTitle}
+          />
         </Box>
       </Modal>
-    
-    <div className='card-item' onClick={() => setShowFormCardDetail(true)}>
 
-      {/* {card?.cover && 
-        <img 
-          src={card.cover} 
-          className='card-cover' 
-          alt='hình ảnh minh họa' 
-          onMouseDown={e => e.preventDefault()}
-        />} */}
-      {card.title}
-      
-    </div>
+      <div className='card-item' onClick={() => setShowFormCardDetail(true)}>
+        {card.title}
+      </div>
     </div>
 
   )

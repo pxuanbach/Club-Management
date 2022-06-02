@@ -113,7 +113,11 @@ const Column = (props) => {
                 >
                     {cards.map((card, index) => (
                         <Draggable disabled={isLeader} key={index}>
-                            <Card card={card} />
+                            <Card
+                                card={card}
+                                isLeader={isLeader}
+                                columnTitle={column.title}
+                            />
                         </Draggable>
                     ))}
                 </Container>

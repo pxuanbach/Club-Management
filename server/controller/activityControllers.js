@@ -4,6 +4,21 @@ const User = require('../models/User')
 const Club = require('../models/Club')
 const async = require('async')
 const Buffer = require('buffer').Buffer
+const { isElementInArray } = require('../helper/ArrayHelper')
+
+function isUserJoined(userId, card) {
+    if (isElementInArray(userId, card.userJoin)) {
+        return true;
+    }
+
+    card.groupJoin.forEach(group => {
+        if (isElementInArray(userId, group.members)) {
+            return true;
+        }
+    })
+
+    return false;
+}
 
 module.exports.create = (req, res) => {
     const { club, title, startDate, endDate } = req.body
@@ -86,6 +101,30 @@ module.exports.createCard = (req, res) => {
     }).catch(err => {
         res.status(400).json({ error: "Save err - " + err.message })
     })
+}
+
+module.exports.join = (req, res) => {
+    const { userId, cardId } = req.body
+    
+    ActivityCard.findById(cardId)
+        .populate('groupJoin')
+        .then(card => {
+            //check user joined?
+            if (isUserJoined(userId, card)) {
+                res.status(200).send({ message: "user joined" })
+            } else {
+                ActivityCard.updateOne(
+                    { _id: cardId },
+                    { $push: { userJoin: userId } }
+                ).then(() => {
+                    res.status(200).send()
+                }).catch(err => {
+                    res.status(500).json({ error: "Update card err - " + err.message })
+                })
+            }
+        }).catch(err => {
+            res.status(500).json({ error: "Query card err - " + err.message })
+        })
 }
 
 module.exports.getList = (req, res) => {
@@ -242,6 +281,19 @@ module.exports.searchUsersNotCollaborators = (req, res) => {
                     res.status(500).send({ error: err.message })
                 })
 
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
+}
+
+module.exports.getJoin = (req, res) => {
+    const cardId = req.params.cardId;
+
+    ActivityCard.findById(cardId)
+        .populate('userJoin')
+        .populate('groupJoin')
+        .then(result => {
+            res.status(200).send(result);
         }).catch(err => {
             res.status(500).send({ error: err.message })
         })

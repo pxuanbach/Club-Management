@@ -59,8 +59,8 @@ const FormActivity = ({ match, isLeader }) => {
       }).catch(err => {
         //err.response.data.error
         showSnackbar(err.response.data.error)
-      }) 
-      setIsLoading(false)
+      })
+    setIsLoading(false)
   }
 
   const handleCreateCard = (activityId, columnId, title) => {
@@ -112,9 +112,9 @@ const FormActivity = ({ match, isLeader }) => {
     if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
       let newColumns = cloneDeep(columns)
       //console.log('New column', newColumns)
-      
+
       let currentColumn = newColumns.find(c => c._id === columnId)
-      
+
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult)
       //console.log('Current column 2', currentColumn)
 
@@ -187,7 +187,7 @@ const FormActivity = ({ match, isLeader }) => {
           {columns.map((column, index) => (
             <Draggable key={index}>
               <Column
-              isLeader={isLeader}
+                isLeader={isLeader}
                 column={column}
                 onCardDrop={onCardDrop}
                 onUpdateColumn={onUpdateColumn}

@@ -4,6 +4,7 @@ const router = Router();
 
 router.post('/create', activityController.create)
 router.post('/createcard', activityController.createCard)
+router.post('/join', activityController.join)
 router.get('/list/:clubId', activityController.getList)
 router.get('/one/:activityId', activityController.getOne)
 router.get('/collaborators/:activityId', activityController.getCollaborators)
@@ -11,6 +12,7 @@ router.get('/usersnotcollaborators/:activityId', activityController.getUsersNotC
 router.get('/search/:clubId/:searchValue', activityController.search)
 router.get('/searchcollaborators/:activityId/:searchValue', activityController.searchCollaborators)
 router.get('/searchusersnotcollaborators/:activityId/:searchValue', activityController.searchUsersNotCollaborators)
+router.get('/usergroupjoin/:cardId', activityController.getJoin)
 router.put('/update/:activityId', activityController.update)
 router.patch('/updateboards/:activityId', activityController.updateBoards)
 router.patch('/updatecolumn/:activityId', activityController.updateColumn)

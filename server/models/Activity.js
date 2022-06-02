@@ -13,7 +13,7 @@ const activitySchema = new mongoose.Schema({
         title: String,
         cards: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'ActivityCard'
+            ref: 'activityCards'
         }]
     }],
     collaborators: [{

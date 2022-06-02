@@ -92,6 +92,7 @@ const Fund = ({ club_id }) => {
     axiosInstance.get(`/fund/colpayinmonth/${club_id}`)
     .then(response => {
       //response.data
+      console.log(response.data)
       setCollectInMonth(response.data.collect)
       setPayInMonth(response.data.pay)
     }).catch(err => {
@@ -124,6 +125,7 @@ const Fund = ({ club_id }) => {
   }
 
   useEffect(() => {
+    console.log(club_id)
     getClub(club_id)
     getColPayInMonth(club_id)
     getFundHistories()

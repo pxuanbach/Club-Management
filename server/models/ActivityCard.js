@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const activityCardSchema = new mongoose.Schema({
     activity: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Activity'
+        ref: 'activities'
     },
     title: {
         type: String,
@@ -20,7 +20,15 @@ const activityCardSchema = new mongoose.Schema({
     }],
     groupJoin: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Group'
+        ref: 'group'
+    }],
+    comments: [{
+        content: String,
+        createdAt: Date,
+        author: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
+        }
     }]
 })
 
