@@ -53,7 +53,7 @@ const Login = () => {
     return (
         <div className='div-container-main'>
             <div className='container-login'>
-                <div>
+                <div style={{backgroundColor:"white", borderRadius: 15 }}>
                     <h2 className='name-club-login'><font className="style" color="E25648">Club</font>Management</h2>
                     <div className='login'>
                         <h1>Đăng nhập</h1>
