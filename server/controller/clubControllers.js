@@ -360,7 +360,7 @@ module.exports.promote = async (req, res) => {
 
     Club.findById(clubId, function (err, doc) {
         if (err) {
-            res.status(500).send()
+            res.status(500).send({ error: err.message })
             return;
         }
 

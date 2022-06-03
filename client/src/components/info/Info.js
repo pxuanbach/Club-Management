@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import {
   Button, Avatar, Box, MenuItem, FormControl,
   Select, TextField, CircularProgress, InputLabel,
@@ -6,15 +6,45 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import NumberFormat from "react-number-format";
 import './Info.css'
 import KeyIcon from '@mui/icons-material/Key';
 import ImageInfo from '../../assets/logoweb.png'
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../UserContext';
+import axiosInstance from '../../helper/Axios';
+
+function NumberFormatCustom(props) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={values => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value
+          }
+        });
+      }}
+    />
+  );
+}
+
 
 const Info = () => {
+  const inputAvatarImage = useRef(null);
   const { user, setUser } = useContext(UserContext);
   const [isEdit, setIsEdit] = useState(false);
+  const [avatarImage, setAvatarImage] = useState();
+  const [name, setName] = useState('');
   const [gender, setGender] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [description, setDescription] = useState('');
+  const [facebook, setFacebook] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -25,13 +55,41 @@ const Info = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordErr, setConfirmPasswordErr] = useState('');
 
+  function isFileImage(file) {
+    return file && file['type'].split('/')[0] === 'image';
+  }
+
+  const handleImageChange = (event) => {
+    if (isFileImage(event.target.files[0])) {
+      setAvatarImage(event.target.files[0]);
+    } else {
+      alert('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...')
+    }
+  };
+
   const handleChange = (event) => {
     setGender(event.target.value);
   };
 
   const handleSaveInfo = (e) => {
     e.preventDefault();
+    console.log(name, gender, phone, email, description, facebook)
+    // var formData = new FormData();
+    // formData.append("file", avatarImage);
+    // formData.append("name", name)
+    // formData.append("gender", gender)
+    // formData.append("phone", phone)
+    // formData.append("email", email)
+    // formData.append("description", description)
+    // formData.append("facebook", facebook)
 
+    // axiosInstance.put(`/update/${user._id}`,
+    //   formData, {
+    //   withCredentials: true,
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    // })
   }
 
   useEffect(() => {
@@ -58,14 +116,27 @@ const Info = () => {
             <div style={{ display: "flex", paddingTop: 10 }}>
               <div className='div-action-image'>
                 <div className='image'>
-                  <Avatar sx={{ width: 120, height: 120 }} src={user.img_url} />
+                  <input type="file" style={{ display: 'none' }} ref={inputAvatarImage} onChange={handleImageChange} />
+                  <Avatar
+                    sx={{ width: 120, height: 120, cursor: 'pointer' }}
+                    src={avatarImage ? URL.createObjectURL(avatarImage)
+                      : user.img_url}
+                    onClick={() => { inputAvatarImage.current.click() }}
+                  />
                 </div>
-                <Button variant='text' sx={{ textTransform: "none", }}>Xóa ảnh</Button>
+                <Button
+                  variant='text'
+                  sx={{ textTransform: "none", }}
+                  onClick={() => { inputAvatarImage.current.click() }}>
+                  Đổi ảnh
+                </Button>
               </div>
               <div style={{ flex: 1, paddingLeft: 40 }}>
                 <div className='div-text-profile'>
                   <label>Họ và tên:</label>
                   {isEdit ? <TextField
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     sx={{ minWidth: 280 }}
                     placeholder={user.name}
                     size="small"
@@ -92,15 +163,22 @@ const Info = () => {
                 <div className='div-text-profile'>
                   <label>Số điện thoại:</label>
                   {isEdit ? <TextField
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     sx={{ minWidth: 280 }}
                     placeholder={user.phone}
                     size="small"
+                    InputProps={{
+                      inputComponent: NumberFormatCustom
+                    }}
                   /> : <p id='textresult3'>{user.phone}</p>}
 
                 </div>
                 <div className='div-text-profile'>
                   <label>Địa chỉ email:</label>
                   {isEdit ? <TextField
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     sx={{ minWidth: 280 }}
                     placeholder={user.email}
                     size="small"
@@ -115,6 +193,8 @@ const Info = () => {
             </div>
             <div className='div-text-profile'>
               {isEdit ? <TextField
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 sx={{ minWidth: 420, marginRight: 3 }}
                 placeholder={user.description}
                 size="small"
@@ -136,6 +216,8 @@ const Info = () => {
             <div className='div-text-profile'>
               <label>Facebook:</label>
               {isEdit ? <TextField
+                value={facebook}
+                onChange={(e) => setFacebook(e.target.value)}
                 sx={{ minWidth: 300, marginRight: 3 }}
                 placeholder={user.facebook}
                 size="small"

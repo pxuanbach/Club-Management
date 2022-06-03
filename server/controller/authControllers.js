@@ -58,19 +58,19 @@ async function uploadAvatar(files) {
         }).catch(error => {
             console.log(error)
             return {
-                img_url: '',
-                cloudinary_id: ''
+                url: '',
+                public_id: ''
             }
         })
         fs.unlinkSync(path)
         return {
-            img_url: newPath.url,
-            cloudinary_id: newPath.public_id
+            url: newPath.url,
+            public_id: newPath.public_id
         }
     }
     return {
-        img_url: '',
-        cloudinary_id: ''
+        url: '',
+        public_id: ''
     }
 }
 
@@ -78,24 +78,27 @@ module.exports.signup = async (req, res) => {
     const files = req.files
     const { username, password, name, email } = req.body;
 
-    const uploadData = await uploadAvatar(files);
-    
     try {
-        const user = await User.create({ 
-            username, 
-            password, 
-            img_url: uploadData.img_url, 
-            cloudinary_id: uploadData.cloudinary_id, 
-            name, 
-            email 
+        const user = await User.create({
+            username,
+            password,
+            name,
+            email
         });
-        res.status(201).json(ConvertUser(user));
+        const uploadData = await uploadAvatar(files);
+        user.img_url = uploadData.url;
+        user.cloudinary_id = uploadData.public_id;
+        user.save().then(result => {
+            res.status(201).send(ConvertUser(result));
+        }).catch(err => {
+            res.status(400).send({ error: err.message })
+        })
+
     } catch (error) {
         let errors = alertError(error);
         console.log('This is ERROR', error.message)
-        res.status(400).json({ errors })
+        res.status(400).send({ errors })
     }
-    res.send()
 }
 
 module.exports.login = async (req, res) => {
@@ -141,9 +144,31 @@ module.exports.logout = (req, res) => {
     res.status(200).json({ logout: true })
 }
 
-module.exports.update = (req, res) => {
+module.exports.update = async (req, res) => {
+    const files = req.files
     const userId = req.params.userId;
     const { name, gender, email, description, facebook } = req.body
 
+    try {
+        let user = await User.findById(userId)
+        user.name = name;
+        user.gender = gender;
+        user.email = email;
+        user.description = description;
+        user.facebook = facebook
 
+        const uploadData = await uploadAvatar(files);
+        user.img_url = uploadData.url;
+        user.cloudinary_id = uploadData.public_id;
+
+        user.save().then(result => {
+            res.status(200).send(result)
+        }).catch(err => {
+            res.status(400).send({ error: err.message })
+        })
+    } catch (error) {
+        let errors = alertError(error);
+        console.log(error.message)
+        res.status(400).json({ errors })
+    }
 }

@@ -76,7 +76,7 @@ const AddAccount = ({ handleClose, users, setUsers }) => {
                 formData, {
                 withCredentials: true,
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "multipart/form-data",
                 },
             }).then(response => {
                 //response.data
