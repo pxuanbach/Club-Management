@@ -9,5 +9,6 @@ router.post('/login', authController.login)
 router.get('/logout', authController.logout)
 router.get('/verifyuser', authController.verifyuser)
 router.get('/verifyclub/:club_id', clubController.verifyclub)
+router.put('/update/:userId', upload.array('file'), authController.update)
 
 module.exports = router;

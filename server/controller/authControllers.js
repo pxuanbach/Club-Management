@@ -48,12 +48,7 @@ const alertError = (err) => {
     return errors;
 }
 
-module.exports.signup = async (req, res) => {
-    const files = req.files
-    const { username, password, name, email } = req.body;
-    let img_url = '';
-    let cloudinary_id = '';
-
+async function uploadAvatar(files) {
     if (files.length > 0) {
         const { path } = files[0]
 
@@ -62,17 +57,38 @@ module.exports.signup = async (req, res) => {
             folder: 'Club-Management/User-Avatar'
         }).catch(error => {
             console.log(error)
-            res.status(400).json({
-                error
-            })
+            return {
+                img_url: '',
+                cloudinary_id: ''
+            }
         })
         fs.unlinkSync(path)
-        img_url = newPath.url;
-        cloudinary_id = newPath.public_id;
+        return {
+            img_url: newPath.url,
+            cloudinary_id: newPath.public_id
+        }
     }
+    return {
+        img_url: '',
+        cloudinary_id: ''
+    }
+}
 
+module.exports.signup = async (req, res) => {
+    const files = req.files
+    const { username, password, name, email } = req.body;
+
+    const uploadData = await uploadAvatar(files);
+    
     try {
-        const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
+        const user = await User.create({ 
+            username, 
+            password, 
+            img_url: uploadData.img_url, 
+            cloudinary_id: uploadData.cloudinary_id, 
+            name, 
+            email 
+        });
         res.status(201).json(ConvertUser(user));
     } catch (error) {
         let errors = alertError(error);
@@ -123,4 +139,11 @@ module.exports.verifyuser = (req, res, next) => {
 module.exports.logout = (req, res) => {
     res.cookie('jwt', "", { maxAge: 1 })
     res.status(200).json({ logout: true })
+}
+
+module.exports.update = (req, res) => {
+    const userId = req.params.userId;
+    const { name, gender, email, description, facebook } = req.body
+
+
 }
