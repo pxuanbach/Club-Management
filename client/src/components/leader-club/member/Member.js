@@ -33,13 +33,6 @@ TabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 export default function BasicTabs() {
   const { path } = useRouteMatch();
   const [isLoading, setIsLoading] = useState(true);
@@ -69,8 +62,8 @@ export default function BasicTabs() {
       <Box sx={{ width: '100%', height: '100%', }}>
         <Box className='header-member' sx={{ borderBottom: 'none', borderColor: 'divider' }} >
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
-            <Tab className='name-tab' label="Thành viên" {...a11yProps(0)} />
-            <Tab label="Nhóm" {...a11yProps(1)} />
+            <Tab label="Thành viên"/>
+            <Tab label="Nhóm" />
           </Tabs>
         </Box>
         {isLoading ?

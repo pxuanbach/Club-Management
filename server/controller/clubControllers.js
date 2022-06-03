@@ -10,7 +10,6 @@ const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const Buffer = require('buffer').Buffer
 
-
 module.exports.create = async (req, res) => {
     const files = req.files
     const {
@@ -170,6 +169,30 @@ module.exports.search = async (req, res) => {
             console.log(err)
             res.status(500).send({ error: err.message })
         })
+}
+
+module.exports.userSearch = (req, res) => {
+    const userId = req.params.userId;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
+
+    User.findById(userId)
+        .then(user => {
+            Club.find({
+                $and: [
+                    { name: { $regex: searchValue } },
+                    user.username.includes('admin') ? {} : { _id: { $in: user.clubs } }
+                ]
+            }).populate('leader')
+                .populate('treasurer')
+                .then(clubs => {
+                    res.status(200).send(ConvertClubs(clubs))
+                }).catch(err => {
+                    res.status(500).send({ error: err.message })
+                })
+        })
+
 }
 
 module.exports.searchMembers = async (req, res) => {
@@ -409,7 +432,7 @@ module.exports.removeMember = async (req, res) => {
                 res.status(500).send({ error: err.message })
             })
         }).catch(err => {
-s
+            s
             res.status(500).send({ error: err.message })
         })
     }).catch(err => {
@@ -452,8 +475,7 @@ module.exports.delete = async (req, res) => {
         if (err) {
             console.log(err)
             res.status(500).send({ error: err.message })
-        }
-        else {
+        } else {
             await cloudinary.uploader.destroy(cloudId, function (result) {
                 console.log(result);
             })

@@ -111,7 +111,7 @@ const AddMembers = ({ club_id, setShowFormAdd, getMembers }) => {
       <div className='stack-left'>
         <CustomTextField
           id="search-field"
-          label="Tìm kiếm thành viên (Tài khoản)"
+          label="Tìm kiếm người dùng"
           variant="standard"
           value={search}
           onChange={handleChangeSearch}

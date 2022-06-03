@@ -1,24 +1,28 @@
 import React from 'react'
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+    Button, Dialog, DialogActions, DialogContent, 
+    DialogContentText, DialogTitle
 } from '@mui/material';
-import axiosInstance from '../../../helper/Axios'
+import axiosInstance from '../../../../helper/Axios'
 
-const DeleteGroup = ({ open, setOpen, group, groups, setGroups }) => {
-    
+const DeleteActivity = ({ open, setOpen, activity, activityDeleted, showSnackbar }) => {
+
     const handleClose = () => {
         setOpen(false)
     }
 
     const handleAgree = async (e) => {
         e.preventDefault();
-        const res = await axiosInstance.delete(`/group/delete/${group._id}`)
-
-        const data = res.data
-        if (data) {
-            setGroups(groups.filter(group => group._id !== data))
-            handleClose()
-        }
+        axiosInstance.delete(`/activity/delete/${activity._id}`)
+        .then(response => {
+            //response.data
+            activityDeleted(response.data)
+            handleClose();
+          }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error)
+          })
+        
     }
 
     return (
@@ -30,12 +34,12 @@ const DeleteGroup = ({ open, setOpen, group, groups, setGroups }) => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"Xóa nhóm?"}
+                    {"Xóa hoạt động?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Bạn có chắc muốn xóa nhóm <b>{group ? group.name : ''}</b> không? <br></br>
-                        Chúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến nhóm này!
+                        Bạn có chắc muốn xóa hoạt động <b>{activity ? activity.title : ''}</b> không? <br></br>
+                        Chúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến hoạt động này!
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, paddingTop: 0 }}>
@@ -58,4 +62,4 @@ const DeleteGroup = ({ open, setOpen, group, groups, setGroups }) => {
     )
 }
 
-export default DeleteGroup
+export default DeleteActivity

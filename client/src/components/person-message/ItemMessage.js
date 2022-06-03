@@ -5,12 +5,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Avatar } from '@mui/material';
-const options = [
 
+const options = [
     'Xóa',
 ];
 const ITEM_HEIGHT = 48;
-const ItemMessage = () => {
+
+const ItemMessage = ({ room, setCurrentRoom }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -24,12 +25,15 @@ const ItemMessage = () => {
 
 
     return (
-        <div className="item-message">
-            <Avatar sx={{width: 58, height: 58}}/>
+        <div className="item-message"
+            onClick={() => {
+                setCurrentRoom(room)
+            }}>
+            <Avatar src={room.imgUrl} sx={{ width: 58, height: 58 }} />
             <div className="content-message">
                 <div className='content'>
-                    <h3>Nguyễn Tiến Đạt</h3>
-                    <p className="latest-message">Hôm nay trời đẹp quá mà mưa cmnr huhu</p>
+                    <h3>{room.name}</h3>
+                    <p className="latest-message">{room.lastMessage}</p>
                 </div>
                 <div className='div-menu-item-mess'>
                     <IconButton

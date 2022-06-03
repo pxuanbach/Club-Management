@@ -37,7 +37,7 @@ const Home = () => {
     e.preventDefault();
     if (search) {
       const encodedSearch = new Buffer(search).toString('base64');
-      const res = await axiosInstance.get(`/club/search/${encodedSearch}`)
+      const res = await axiosInstance.get(`/club/usersearch/${user._id}/${encodedSearch}`)
 
       const data = res.data;
       //console.log(data)
@@ -114,9 +114,9 @@ const Home = () => {
           {clubs && clubs.map(club => (
             <Link key={club._id} 
               style={{textDecoration: 'none'}}
-              to={club.isblocked ? '' : '/club/' + club._id + '/' + club.name + '/message'}
+              to={club.isblocked ? '#' : '/club/' + club._id + '/' + club.name + '/message'}
               onClick={() => {
-                setOpenSnackbar(true)
+                club.isblocked ? setOpenSnackbar(true) : setOpenSnackbar(false)
               }}>
               <ClubItem club={club}/>
             </Link>

@@ -1,0 +1,14 @@
+.activity-item-title{
+    width: 100%;
+    font-size: 22px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--primary-color);
+}
+.activity-item-menu{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+}

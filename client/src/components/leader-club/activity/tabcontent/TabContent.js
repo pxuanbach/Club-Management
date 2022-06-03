@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, Tooltip, Modal, TextField, Snackbar, Alert } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { useRouteMatch } from 'react-router-dom';
 import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
+import UpdateActivity from '../action/UpdateActivity';
+import DeleteActivity from '../action/DeleteActivity';
+import Collaborators from '../action/Collaborators';
+import { Buffer } from 'buffer';
+
 import './TabContent.css';
 
 const CustomTextField = styled(TextField)({
@@ -29,10 +34,27 @@ const style = {
   p: 3,
 };
 
-const TabContent = ({ match, club_id }) => {
-  const {path} = useRouteMatch();
+const collaboratorStyle = {
+  position: 'absolute',
+  top: '45%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 750,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 3,
+};
+
+const TabContent = ({ match, club_id, isLeader }) => {
+  const { path } = useRouteMatch();
   const [showFormAdd, setShowFormAdd] = useState(false);
+  const [showFormUpdate, setShowFormUpdate] = useState(false);
+  const [showCollaborators, setShowCollaborators] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [activities, setActivities] = useState([]);
+  const [search, setSearch] = useState()
+  const [activitySelected, setActivitySelected] = useState()
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
@@ -45,11 +67,49 @@ const TabContent = ({ match, club_id }) => {
     setActivities([...activities, data]);
   }
 
+  const activityUpdated = (data) => {
+    const activitiesUpdated = activities.map((elm) => {
+      if (elm._id === data._id) {
+        return {
+          ...elm,
+          title: data.title,
+          startDate: data.startDate,
+          endDate: data.endDate
+        }
+      }
+      return elm;
+    });
+    setActivities(activitiesUpdated)
+  }
+
+  const activityDeleted = (data) => {
+    var activitiesDeleted = activities.filter(function (value, index, arr) {
+      return value._id !== data._id;
+    })
+    setActivities(activitiesDeleted)
+  }
+
+  const handleSearchActivities = (e) => {
+    e.preventDefault();
+    if (search) {
+      const encodedSearch = new Buffer(search).toString('base64');
+      axiosInstance.get(`/activity/search/${club_id}/${encodedSearch}`)
+        .then(response => {
+          //response.data
+          setActivities(response.data)
+        }).catch(err => {
+          //err.response.data.error
+          showSnackbar(err.response.data.error)
+        })
+    } else {
+      getActivities()
+    }
+  }
+
   const getActivities = () => {
     axiosInstance.get(`/activity/list/${club_id}`)
       .then(response => {
         //response.data
-        console.log(response.data)
         setActivities(response.data)
       }).catch(err => {
         //err.response.data.error
@@ -88,6 +148,46 @@ const TabContent = ({ match, club_id }) => {
           />
         </Box>
       </Modal>
+      <Modal
+        open={showFormUpdate}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormUpdate(false);
+        }}
+      >
+        <Box sx={style}>
+          <UpdateActivity
+            setShow={setShowFormUpdate}
+            activity={activitySelected}
+            activityUpdated={activityUpdated}
+            showSnackbar={showSnackbar}
+          />
+        </Box>
+      </Modal>
+      <Modal
+        open={showCollaborators}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowCollaborators(false);
+        }}
+      >
+        <Box sx={collaboratorStyle}>
+          <Collaborators
+            setShow={setShowCollaborators}
+            activity={activitySelected}
+            showSnackbar={showSnackbar}
+          />
+        </Box>
+      </Modal>
+      <DeleteActivity
+        open={openDialog}
+        setOpen={setOpenDialog}
+        activity={activitySelected}
+        activityDeleted={activityDeleted}
+        showSnackbar={showSnackbar}
+      />
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
@@ -98,9 +198,12 @@ const TabContent = ({ match, club_id }) => {
               }}
             >
               <CustomTextField
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 id="search-field-tabcontent"
-                label="Tìm kiếm thành viên"
+                label="Tìm kiếm hoạt động"
                 variant="standard"
+                onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
               />
 
             </Box>
@@ -108,12 +211,13 @@ const TabContent = ({ match, club_id }) => {
               <Button
                 variant="text"
                 disableElevation
-                onClick={() => { }}
+                onClick={handleSearchActivities}
               >
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            <Button
+            {isLeader ? 
+            (<Button
               onClick={() => {
                 setShowFormAdd(true)
               }}
@@ -122,14 +226,22 @@ const TabContent = ({ match, club_id }) => {
               disableElevation
               style={{ background: '#1B264D' }}>
               Thêm hoạt động
-            </Button>
+            </Button>) : <></>}
+            
           </div>
         </div>
         <div className='div-body-content' >
           {activities && activities.map(activity => (
-            <Link key={activity._id} to={path + '/' + activity._id} className='item-work'>
-              <ActivityItem activity={activity}/>
-            </Link>
+            <div key={activity._id} className='item-work'>
+              <ActivityItem
+                activity={activity}
+                link={path + '/' + activity._id}
+                setShowFormUpdate={setShowFormUpdate}
+                setOpenDialog={setOpenDialog}
+                setShowCollaborators={setShowCollaborators}
+                setActivitySelected={setActivitySelected}
+              />
+            </div>
           ))}
         </div>
       </div>

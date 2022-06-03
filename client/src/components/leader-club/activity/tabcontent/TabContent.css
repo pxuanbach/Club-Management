@@ -1,5 +1,6 @@
 .div-tabcontent{
-    margin-top: 10px;
+    padding-top: 10px;
+    height: 100vh;
 }
 .name-content{
     color: #1B264D;
@@ -29,5 +30,5 @@
 }
 .item-work{
     margin-left: 20px;
-    text-decoration: none;
+
 }
