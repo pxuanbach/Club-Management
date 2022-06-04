@@ -1,4 +1,4 @@
-# Club-Management
+# Club-Management - Phần mềm quản lý câu lạc bộ trong trường học
 
 ## Mục lục
 - [Chức năng](#chức-năng)
