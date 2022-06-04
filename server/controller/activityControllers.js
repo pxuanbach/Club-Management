@@ -111,7 +111,7 @@ module.exports.join = (req, res) => {
         .then(card => {
             //check user joined?
             if (isUserJoined(userId, card)) {
-                res.status(200).send({ message: "user joined" })
+                res.status(200).send({ message: "Bạn đã tham gia" })
             } else {
                 ActivityCard.updateOne(
                     { _id: cardId },

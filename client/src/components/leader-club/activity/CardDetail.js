@@ -4,10 +4,11 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {
     Button, TextareaAutosize, IconButton, Avatar,
-    Tooltip, AvatarGroup, Snackbar, Alert
+    Tooltip, AvatarGroup, Snackbar, Alert, Popover,
 } from '@mui/material'
 import './CardDetail.css'
 import axiosInstance from '../../../helper/Axios';
+import UserCard from '../../card/UserCard';
 import MemberAssgin from './MemberAssign';
 import { UserContext } from '../../../UserContext';
 
@@ -21,15 +22,17 @@ const columnTitles = [
 const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     const { user } = useContext(UserContext);
     const newCardTextareaRef = useRef(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
+    const [userSelected, setUserSelected] = useState()
     const [show, setShow] = useState(false);
-    const [showCardProfile, setShowCardProfile] = useState(false);
     const [userJoin, setUserJoin] = useState([]);
     const [groupJoin, setGroupJoin] = useState([]);
-    const options = columnTitles.filter(col => col !== columnTitle)
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [isError, setIsError] = useState(false);
+    const options = columnTitles.filter(col => col !== columnTitle)
+    const openPopover = Boolean(anchorEl)
 
     const showSnackbar = (message, isErr) => {
         setIsError(isErr)
@@ -39,6 +42,15 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
 
     const onExitClick = () => {
         setShowForm(false);
+    };
+
+    const handleShowPopover = (event, user) => {
+        setAnchorEl(event.currentTarget);
+        setUserSelected(user)
+    };
+
+    const handleClosePopover = () => {
+        setAnchorEl(null);
     };
 
     const showhideFunction = () => {
@@ -105,13 +117,13 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     return (
         <div>
             <Snackbar
-                    autoHideDuration={3000}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                    open={openSnackbar}
-                    onClose={() => setOpenSnackbar(false)}
-                >
-                    <Alert severity={isError ? "error" : "warning"}>{alertMessage}</Alert>
-                </Snackbar>
+                autoHideDuration={2000}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={openSnackbar}
+                onClose={() => setOpenSnackbar(false)}
+            >
+                <Alert severity={isError ? "error" : "warning"}>{alertMessage}</Alert>
+            </Snackbar>
             <div className='button-close' onClick={() => onExitClick()}>
                 <i className="fa-solid fa-xmark"></i>
             </div>
@@ -127,36 +139,31 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                             <div className="avatar-display">
                                 <AvatarGroup total={card.userJoin.length}>
                                     {userJoin.map((user, index) => (
-                                        <Tooltip key={index} title={user.name} arrow>
-                                            <Avatar
-                                                sx={{ cursor: 'pointer', fontSize: '16px' }}
-                                                alt={user.name}
-                                                src={user.img_url}
-                                                onClick={() => setShowCardProfile(true)} />
-                                        </Tooltip>
+
+                                        <Avatar key={index}
+                                            sx={{ cursor: 'pointer', fontSize: '16px' }}
+                                            alt={user.name}
+                                            src={user.img_url}
+                                            onClick={(e) => handleShowPopover(e, user)}
+                                        />
+
                                     ))}
                                 </AvatarGroup>
-                                {showCardProfile ?
-                                    <div className='card-profile'>
-                                        <i class="fa-solid fa-xmark" onClick={() => setShowCardProfile(false)}></i>
-                                        <div className='container-info-profile'>
-                                            <div style={{ marginLeft: 30, marginTop: '30px' }}>
-                                                <h3>Nguyễn Tiến Đạt</h3>
-                                                <h4 style={{ fontWeight: 'lighter' }}>abc@gmail.com</h4>
-                                            </div>
-                                        </div>
-                                        <Avatar sx={{ width: 90, height: 90, cursor: 'pointer', fontSize: '16px', position: 'absolute', top: 20, left: 18 }} />
-                                        <div className='button-delete'>
-                                            Gỡ khỏi thẻ
-                                        </div>
-                                        <div className='button-info'>
-                                            Xem hồ sơ
-                                        </div>
-                                    </div> : <></>}
+                                <Popover
+                                    open={openPopover}
+                                    anchorEl={anchorEl}
+                                    onClose={handleClosePopover}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    }}
+                                >
+                                    <UserCard user={userSelected}/>
+                                </Popover>
                             </div>
                         </div>
                         <div>
-                            <h5 style={{ color: '#1B264D', fontSize: '16px', marginBottom: 5 }}>Nhóm tham gia</h5>
+                            <h5 style={{ color: 's', fontSize: '16px', marginBottom: 5 }}>Nhóm tham gia</h5>
                             <div className="avatar-display">
                                 <AvatarGroup total={card.groupJoin.length}>
                                     {groupJoin.map((group, index) => (
@@ -174,7 +181,8 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                         </div>
                     </div>
                     <div style={{ display: 'flex', width: '100%', marginTop: 20 }}>
-                        <i style={{ marginTop: '10px', fontSize: '20px', paddingRight: '15px', color: '#1B264D' }} class="fa-solid fa-bars"></i>
+                        <i style={{ marginTop: '10px', fontSize: '20px', paddingRight: '15px', color: '#1B264D' }} 
+                        class="fa-solid fa-bars"></i>
                         <div className='description'>
                             <h4>Mô tả</h4>
                             {openNewCardForm &&

@@ -48,7 +48,7 @@ const alertError = (err) => {
     return errors;
 }
 
-async function uploadAvatar(files) {
+async function uploadAvatar(files, public_id) {
     if (files.length > 0) {
         const { path } = files[0]
 
@@ -63,6 +63,13 @@ async function uploadAvatar(files) {
             }
         })
         fs.unlinkSync(path)
+        if (public_id !== '') {
+            await cloudinary.uploader.destroy(public_id, function (result) {
+                console.log("destroy image", result);
+            }).catch(err => {
+                console.log("destroy image err ", err.message)
+            })
+        }
         return {
             url: newPath.url,
             public_id: newPath.public_id
@@ -85,7 +92,7 @@ module.exports.signup = async (req, res) => {
             name,
             email
         });
-        const uploadData = await uploadAvatar(files);
+        const uploadData = await uploadAvatar(files, '');
         user.img_url = uploadData.url;
         user.cloudinary_id = uploadData.public_id;
         user.save().then(result => {
@@ -145,30 +152,48 @@ module.exports.logout = (req, res) => {
 }
 
 module.exports.update = async (req, res) => {
+    const token = req.cookies.jwt;
     const files = req.files
-    const userId = req.params.userId;
     const { name, gender, email, description, facebook } = req.body
 
-    try {
-        let user = await User.findById(userId)
-        user.name = name;
-        user.gender = gender;
-        user.email = email;
-        user.description = description;
-        user.facebook = facebook
+    if (token) {
+        jwt.verify(token, 'club secret', async (err, decodedToken) => {
+            console.log('decoded Token', decodedToken);
+            if (err) {
+                console.log("decoded err ", err.message)
+                res.status(400).send({ error: err.message })
+            } else {
+                try {
+                    let user = await User.findById(decodedToken.id)
+                    user.name = name;
+                    user.gender = gender;
+                    user.email = email;
+                    user.description = description;
+                    user.facebook = facebook
 
-        const uploadData = await uploadAvatar(files);
-        user.img_url = uploadData.url;
-        user.cloudinary_id = uploadData.public_id;
+                    const uploadData = await uploadAvatar(files, user.cloudinary_id);
+                    
+                    user.img_url = uploadData.url;
+                    user.cloudinary_id = uploadData.public_id;
 
-        user.save().then(result => {
-            res.status(200).send(result)
-        }).catch(err => {
-            res.status(400).send({ error: err.message })
+                    user.save().then(result => {
+                        res.status(200).send(result)
+                    }).catch(err => {
+                        res.status(400).send({ error: err.message })
+                    })
+                } catch (error) {
+                    let errors = alertError(error);
+                    console.log("catch ", error.message)
+                    res.status(400).json({ errors })
+                }
+            }
         })
-    } catch (error) {
-        let errors = alertError(error);
-        console.log(error.message)
-        res.status(400).json({ errors })
+    } else {
+        res.status(400).send({ error: "Không tìm thấy token" })
     }
+}
+
+module.exports.changePassword = (req, res) => {
+    const token = req.cookies.jwt;
+    const { password, newPassword } = req.body
 }

@@ -74,22 +74,32 @@ const Info = () => {
   const handleSaveInfo = (e) => {
     e.preventDefault();
     console.log(name, gender, phone, email, description, facebook)
-    // var formData = new FormData();
-    // formData.append("file", avatarImage);
-    // formData.append("name", name)
-    // formData.append("gender", gender)
-    // formData.append("phone", phone)
-    // formData.append("email", email)
-    // formData.append("description", description)
-    // formData.append("facebook", facebook)
+    var formData = new FormData();
+    formData.append("file", avatarImage);
+    formData.append("name", name ? name : user.name)
+    formData.append("gender", gender)
+    formData.append("phone", phone ? phone : user.phone)
+    formData.append("email", email ? email: user.email)
+    formData.append("description", description ? description : user.description)
+    formData.append("facebook", facebook ? facebook : user.facebook)
 
-    // axiosInstance.put(`/update/${user._id}`,
-    //   formData, {
-    //   withCredentials: true,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // })
+    axiosInstance.put(`/update`,
+      formData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then(response => {
+      //response.data
+      console.log(response.data)
+      setUser(response.data)
+    }).catch(err => {
+      //err.response.data
+      console.log(err.response.data)
+      if (err.response.data.errors) {
+
+      }
+    })
   }
 
   useEffect(() => {
@@ -157,8 +167,6 @@ const Info = () => {
                       </Select>
                     </FormControl>
                   </Box> : <p id='textresult2'>{user.gender}</p>}
-
-
                 </div>
                 <div className='div-text-profile'>
                   <label>Số điện thoại:</label>
@@ -223,7 +231,11 @@ const Info = () => {
                 size="small"
                 fullWidth
               />
-                : <p id='textresult6'>{user.facebook}</p>}
+                : <a href={user.facebook}
+                  target="_blank"
+                  id='textresult6'>
+                  {user.facebook}
+                </a>}
 
             </div>
             {isEdit ? <div className='stack-right'>
