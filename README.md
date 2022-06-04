@@ -13,43 +13,67 @@
 - Đăng nhập
 - Tài khoản admin cho quản lý
 
-  <img src="https://user-images.githubusercontent.com/67258104/146002194-0db99695-fccf-42a6-b580-40d6b097f0d3.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015504-4577849b-cfef-4da2-b4bc-050bfa55cea0.png" alt="..." width="700" />
 
-- Hiển thị tổng quan về sản phẩm, khách hàng, hóa đơn, báo cáo,...
+- Hiển thị tổng quan về giao diện khi đăng nhập bằng tài khoản admin
+- Tab quản lý lịch trình
 
-  <img src="https://user-images.githubusercontent.com/67258104/146002451-1d722d1f-9ea2-4a15-92e7-d8916609a4d8.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015736-c96318f0-f88f-4711-a42e-f336e4ad84b3.png" alt="..." width="700" />
 
-- Quản lý bán hàng
+- Tab nhắn tin cá nhân
 
-  <img src="https://user-images.githubusercontent.com/67258104/146002572-91a3f8a4-a007-498c-9749-4c196fb1d25d.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015799-5a3e279c-fd3a-468b-ba51-9f3bd7c7316f.png" alt="..." width="700" />
 
-- Quản lý khách hàng
+- Tab quản lý câu lạc bộ
 
-  <img src="https://user-images.githubusercontent.com/67258104/146002672-241fbe7a-69b4-4067-87f3-0ab82bd785cd.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015838-74fc82e2-627d-453d-a466-186d32fc2588.png" alt="..." width="700" />
 
-- Quản lý sản phẩm
+- Tab quản lý tài khoản
 
-  <img src="https://user-images.githubusercontent.com/67258104/146002771-59f77f07-5372-46cc-8842-0b9a8bbb877e.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015873-e52588d0-168b-4d39-8035-745541bb76a1.png" alt="..." width="700" />
 
-- Quản lý nhân viên
+- Thông tin cá nhân
 
-  <img src="https://user-images.githubusercontent.com/67258104/146002859-5014252d-f187-412e-bc9e-86832d587819.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015916-7732b014-12a0-4dc9-8d92-669a833d6ed1.png" alt="..." width="700" />
 
-- Xem doanh thu theo thời gian
+- Câu lạc bộ của tôi
 
-  <img src="https://user-images.githubusercontent.com/67258104/146003050-9ebfd6ad-1885-42ba-8399-aca4f08feea6.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172015945-7d25d35d-6c6e-47c4-8cca-5a34cda99124.png" alt="..." width="700" />
+  
+- Khi vào một câu lạc bộ:
 
-- Quản lý hóa đơn
+- Quản lý hoạt động
 
-  <img src="https://user-images.githubusercontent.com/67258104/146003149-7be37095-a531-43cb-8464-fb8225fef393.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172016021-57434a00-2460-410b-abff-11ce0f8640ea.png" alt="..." width="700" />
+  
 
-- Quản lý đổi trả
+  + Chọn một hoạt động:
+  
 
-  <img src="https://user-images.githubusercontent.com/67258104/146003235-c581e674-6edc-40e3-abdb-f8785aaec157.png" alt="..." width="700" />
+  <img src="https://user-images.githubusercontent.com/71374867/172016066-b6c923df-001f-4c1c-b824-cca33028f360.png" alt="..." width="700" />
 
-- Quản lý tài khoản
+- Quản lý thành viên
 
-  <img src="https://user-images.githubusercontent.com/67258104/146003316-b9824c4f-96b0-4f17-a6ef-1975a2710c41.png" alt="..." width="700" />
+
+  + Tab thành viên
+  
+
+  <img src="https://user-images.githubusercontent.com/71374867/172016123-52f91412-ed03-403f-9d39-9a7bc2845a6d.png" alt="..." width="700" />
+  
+  
+  + Tab Nhóm
+  
+ 
+  <img src="https://user-images.githubusercontent.com/71374867/172016209-fea7ab85-a510-41ec-9ebd-22546fb55a7c.png" alt="..." width="700" />
+  
+
+- Tin nhắn nhóm
+
+  <img src="https://user-images.githubusercontent.com/71374867/172016226-d44a9f92-6fac-48c6-ba32-2e8656f76c09.png" alt="..." width="700" />
+  
+- Quản lý quỹ
+
+   <img src="https://user-images.githubusercontent.com/71374867/172016260-ef380f01-24fe-4257-ab23-c3dc30010f11.png" alt="..." width="700" />
 
 ## Thư viện và công nghệ
 - [React JS](https://reactjs.org/).
