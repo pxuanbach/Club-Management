@@ -1,10 +1,10 @@
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
 const User = require('../models/User')
-const Club = require('../models/Club')
+const Group = require('../models/Group')
 const async = require('async')
 const Buffer = require('buffer').Buffer
-const { isElementInArray } = require('../helper/ArrayHelper')
+const { isElementInArray, isElementInArrayObject } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
     if (isElementInArray(userId, card.userJoin)) {
@@ -17,6 +17,13 @@ function isUserJoined(userId, card) {
         }
     })
 
+    return false;
+}
+
+function isGroupJoined(groupId, card) {
+    if (isElementInArrayObject(groupId, card.groupJoin)) {
+        return true;
+    }
     return false;
 }
 
@@ -103,7 +110,7 @@ module.exports.createCard = (req, res) => {
     })
 }
 
-module.exports.join = (req, res) => {
+module.exports.userJoin = (req, res) => {
     const { userId, cardId } = req.body
     
     ActivityCard.findById(cardId)
@@ -117,7 +124,7 @@ module.exports.join = (req, res) => {
                     { _id: cardId },
                     { $push: { userJoin: userId } }
                 ).then(() => {
-                    res.status(200).send()
+                    res.status(200).send({message: "Tham gia thành công!"})
                 }).catch(err => {
                     res.status(500).json({ error: "Update card err - " + err.message })
                 })
@@ -125,6 +132,29 @@ module.exports.join = (req, res) => {
         }).catch(err => {
             res.status(500).json({ error: "Query card err - " + err.message })
         })
+}
+
+module.exports.groupJoin = (req, res) => {
+    const { groupId, cardId } = req.body;
+
+    ActivityCard.findById(cardId)
+    .populate('groupJoin')
+    then(card => {
+        if (isGroupJoined(groupId, card)) {
+            res.status(200).send({ message: "Nhóm đã tham gia" })
+        } else {
+            ActivityCard.updateOne(
+                {_id: cardId},
+                {$push: {groupJoin: groupId}}
+            ).then(() => {
+                res.status(200).send({message: "Nhóm tham gia thành công!"})
+            }).catch(err => {
+                res.status(500).json({ error: "Update card err - " + err.message })
+            })
+        }
+    }).catch(err => {
+        res.status(500).json({ error: "Query card err - " + err.message })
+    })
 }
 
 module.exports.getList = (req, res) => {

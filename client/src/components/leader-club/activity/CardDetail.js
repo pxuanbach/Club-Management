@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef, useContext } from 'react'
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import {
     Button, TextareaAutosize, IconButton, Avatar,
     Tooltip, AvatarGroup, Snackbar, Alert, Popover,
-} from '@mui/material'
+} from '@mui/material';
+import { useParams } from 'react-router-dom';
 import './CardDetail.css'
 import axiosInstance from '../../../helper/Axios';
 import UserCard from '../../card/UserCard';
@@ -20,6 +22,7 @@ const columnTitles = [
 ]
 
 const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
+    const {activityId} = useParams()
     const { user } = useContext(UserContext);
     const newCardTextareaRef = useRef(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -66,23 +69,30 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
 
     const handleJoinCard = (e) => {
         e.preventDefault();
-        axiosInstance.post(`/activity/join/`,
-            JSON.stringify({
-                "userId": user._id,
-                "cardId": card._id
-            }), {
-            headers: { "Content-Type": "application/json" }
-        }).then(response => {
-            //response.data
-            if (response.data.message) {
-                showSnackbar(response.data.message, false)
-            } else {
-                getJoin();
-            }
-        }).catch(err => {
-            //err.response.data.error
-            showSnackbar(err.response.data.error, true)
-        })
+        if (user) {
+            axiosInstance.post(`/activity/userjoin`,
+                JSON.stringify({
+                    "userId": user._id,
+                    "cardId": card._id
+                }), {
+                headers: { "Content-Type": "application/json" }
+            }).then(response => {
+                //response.data
+                if (response.data.message) {
+                    showSnackbar(response.data.message, false)
+                } else {
+                    console.log("success", response.data)
+                    const newUserJoin = [...userJoin, user]
+                    console.log(newUserJoin)
+                    setUserJoin([...newUserJoin])
+                }
+            }).catch(err => {
+                //err.response.data.error
+                showSnackbar(err.response.data.error, true)
+            })
+        } else {
+            showSnackbar("Đang tải dữ liệu...", false)
+        }
     }
 
     const handleSendToColumn = (toColumn) => {
@@ -111,6 +121,7 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     }, [openNewCardForm])
 
     useEffect(() => {
+        console.log("activityId", activityId)
         getJoin()
     }, [])
 
@@ -137,16 +148,14 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                         <div>
                             <h5 style={{ color: '#1B264D', fontSize: '16px', marginBottom: 5 }}>Thành viên tham gia</h5>
                             <div className="avatar-display">
-                                <AvatarGroup total={card.userJoin.length}>
-                                    {userJoin.map((user, index) => (
-
-                                        <Avatar key={index}
+                                <AvatarGroup total={userJoin.length}>
+                                    {userJoin.map((user) => (
+                                        <Avatar key={user._id}
                                             sx={{ cursor: 'pointer', fontSize: '16px' }}
                                             alt={user.name}
                                             src={user.img_url}
                                             onClick={(e) => handleShowPopover(e, user)}
                                         />
-
                                     ))}
                                 </AvatarGroup>
                                 <Popover
@@ -158,14 +167,14 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                                         horizontal: 'left',
                                     }}
                                 >
-                                    <UserCard user={userSelected}/>
+                                    <UserCard user={userSelected} />
                                 </Popover>
                             </div>
                         </div>
                         <div>
                             <h5 style={{ color: 's', fontSize: '16px', marginBottom: 5 }}>Nhóm tham gia</h5>
                             <div className="avatar-display">
-                                <AvatarGroup total={card.groupJoin.length}>
+                                <AvatarGroup total={groupJoin.length}>
                                     {groupJoin.map((group, index) => (
                                         <Tooltip key={index} title={group.name} arrow>
                                             <Avatar
@@ -181,8 +190,8 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                         </div>
                     </div>
                     <div style={{ display: 'flex', width: '100%', marginTop: 20 }}>
-                        <i style={{ marginTop: '10px', fontSize: '20px', paddingRight: '15px', color: '#1B264D' }} 
-                        class="fa-solid fa-bars"></i>
+                        <i style={{ marginTop: '10px', fontSize: '20px', paddingRight: '15px', color: '#1B264D' }}
+                            class="fa-solid fa-bars"></i>
                         <div className='description'>
                             <h4>Mô tả</h4>
                             {openNewCardForm &&
@@ -270,12 +279,12 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                         <h4 className='title-action'>Tùy chọn thẻ</h4>
                         <button className='btn-action' onClick={() => setShow(true)}>
                             <i class="fa-solid fa-user-plus"></i>
-                            Thành viên
+                            Thêm nhóm
                         </button>
                         {
                             show ? <MemberAssgin setShow={setShow} /> : null
                         }
-                        {options.map((option, index) => (
+                        {isLeader && options.map((option, index) => (
                             <button key={index} className='btn-action' onClick={handleSendToColumn(option)}>
                                 <ArrowForwardIcon fontSize='small' />
                                 {option}

@@ -4,7 +4,8 @@ const router = Router();
 
 router.post('/create', activityController.create)
 router.post('/createcard', activityController.createCard)
-router.post('/join', activityController.join)
+router.post('/userjoin', activityController.userJoin)
+router.post('/groupjoin', activityController.groupJoin)
 router.get('/list/:clubId', activityController.getList)
 router.get('/one/:activityId', activityController.getOne)
 router.get('/collaborators/:activityId', activityController.getCollaborators)

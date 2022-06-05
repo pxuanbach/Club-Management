@@ -71,15 +71,37 @@ const Info = () => {
     setGender(event.target.value);
   };
 
+  const validatePassword = () => {
+    let isOk = true;
+    if (!password) {
+      setPasswordErr("Mật khẩu trống");
+      isOk = false;
+    }
+    if (!newPassword) {
+      setNewPasswordErr("Mật khẩu mới trống")
+      isOk = false;
+    }
+    if (!confirmPassword) {
+      setConfirmPasswordErr("Mật khẩu nhập lại trống")
+      isOk = false;
+    }
+    if (newPassword !== confirmPassword) {
+      setNewPasswordErr("Mật khẩu mới không khớp")
+      setConfirmPasswordErr("Mật khẩu nhập lại không khớp")
+      isOk = false;
+    }
+    return isOk;
+  }
+
   const handleSaveInfo = (e) => {
     e.preventDefault();
-    console.log(name, gender, phone, email, description, facebook)
+    //console.log(name, gender, phone, email, description, facebook)
     var formData = new FormData();
     formData.append("file", avatarImage);
     formData.append("name", name ? name : user.name)
     formData.append("gender", gender)
     formData.append("phone", phone ? phone : user.phone)
-    formData.append("email", email ? email: user.email)
+    formData.append("email", email ? email : user.email)
     formData.append("description", description ? description : user.description)
     formData.append("facebook", facebook ? facebook : user.facebook)
 
@@ -100,6 +122,31 @@ const Info = () => {
 
       }
     })
+  }
+
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+    if (validatePassword()) {
+      axiosInstance.patch('/changepassword',
+        JSON.stringify({
+          "password": password,
+          "newPassword": newPassword
+        }), {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" }
+      }).then(response => {
+        //response.data
+      }).catch(err => {
+        const data = err.response.data;
+        if (data.errors) {
+          setPasswordErr(err.response.data.errors.password)
+        } 
+        if (data.error) {
+          if (data.error.includes('6 ký tự'))
+            setNewPasswordErr("Mật khẩu ít hơn 6 ký tự")
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -257,7 +304,7 @@ const Info = () => {
           <img className='imageInfo' src={ImageInfo} alt="ảnh logo" />
           <h1 className='name-logo'>School Club Management</h1>
         </div>
-        <div style={{ border: "1px solid #ccc", borderRadius: 5, margin: 20, marginLeft: 0, marginTop: 20, height: "50vh", backgroundColor: 'white' }}>
+        <div style={{ border: "1px solid #ccc", borderRadius: 5, margin: 20, marginLeft: 0, marginTop: 20, height: "auto", backgroundColor: 'white' }}>
           <div style={{ display: "flex", borderBottom: "1px solid #ccc", alignItems: "center" }}>
             <div style={{ padding: 10, paddingLeft: 25 }}>
               <KeyIcon sx={{ fontSize: "2.5rem", transform: "rotate(-45deg)" }}></KeyIcon>
@@ -276,6 +323,7 @@ const Info = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => {
+                    setPasswordErr('')
                     setPassword(e.target.value)
                   }}
                   endAdornment={
@@ -301,6 +349,7 @@ const Info = () => {
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => {
+                    setNewPasswordErr('')
                     setNewPassword(e.target.value)
                   }}
                   endAdornment={
@@ -326,6 +375,7 @@ const Info = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => {
+                    setConfirmPasswordErr('')
                     setConfirmPassword(e.target.value)
                   }}
                   endAdornment={
@@ -344,11 +394,11 @@ const Info = () => {
               </FormControl>
             </div>
             <div style={{ padding: 20 }} >
-              <label style={{ color: "#1976d2", marginLeft: 100, cursor: 'pointer' }}>Bạn quên mật khẩu ?</label>
+              <label style={{ color: "#1976d2", marginLeft: 100, cursor: 'pointer' }}>Bạn quên mật khẩu?</label>
             </div>
           </div>
           <div className='list-action-password'>
-            <Button variant='outlined'>Lưu thay đổi</Button>
+            <Button variant='outlined' onClick={handleChangePassword}>Lưu thay đổi</Button>
           </div>
         </div>
 

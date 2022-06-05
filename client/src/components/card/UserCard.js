@@ -5,6 +5,7 @@ import {
 } from '@mui/material'
 import FacebookIcon from '@mui/icons-material/Facebook';
 import SendIcon from '@mui/icons-material/Send';
+import './UserCard.css'
 
 const UserCard = ({ user }) => {
     const handleOpenFacebook = () => {
@@ -14,7 +15,7 @@ const UserCard = ({ user }) => {
     return (
         <Box>
             <Card>
-                <CardHeader
+                <CardHeader className='card__header'
                     avatar={<Avatar src={user.img_url} />}
                     title={user.name}
                     subheader={user.email}

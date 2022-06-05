@@ -195,5 +195,37 @@ module.exports.update = async (req, res) => {
 
 module.exports.changePassword = (req, res) => {
     const token = req.cookies.jwt;
-    const { password, newPassword } = req.body
+    const { password, newPassword } = req.body;
+    console.log()
+
+    if (token) {
+        jwt.verify(token, 'club secret', async (err, decodedToken) => {
+            console.log('decoded Token', decodedToken);
+            if (err) {
+                console.log("decoded err ", err.message)
+                res.status(400).send({ error: err.message })
+            } else {
+                try {
+                    let user = await User.findById(decodedToken.id)
+                    const isUser = await User.login(user.username, password);
+
+                    if (isUser) {
+                        user.password = newPassword;
+                    } 
+
+                    user.save().then(result => {
+                        res.status(200).send({ message: "Đổi mật khẩu thành công!" })
+                    }).catch(err => {
+                        res.status(400).send({ error: "Save err - " + err.message })
+                    })
+                } catch (error) {
+                    let errors = alertError(error);
+                    console.log("catch ", error.message)
+                    res.status(400).json({ errors })
+                }
+            }
+        })
+    } else {
+        res.status(400).send({ error: "Không tìm thấy token" })
+    }
 }
