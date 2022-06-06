@@ -18,12 +18,9 @@ module.exports.upload = async (req, res) => {
             })
         })
 
-        if (newPath) {
-            urls.push({
-                url: newPath.url,
-                public_id: newPath.public_id,
-            })
-        }
+
+        urls.push(newPath)
+
 
         fs.unlinkSync(path)
     }

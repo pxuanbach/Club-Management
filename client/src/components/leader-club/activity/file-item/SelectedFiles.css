@@ -1,0 +1,15 @@
+.selected-file__list{
+    padding-top: 5px;
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    max-width: 515px;
+    max-height: 90px;
+}
+.selected-file__item{
+    max-width: 160px;
+    cursor: pointer;
+    text-decoration: none;
+}

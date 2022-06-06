@@ -10,9 +10,10 @@ const activityCardSchema = new mongoose.Schema({
         required: true
     },
     description: String,
-    file: [{
+    files: [{
+        original_filename: String,
         url: String,
-        cloudId: String,
+        public_id: String,
     }],
     userJoin: [{
         type: mongoose.Schema.Types.ObjectId,

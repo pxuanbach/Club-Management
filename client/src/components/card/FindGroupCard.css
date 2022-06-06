@@ -1,0 +1,38 @@
+.find-group__header{
+    padding: 2px 0;
+    text-align: center;
+    
+}
+.find-group__header .MuiCardHeader-title{
+    font-size: 18px;
+}
+.find-group__content{
+    min-width: 300px;
+    padding: 2px 10px;
+}
+.find-group__search{
+    display: flex;
+    width: 100%;
+    background-color: #ffffff;
+    /* border: 1px solid #b4b0b0; */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    align-items: center;
+    margin-top: 10px;
+}
+.find-group__search input{
+    border: none;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px;
+    padding-left: 15px;
+    outline: none;
+    border-radius: 5px;
+    
+}
+.find-group__search > i{
+    font-size: 1.0rem;
+    margin-right: 15px;
+    color: #5e6c84;
+    cursor: pointer;
+}

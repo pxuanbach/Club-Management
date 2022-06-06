@@ -2,6 +2,8 @@ const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
 const User = require('../models/User')
 const Group = require('../models/Group')
+const cloudinary = require('../helper/Cloudinary')
+const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
 const { isElementInArray, isElementInArrayObject } = require('../helper/ArrayHelper')
@@ -25,6 +27,43 @@ function isGroupJoined(groupId, card) {
         return true;
     }
     return false;
+}
+
+async function uploadFile(files, public_id) {
+    if (files.length > 0) {
+        const { path } = files[0]
+
+        const newPath = await cloudinary.uploader.upload(path, {
+            resource_type: 'auto',
+            folder: 'Club-Management/Activity'
+        }).catch(error => {
+            console.log(error)
+            return {
+                original_filename: '',
+                url: '',
+                public_id: '',
+            }
+        })
+        fs.unlinkSync(path)
+        if (public_id !== '') {
+            await cloudinary.uploader.destroy(public_id, function (result) {
+                console.log("destroy image", result);
+            }).catch(err => {
+                console.log("destroy image err ", err.message)
+            })
+        }
+        //console.log("upload function", newPath)
+        return {
+            original_filename: newPath.original_filename,
+            url: newPath.url,
+            public_id: newPath.public_id
+        }
+    }
+    return {
+        original_filename: '',
+        url: '',
+        public_id: '',
+    }
 }
 
 module.exports.create = (req, res) => {
@@ -112,19 +151,19 @@ module.exports.createCard = (req, res) => {
 
 module.exports.userJoin = (req, res) => {
     const { userId, cardId } = req.body
-    
+
     ActivityCard.findById(cardId)
         .populate('groupJoin')
         .then(card => {
             //check user joined?
             if (isUserJoined(userId, card)) {
-                res.status(200).send({ message: "Bạn đã tham gia" })
+                res.status(200).send({ message: "Bạn đã tham gia", success: false })
             } else {
                 ActivityCard.updateOne(
                     { _id: cardId },
                     { $push: { userJoin: userId } }
                 ).then(() => {
-                    res.status(200).send({message: "Tham gia thành công!"})
+                    res.status(200).send({ message: "Tham gia thành công!", success: true })
                 }).catch(err => {
                     res.status(500).json({ error: "Update card err - " + err.message })
                 })
@@ -138,22 +177,42 @@ module.exports.groupJoin = (req, res) => {
     const { groupId, cardId } = req.body;
 
     ActivityCard.findById(cardId)
-    .populate('groupJoin')
+        .populate('groupJoin')
     then(card => {
         if (isGroupJoined(groupId, card)) {
             res.status(200).send({ message: "Nhóm đã tham gia" })
         } else {
             ActivityCard.updateOne(
-                {_id: cardId},
-                {$push: {groupJoin: groupId}}
+                { _id: cardId },
+                { $push: { groupJoin: groupId } }
             ).then(() => {
-                res.status(200).send({message: "Nhóm tham gia thành công!"})
+                res.status(200).send({ message: "Nhóm tham gia thành công!" })
             }).catch(err => {
                 res.status(500).json({ error: "Update card err - " + err.message })
             })
         }
     }).catch(err => {
         res.status(500).json({ error: "Query card err - " + err.message })
+    })
+}
+
+module.exports.upload = async (req, res) => {
+    const files = req.files;
+    const { cardId } = req.body;
+
+    const uploadData = await uploadFile(files, '');
+    //console.log(uploadData)
+    ActivityCard.updateOne(
+        { _id: cardId },
+        { $push: { files: uploadData } }
+    ).then(() => {
+        ActivityCard.findById(cardId).then(result => {
+            res.status(200).send(result)
+        }).catch(err => {
+            res.status(500).json({ error: "Result err - " + err.message })
+        })
+    }).catch(err => {
+        res.status(500).json({ error: "Update card err - " + err.message })
     })
 }
 

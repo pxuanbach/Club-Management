@@ -1,11 +1,13 @@
 const {Router} = require('express');
 const activityController = require('../controller/activityControllers');
+const upload = require('../helper/multer')
 const router = Router();
 
 router.post('/create', activityController.create)
 router.post('/createcard', activityController.createCard)
 router.post('/userjoin', activityController.userJoin)
 router.post('/groupjoin', activityController.groupJoin)
+router.post('/upload', upload.array('file'), activityController.upload)
 router.get('/list/:clubId', activityController.getList)
 router.get('/one/:activityId', activityController.getOne)
 router.get('/collaborators/:activityId', activityController.getCollaborators)
