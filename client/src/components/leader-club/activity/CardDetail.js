@@ -22,7 +22,7 @@ const columnTitles = [
     "Ghi chú",
 ]
 
-const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
+const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) => {
     const { activityId } = useParams()
     const { user } = useContext(UserContext);
     const inputFile = useRef(null);
@@ -102,7 +102,20 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
 
     const handleSaveDescription = (e) => {
         e.preventDefault();
-        console.log(description)
+        //console.log(description)
+        axiosInstance.patch(`/activity/card/description/${card._id}`,
+            JSON.stringify({
+                "description": description
+            }), {
+            headers: { "Content-Type": "application/json" }
+        }).then(response => {
+            //response.data
+            updateCards(response.data)
+            toggleOpenNewCardForm();
+        }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error, true)
+        })
     }
 
     const handleJoinCard = (e) => {
@@ -225,7 +238,11 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                         </div>
                     </div>
                     <Box className="display-member-attend" sx={{ paddingTop: 2 }}>
-                        <SelectedFiles files={files} />
+                        <SelectedFiles 
+                        files={files} 
+                        isLeader={isLeader}
+                        showSnackbar={showSnackbar}
+                        />
                     </Box>
                     <div style={{ display: 'flex', width: '100%', marginTop: 20 }}>
                         <i style={{ marginTop: '10px', fontSize: '20px', paddingRight: '15px', color: '#1B264D' }}
@@ -298,7 +315,6 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                                                     sx={{
                                                         fontSize: 20,
                                                         color: "#1B264D",
-
                                                     }}
                                                 />
                                             </IconButton>
@@ -333,7 +349,12 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                                 horizontal: 'left',
                             }}
                         >
-                            <FindGroupCard activityId={activityId} />
+                            <FindGroupCard
+                                activityId={activityId}
+                                card={card}
+                                getJoin={getJoin}
+                                showSnackbar={showSnackbar}
+                            />
                         </Popover>
                         {isLeader && options.map((option, index) => (
                             <button key={index} className='btn-action'

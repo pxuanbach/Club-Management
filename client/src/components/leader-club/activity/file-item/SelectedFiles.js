@@ -3,25 +3,31 @@ import { Avatar, Chip, Stack, Box } from '@mui/material'
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import './SelectedFiles.css'
 
-const SelectedFiles = ({ files }) => {
+const SelectedFiles = ({ files, isLeader, showSnackbar }) => {
+    const handleDeleteFile = (e) => {
+        e.preventDefault();
+        if (!isLeader) {
+            showSnackbar("Bạn không đủ quyền để xóa.", false)
+            return;
+        }
+    }
 
     return (
         <Box>
             <h5>Tệp đính kèm</h5>
             <div className='selected-file__list'>
                 {files.map((file, index) => (
-                    <a key={index}
-                        className="selected-file__item"
-                        href={file.url}
-                        target="_blank">
-                        <Chip className='selected-file__item'
-                            avatar={<Avatar src={file.url}>
-                                <FilePresentIcon sx={{ color: '#388E3C', backgroundColor: '#fff'}} />
+                    <Chip className='selected-file__item'
+                        key={index}
+                        avatar={<Avatar src={file.url}>
+                                <FilePresentIcon sx={{ color: '#388E3C', backgroundColor: '#fff' }} />
                             </Avatar>}
-                            label={file.original_filename}
-                        />
-                    </a>
-
+                        label={<a href={file.url} target="_blank">
+                            {file.original_filename}
+                        </a>}
+                        onDelete={handleDeleteFile}
+                        clickable
+                    />
                 ))}
             </div>
         </Box>

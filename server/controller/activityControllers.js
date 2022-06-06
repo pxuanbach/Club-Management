@@ -178,22 +178,22 @@ module.exports.groupJoin = (req, res) => {
 
     ActivityCard.findById(cardId)
         .populate('groupJoin')
-    then(card => {
-        if (isGroupJoined(groupId, card)) {
-            res.status(200).send({ message: "Nhóm đã tham gia" })
-        } else {
-            ActivityCard.updateOne(
-                { _id: cardId },
-                { $push: { groupJoin: groupId } }
-            ).then(() => {
-                res.status(200).send({ message: "Nhóm tham gia thành công!" })
-            }).catch(err => {
-                res.status(500).json({ error: "Update card err - " + err.message })
-            })
-        }
-    }).catch(err => {
-        res.status(500).json({ error: "Query card err - " + err.message })
-    })
+        .then(card => {
+            if (isGroupJoined(groupId, card)) {
+                res.status(200).send({ message: "Nhóm đã tham gia", success: false })
+            } else {
+                ActivityCard.updateOne(
+                    { _id: cardId },
+                    { $push: { groupJoin: groupId } }
+                ).then(() => {
+                    res.status(200).send({ message: "Nhóm tham gia thành công!", success: true })
+                }).catch(err => {
+                    res.status(500).json({ error: "Update card err - " + err.message })
+                })
+            }
+        }).catch(err => {
+            res.status(500).json({ error: "Query card err - " + err.message })
+        })
 }
 
 module.exports.getList = (req, res) => {
@@ -547,5 +547,19 @@ module.exports.upload = async (req, res) => {
 }
 
 module.exports.updateCardDescription = (req, res) => {
-    
+    const cardId = req.params.cardId;
+    const { description } = req.body;
+
+    ActivityCard.updateOne(
+        { _id: cardId },
+        { description }
+    ).then(() => {
+        ActivityCard.findById(cardId).then(result => {
+            res.status(200).send(result)
+        }).catch(err => {
+            res.status(500).json({ error: "Result err - " + err.message })
+        })
+    }).catch(err => {
+        res.status(500).json({ error: "Update card err - " + err.message })
+    })
 }

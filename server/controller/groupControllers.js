@@ -104,7 +104,7 @@ module.exports.searchGroupInClub = (req, res) => {
         })
 }
 
-module.exports.getAll = (req, res) => {
+module.exports.getAllMembers = (req, res) => {
     const clubId = req.params.clubId;
 
     Club.findById(clubId).then(club => {

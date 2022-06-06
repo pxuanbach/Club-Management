@@ -12,7 +12,9 @@ import { useParams } from 'react-router-dom'
 const ITEM_HEIGHT = 48;
 const Column = (props) => {
     const { activityId } = useParams();
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [cards, setCards] = useState(column.cards);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -20,8 +22,7 @@ const Column = (props) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
-    const cards = column.cards
+    
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
@@ -51,6 +52,14 @@ const Column = (props) => {
         toggleOpenNewCardForm()
     }
 
+    const updateCards = (card) => {
+        var newCards = cards.map(obj => {
+            if (obj._id === card._id)
+                return card;
+            return obj;
+        })
+        setCards(newCards)
+    }
 
     return (
         <div className='column'>
@@ -115,6 +124,7 @@ const Column = (props) => {
                         <Draggable disabled={isLeader} key={index}>
                             <Card
                                 card={card}
+                                updateCards={updateCards}
                                 isLeader={isLeader}
                                 columnTitle={column.title}
                             />
