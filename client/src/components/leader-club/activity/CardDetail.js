@@ -34,6 +34,7 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     const [userJoin, setUserJoin] = useState([]);
     const [groupJoin, setGroupJoin] = useState([]);
     const [files, setFiles] = useState(card.files);
+    const [description, setDescription] = useState();
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [isError, setIsError] = useState(false);
@@ -52,7 +53,6 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     };
 
     function isFileImage(file) {
-        console.log(file)
         const fileType = file.type;
         return fileType.includes('spreadsheetml.sheet')
             || fileType.includes('ms-excel')
@@ -65,7 +65,7 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
             var formData = new FormData();
             formData.append("file", event.target.files[0]);
             formData.append("cardId", card._id)
-            axiosInstance.post('/activity/upload',
+            axiosInstance.post('/activity/card/upload',
                 formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             }).then(response => {
@@ -76,7 +76,7 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                 showSnackbar(err.response.data.error, true)
             })
         } else {
-            alert('Tệp tải lên nên có định dạng excel, image')
+            showSnackbar('Tệp tải lên nên có định dạng excel, image.', false)
         }
     };
 
@@ -99,6 +99,11 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     }
 
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
+
+    const handleSaveDescription = (e) => {
+        e.preventDefault();
+        console.log(description)
+    }
 
     const handleJoinCard = (e) => {
         e.preventDefault();
@@ -126,10 +131,6 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     }
 
     const handleSendToColumn = (toColumn) => {
-        if (!isLeader) {
-            showSnackbar("Bạn không đủ quyền", false);
-            return;
-        }
         const fromColumn = columnTitle;
 
     }
@@ -155,7 +156,7 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
     }, [openNewCardForm])
 
     useEffect(() => {
-        console.log("activityId", activityId)
+        //console.log("activityId", activityId)
         getJoin()
     }, [])
 
@@ -234,6 +235,8 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                             {openNewCardForm &&
                                 <div className='text-area'>
                                     <TextareaAutosize
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
                                         aria-label="minimum height"
                                         minRows={4}
                                         placeholder={card.description ? card.description : "Thêm mô tả chi tiết hơn..."}
@@ -244,7 +247,7 @@ const CardDetail = ({ setShowForm, card, isLeader, columnTitle }) => {
                             }
                             {openNewCardForm &&
                                 <div className='add-new-description-action'>
-                                    <Button variant="contained" >Lưu</Button>
+                                    <Button variant="contained" onClick={handleSaveDescription}>Lưu</Button>
                                     <span className='cancel-icon' onClick={toggleOpenNewCardForm}>
                                         <i className="fa fa-trash icon" />
                                     </span>

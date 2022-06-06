@@ -7,7 +7,6 @@ router.post('/create', activityController.create)
 router.post('/createcard', activityController.createCard)
 router.post('/userjoin', activityController.userJoin)
 router.post('/groupjoin', activityController.groupJoin)
-router.post('/upload', upload.array('file'), activityController.upload)
 router.get('/list/:clubId', activityController.getList)
 router.get('/one/:activityId', activityController.getOne)
 router.get('/collaborators/:activityId', activityController.getCollaborators)
@@ -22,5 +21,8 @@ router.patch('/updatecolumn/:activityId', activityController.updateColumn)
 router.patch('/updatecollaborators/:activityId', activityController.updateCollaborators)
 router.patch('/addcollaborators/:activityId', activityController.addCollaborators)
 router.delete('/delete/:activityId', activityController.delete)
+
+router.post('/card/upload', upload.array('file'), activityController.upload)
+router.patch('/card/description/:cardId', activityController.updateCardDescription)
 
 module.exports = router;
