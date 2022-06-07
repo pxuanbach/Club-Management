@@ -17,7 +17,7 @@ const SelectedFiles = ({ files, isLeader, showSnackbar }) => {
             <h5>Tệp đính kèm</h5>
             <div className='selected-file__list'>
                 {files.map((file, index) => (
-                    <Chip className='selected-file__item'
+                    <Chip className='selected-file__item' sx={{maxWidth: '160px'}}
                         key={index}
                         avatar={<Avatar src={file.url}>
                                 <FilePresentIcon sx={{ color: '#388E3C', backgroundColor: '#fff' }} />

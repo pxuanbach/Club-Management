@@ -8,8 +8,3 @@
     max-width: 515px;
     max-height: 90px;
 }
-.selected-file__item{
-    max-width: 160px;
-    cursor: pointer;
-    text-decoration: none;
-}

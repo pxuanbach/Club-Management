@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import {
   Button, Avatar, Box, MenuItem, FormControl,
-  Select, TextField, CircularProgress, InputLabel,
-  OutlinedInput, InputAdornment, IconButton, FormHelperText
+  Select, TextField, CircularProgress, Alert,
+  OutlinedInput, InputAdornment, IconButton,
+  FormHelperText, Snackbar
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -20,6 +21,7 @@ function NumberFormatCustom(props) {
     <NumberFormat
       {...other}
       getInputRef={inputRef}
+      prefix="0"
       onValueChange={values => {
         onChange({
           target: {
@@ -41,7 +43,9 @@ const Info = () => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneErr, setPhoneErr] = useState('');
   const [email, setEmail] = useState('');
+  const [emailErr, setEmailErr] = useState('');
   const [description, setDescription] = useState('');
   const [facebook, setFacebook] = useState('');
 
@@ -54,6 +58,13 @@ const Info = () => {
   const [newPasswordErr, setNewPasswordErr] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordErr, setConfirmPasswordErr] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showSnackbar = (message) => {
+    setAlertMessage(message)
+    setOpenSnackbar(true);
+  }
 
   function isFileImage(file) {
     return file && file['type'].split('/')[0] === 'image';
@@ -70,6 +81,19 @@ const Info = () => {
   const handleChange = (event) => {
     setGender(event.target.value);
   };
+
+  const toggleEditMode = (e) => {
+    e.preventDefault();
+    setIsEdit(!isEdit);
+    //reset state
+    setName('')
+    setGender(user.gender)
+    setPhone('')
+    setEmail('')
+    setDescription('')
+    setFacebook('')
+    setAvatarImage(null)
+  }
 
   const validatePassword = () => {
     let isOk = true;
@@ -113,13 +137,15 @@ const Info = () => {
       },
     }).then(response => {
       //response.data
-      console.log(response.data)
+      //console.log(response.data)
+      showSnackbar("Thông tin cập nhật thành công!")
       setUser(response.data)
     }).catch(err => {
       //err.response.data
       console.log(err.response.data)
       if (err.response.data.errors) {
-
+        setPhoneErr(err.response.data.errors.phone)
+        setEmailErr(err.response.data.errors.email)
       }
     })
   }
@@ -136,11 +162,12 @@ const Info = () => {
         headers: { "Content-Type": "application/json" }
       }).then(response => {
         //response.data
+        showSnackbar("Đổi mật khẩu thành công!")
       }).catch(err => {
         const data = err.response.data;
         if (data.errors) {
           setPasswordErr(err.response.data.errors.password)
-        } 
+        }
         if (data.error) {
           if (data.error.includes('6 ký tự'))
             setNewPasswordErr("Mật khẩu ít hơn 6 ký tự")
@@ -157,6 +184,14 @@ const Info = () => {
 
   return (
     <div className='page-infor' style={{ display: "flex" }}>
+      <Snackbar
+        autoHideDuration={2000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="success">{alertMessage}</Alert>
+      </Snackbar>
       {!user ?
         <Box className='loading-temp'>
           <CircularProgress />
@@ -167,7 +202,7 @@ const Info = () => {
           <div className='container-info'>
             <div className='header-title-info'>
               <h4 className='title-profile-1'>Thông tin chung</h4>
-              <h5 onClick={() => setIsEdit(!isEdit)}>Chỉnh sửa</h5>
+              <h5 onClick={toggleEditMode}>Chỉnh sửa</h5>
             </div>
 
             <div style={{ display: "flex", paddingTop: 10 }}>
@@ -175,13 +210,13 @@ const Info = () => {
                 <div className='image'>
                   <input type="file" style={{ display: 'none' }} ref={inputAvatarImage} onChange={handleImageChange} />
                   <Avatar
-                    sx={{ width: 120, height: 120, cursor: 'pointer' }}
+                    sx={{ width: 120, height: 120, cursor: isEdit ? 'pointer' : 'auto' }}
                     src={avatarImage ? URL.createObjectURL(avatarImage)
                       : user.img_url}
-                    onClick={() => { inputAvatarImage.current.click() }}
+                    onClick={isEdit ? () => { inputAvatarImage.current.click() } : null}
                   />
                 </div>
-                <Button
+                <Button disabled={!isEdit}
                   variant='text'
                   sx={{ textTransform: "none", }}
                   onClick={() => { inputAvatarImage.current.click() }}>
@@ -218,8 +253,13 @@ const Info = () => {
                 <div className='div-text-profile'>
                   <label>Số điện thoại:</label>
                   {isEdit ? <TextField
+                    error={phoneErr}
+                    helperText={phoneErr}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhoneErr('')
+                      setPhone(e.target.value)
+                    }}
                     sx={{ minWidth: 280 }}
                     placeholder={user.phone}
                     size="small"
@@ -232,8 +272,13 @@ const Info = () => {
                 <div className='div-text-profile'>
                   <label>Địa chỉ email:</label>
                   {isEdit ? <TextField
+                    error={emailErr}
+                    helperText={emailErr}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmailErr('')
+                      setEmail(e.target.value)
+                    }}
                     sx={{ minWidth: 280 }}
                     placeholder={user.email}
                     size="small"
@@ -291,7 +336,7 @@ const Info = () => {
                 Lưu
               </Button>
               <Button variant='outlined'
-                onClick={() => setIsEdit(false)}>
+                onClick={toggleEditMode}>
                 Hủy
               </Button>
             </div> : <></>}

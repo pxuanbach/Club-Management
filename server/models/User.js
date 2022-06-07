@@ -32,7 +32,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'Khác',
     },
-    phone: String,
+    phone: {
+        type: String, 
+        unique: [true, 'Số điện thoại đã tồn tại'],
+        sparse: true
+    },
     facebook: String,
     description: {
         type: String,

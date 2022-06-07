@@ -11,7 +11,7 @@ const createJWT = id => {
 }
 
 const alertError = (err) => {
-    let errors = { username: '', password: '', name: '', email: '' }
+    let errors = { username: '', password: '', name: '', email: '', phone: '' }
     if (err.message === 'incorrect email') {
         errors.email = 'Email không tồn tại';
     }
@@ -22,9 +22,11 @@ const alertError = (err) => {
         if (err.message.includes('username')) {
             errors.username = 'Tài khoản đã tồn tại'
         }
-
         if (err.message.includes('email')) {
             errors.email = 'Email đã được sử dụng';
+        }
+        if (err.message.includes('phone')) {
+            errors.phone = 'Số điện thoại đã được sử dụng';
         }
         return errors;
     }
@@ -154,42 +156,46 @@ module.exports.logout = (req, res) => {
 module.exports.update = async (req, res) => {
     const token = req.cookies.jwt;
     const files = req.files
-    const { name, gender, email, description, facebook } = req.body
+    const { name, gender, phone, email, description, facebook } = req.body
+    try {
+        if (token) {
+            jwt.verify(token, 'club secret', async (err, decodedToken) => {
+                console.log('decoded Token', decodedToken);
+                if (err) {
+                    console.log("decoded err ", err.message)
+                    res.status(400).send({ error: err.message })
+                } else {
 
-    if (token) {
-        jwt.verify(token, 'club secret', async (err, decodedToken) => {
-            console.log('decoded Token', decodedToken);
-            if (err) {
-                console.log("decoded err ", err.message)
-                res.status(400).send({ error: err.message })
-            } else {
-                try {
                     let user = await User.findById(decodedToken.id)
                     user.name = name;
                     user.gender = gender;
+                    user.phone = "0" + phone;
                     user.email = email;
                     user.description = description;
                     user.facebook = facebook
 
                     const uploadData = await uploadAvatar(files, user.cloudinary_id);
-                    
-                    user.img_url = uploadData.url;
-                    user.cloudinary_id = uploadData.public_id;
+                    if (uploadData.url !== "") {
+                        user.img_url = uploadData.url;
+                        user.cloudinary_id = uploadData.public_id;
+                    }
 
                     user.save().then(result => {
                         res.status(200).send(result)
-                    }).catch(err => {
-                        res.status(400).send({ error: err.message })
+                    }).catch(error => {
+                        let errors = alertError(error);
+                        console.log("catch ", error.message)
+                        res.status(400).json({ errors })
                     })
-                } catch (error) {
-                    let errors = alertError(error);
-                    console.log("catch ", error.message)
-                    res.status(400).json({ errors })
                 }
-            }
-        })
-    } else {
-        res.status(400).send({ error: "Không tìm thấy token" })
+            })
+        } else {
+            res.status(400).send({ error: "Không tìm thấy token" })
+        }
+    } catch (error) {
+        let errors = alertError(error);
+        console.log("catch ", error.message)
+        res.status(400).json({ errors })
     }
 }
 
@@ -211,7 +217,7 @@ module.exports.changePassword = (req, res) => {
 
                     if (isUser) {
                         user.password = newPassword;
-                    } 
+                    }
 
                     user.save().then(result => {
                         res.status(200).send({ message: "Đổi mật khẩu thành công!" })
