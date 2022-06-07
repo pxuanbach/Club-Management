@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import {
     Button, TextareaAutosize, IconButton, Avatar, Box,
@@ -14,13 +13,6 @@ import UserCard from '../../card/UserCard';
 import FindGroupCard from '../../card/FindGroupCard';
 import SelectedFiles from './file-item/SelectedFiles'
 import { UserContext } from '../../../UserContext';
-
-const columnTitles = [
-    "Cần làm",
-    "Đang làm",
-    "Đã xong",
-    "Ghi chú",
-]
 
 const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) => {
     const { activityId } = useParams()
@@ -38,7 +30,6 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [isError, setIsError] = useState(false);
-    const options = columnTitles.filter(col => col !== columnTitle)
     const openUserCard = Boolean(anchorUser)
     const openFindGroup = Boolean(anchorFindGroup)
 
@@ -141,11 +132,6 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
         } else {
             showSnackbar("Đang tải dữ liệu...", false)
         }
-    }
-
-    const handleSendToColumn = (toColumn) => {
-        const fromColumn = columnTitle;
-
     }
 
     const getJoin = () => {
@@ -356,13 +342,6 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                                 showSnackbar={showSnackbar}
                             />
                         </Popover>
-                        {isLeader && options.map((option, index) => (
-                            <button key={index} className='btn-action'
-                                onClick={() => handleSendToColumn(option)}>
-                                <ArrowForwardIcon fontSize='small' />
-                                {option}
-                            </button>
-                        ))}
                         <input style={{ display: 'none' }} type="file" ref={inputFile} onChange={handleFileChange} />
                         <button className='btn-action'
                             onClick={(e) => inputFile.current.click()}>
