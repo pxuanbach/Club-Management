@@ -6,6 +6,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { Buffer } from 'buffer';
 import axiosInstance from '../../helper/Axios'
+import SeverityOptions from '../../helper/SeverityOptions';
 import './FindGroupCard.css'
 
 const FindGroupCard = ({ activityId, card, getJoin, showSnackbar }) => {
@@ -21,7 +22,7 @@ const FindGroupCard = ({ activityId, card, getJoin, showSnackbar }) => {
                 getGroups(response.data.club._id)
             }).catch(err => {
                 //err.response.data.error
-                console.log(err.response.data.error)
+                showSnackbar(err.response.data.error, SeverityOptions.error)
             })
     }
 
@@ -29,11 +30,10 @@ const FindGroupCard = ({ activityId, card, getJoin, showSnackbar }) => {
         axiosInstance.get(`/group/list/${clubId}`)
             .then(response => {
                 //response.data
-                console.log(response.data)
                 setGroups(response.data)
             }).catch(err => {
                 //err.response.data.error
-                console.log(err.response.data.error)
+                showSnackbar(err.response.data.error, SeverityOptions.error)
             })
     }
 
@@ -65,11 +65,11 @@ const FindGroupCard = ({ activityId, card, getJoin, showSnackbar }) => {
             if (response.data.success) {
                 getJoin()
             } else {
-                showSnackbar(response.data.message, false)
+                showSnackbar(response.data.message, SeverityOptions.warning)
             }
         }).catch(err => {
             //err.response.data.error
-            showSnackbar(err.response.data.error, true)
+            showSnackbar(err.response.data.error, SeverityOptions.error)
         })
     }
 

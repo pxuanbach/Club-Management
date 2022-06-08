@@ -14,7 +14,6 @@ router.get('/usersnotcollaborators/:activityId', activityController.getUsersNotC
 router.get('/search/:clubId/:searchValue', activityController.search)
 router.get('/searchcollaborators/:activityId/:searchValue', activityController.searchCollaborators)
 router.get('/searchusersnotcollaborators/:activityId/:searchValue', activityController.searchUsersNotCollaborators)
-router.get('/usergroupjoin/:cardId', activityController.getJoin)
 router.put('/update/:activityId', activityController.update)
 router.patch('/updateboards/:activityId', activityController.updateBoards)
 router.patch('/updatecolumn/:activityId', activityController.updateColumn)
@@ -23,6 +22,7 @@ router.patch('/addcollaborators/:activityId', activityController.addCollaborator
 router.delete('/delete/:activityId', activityController.delete)
 
 router.post('/card/upload', upload.array('file'), activityController.upload)
+router.get('/card/:cardId', activityController.getCard)
 router.patch('/card/description/:cardId', activityController.updateCardDescription)
 
 module.exports = router;

@@ -11,10 +11,12 @@ import './CardDetail.css'
 import axiosInstance from '../../../helper/Axios';
 import UserCard from '../../card/UserCard';
 import FindGroupCard from '../../card/FindGroupCard';
-import SelectedFiles from './file-item/SelectedFiles'
+import SelectedFiles from './file-item/SelectedFiles';
+import CustomDialog from '../../dialog/CustomDialog';
 import { UserContext } from '../../../UserContext';
+import SeverityOptions from '../../../helper/SeverityOptions'
 
-const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) => {
+const CardDetail = ({ setShowForm, card, isLeader }) => {
     const { activityId } = useParams()
     const { user } = useContext(UserContext);
     const inputFile = useRef(null);
@@ -22,19 +24,20 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
     const [anchorUser, setAnchorUser] = useState(null);
     const [anchorFindGroup, setAnchorFindGroup] = useState(null);
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     const [userSelected, setUserSelected] = useState()
     const [userJoin, setUserJoin] = useState([]);
     const [groupJoin, setGroupJoin] = useState([]);
-    const [files, setFiles] = useState(card.files);
+    const [files, setFiles] = useState([]);
     const [description, setDescription] = useState();
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
-    const [isError, setIsError] = useState(false);
-    const openUserCard = Boolean(anchorUser)
-    const openFindGroup = Boolean(anchorFindGroup)
+    const [options, setOptions] = useState(false);
+    const openUserCard = Boolean(anchorUser);
+    const openFindGroup = Boolean(anchorFindGroup);
 
-    const showSnackbar = (message, isErr) => {
-        setIsError(isErr)
+    const showSnackbar = (message, options) => {
+        setOptions(options)
         setAlertMessage(message)
         setOpenSnackbar(true)
     }
@@ -61,13 +64,14 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                 headers: { "Content-Type": "multipart/form-data" }
             }).then(response => {
                 //response.data
-                setFiles(response.data.files)
+                setFiles(response.data.files);
+                showSnackbar('Tệp tải lên thành công.', SeverityOptions.success)
             }).catch(err => {
                 //err.response.data.error
-                showSnackbar(err.response.data.error, true)
+                showSnackbar(err.response.data.error, SeverityOptions.error)
             })
         } else {
-            showSnackbar('Tệp tải lên nên có định dạng excel, image.', false)
+            showSnackbar('Tệp tải lên nên có định dạng excel, image.', SeverityOptions.warning)
         }
     };
 
@@ -101,11 +105,11 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
             headers: { "Content-Type": "application/json" }
         }).then(response => {
             //response.data
-            updateCards(response.data)
+            getCardInfo()
             toggleOpenNewCardForm();
         }).catch(err => {
             //err.response.data.error
-            showSnackbar(err.response.data.error, true)
+            showSnackbar(err.response.data.error, SeverityOptions.error)
         })
     }
 
@@ -121,26 +125,31 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
             }).then(response => {
                 //response.data
                 if (response.data.success) {
-                    getJoin()
+                    getCardInfo()
                 } else {
-                    showSnackbar(response.data.message, false)
+                    showSnackbar(response.data.message, SeverityOptions.warning)
                 }
             }).catch(err => {
                 //err.response.data.error
-                showSnackbar(err.response.data.error, true)
+                showSnackbar(err.response.data.error, SeverityOptions.error)
             })
         } else {
             showSnackbar("Đang tải dữ liệu...", false)
         }
     }
 
-    const getJoin = () => {
-        axiosInstance.get(`/activity/usergroupjoin/${card._id}`)
+    const deleteCard = () => {
+
+    }
+
+    const getCardInfo = () => {
+        axiosInstance.get(`/activity/card/${card._id}`)
             .then(response => {
                 //response.data
-                //console.log(response.data)
                 setUserJoin(response.data.userJoin)
                 setGroupJoin(response.data.groupJoin)
+                setFiles(response.data.files)
+                setDescription(response.data.description)
             }).catch(err => {
                 //err.response.data.error
                 showSnackbar(err.response.data.error, true)
@@ -156,18 +165,25 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
 
     useEffect(() => {
         //console.log("activityId", activityId)
-        getJoin()
+        getCardInfo()
     }, [])
 
     return (
         <div>
+            <CustomDialog
+                open={openDialog}
+                setOpen={setOpenDialog}
+                title="Xóa thẻ"
+                contentText={`Bạn có chắc muốn xóa thẻ này?`}
+                handleAgree={deleteCard}
+            />
             <Snackbar
                 autoHideDuration={2000}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={openSnackbar}
                 onClose={() => setOpenSnackbar(false)}
             >
-                <Alert severity={isError ? "error" : "warning"}>{alertMessage}</Alert>
+                <Alert severity={options}>{alertMessage}</Alert>
             </Snackbar>
             <div className='button-close' onClick={() => onExitClick()}>
                 <i className="fa-solid fa-xmark"></i>
@@ -224,10 +240,10 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                         </div>
                     </div>
                     <Box className="display-member-attend" sx={{ paddingTop: 2 }}>
-                        <SelectedFiles 
-                        files={files} 
-                        isLeader={isLeader}
-                        showSnackbar={showSnackbar}
+                        <SelectedFiles
+                            files={files}
+                            isLeader={isLeader}
+                            showSnackbar={showSnackbar}
                         />
                     </Box>
                     <div style={{ display: 'flex', width: '100%', marginTop: 20 }}>
@@ -242,7 +258,7 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                                         onChange={(e) => setDescription(e.target.value)}
                                         aria-label="minimum height"
                                         minRows={4}
-                                        placeholder={card.description ? card.description : "Thêm mô tả chi tiết hơn..."}
+                                        placeholder={"Thêm mô tả chi tiết hơn..."}
                                         className='textarea-enter-description'
                                         ref={newCardTextareaRef}
                                     />
@@ -259,7 +275,7 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                             {!openNewCardForm &&
                                 <div className='add-description-area' onClick={toggleOpenNewCardForm}>
                                     <h5 className>
-                                        {card.description ? card.description : "Thêm mô tả chi tiết hơn..."}
+                                        {description ? description : "Thêm mô tả chi tiết hơn..."}
                                     </h5>
                                 </div>
                             }
@@ -321,11 +337,18 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                     </div>
                     <div className='action-2'>
                         <h4 className='title-action'>Tùy chọn thẻ</h4>
-                        {isLeader && <button className='btn-action'
-                            onClick={(e) => handleShowPopover(e, null, setAnchorFindGroup)}>
-                            <i class="fa-solid fa-user-plus"></i>
-                            Thêm nhóm
-                        </button>}
+                        {isLeader && <>
+                            <button className='btn-action'
+                                onClick={(e) => handleShowPopover(e, null, setAnchorFindGroup)}>
+                                <i class="fa-solid fa-user-plus"></i>
+                                Thêm nhóm
+                            </button>
+                            <button className='btn-action'
+                                onClick={(e) => setOpenDialog(true)}>
+                                <i class="fa-solid fa-trash-can"></i>
+                                Xóa thẻ
+                            </button>
+                        </>}
                         <Popover
                             open={openFindGroup}
                             anchorEl={anchorFindGroup}
@@ -338,7 +361,7 @@ const CardDetail = ({ setShowForm, card, updateCards, isLeader, columnTitle }) =
                             <FindGroupCard
                                 activityId={activityId}
                                 card={card}
-                                getJoin={getJoin}
+                                getJoin={getCardInfo}
                                 showSnackbar={showSnackbar}
                             />
                         </Popover>

@@ -7,10 +7,9 @@ import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
 import UpdateActivity from '../action/UpdateActivity';
-import DeleteActivity from '../action/DeleteActivity';
 import Collaborators from '../action/Collaborators';
 import { Buffer } from 'buffer';
-
+import CustomDialog from '../../../dialog/CustomDialog';
 import './TabContent.css';
 
 const CustomTextField = styled(TextField)({
@@ -87,6 +86,18 @@ const TabContent = ({ match, club_id, isLeader }) => {
       return value._id !== data._id;
     })
     setActivities(activitiesDeleted)
+  }
+
+  const handleDeleteActivity = async () => {
+    axiosInstance.delete(`/activity/delete/${activitySelected._id}`)
+      .then(response => {
+        //response.data
+        activityDeleted(response.data)
+      }).catch(err => {
+        //err.response.data.error
+        showSnackbar(err.response.data.error)
+      })
+
   }
 
   const handleSearchActivities = (e) => {
@@ -181,12 +192,13 @@ const TabContent = ({ match, club_id, isLeader }) => {
           />
         </Box>
       </Modal>
-      <DeleteActivity
+      <CustomDialog
         open={openDialog}
         setOpen={setOpenDialog}
-        activity={activitySelected}
-        activityDeleted={activityDeleted}
-        showSnackbar={showSnackbar}
+        title="Xóa hoạt động"
+        contentText={`Bạn có chắc muốn xóa hoạt động \b${activitySelected ? activitySelected.title : ''}\b không?
+        \nChúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến hoạt động này!`}
+        handleAgree={handleDeleteActivity}
       />
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
@@ -216,18 +228,18 @@ const TabContent = ({ match, club_id, isLeader }) => {
                 <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
-            {isLeader ? 
-            (<Button
-              onClick={() => {
-                setShowFormAdd(true)
-              }}
-              className='btn-add-tabcontent'
-              variant="contained"
-              disableElevation
-              style={{ background: '#1B264D' }}>
-              Thêm hoạt động
-            </Button>) : <></>}
-            
+            {isLeader ?
+              (<Button
+                onClick={() => {
+                  setShowFormAdd(true)
+                }}
+                className='btn-add-tabcontent'
+                variant="contained"
+                disableElevation
+                style={{ background: '#1B264D' }}>
+                Thêm hoạt động
+              </Button>) : <></>}
+
           </div>
         </div>
         <div className='div-body-content' >

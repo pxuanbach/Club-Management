@@ -12,17 +12,18 @@ import { useParams } from 'react-router-dom'
 const ITEM_HEIGHT = 48;
 const Column = (props) => {
     const { activityId } = useParams();
-    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
     const [anchorEl, setAnchorEl] = useState(null);
-    const [cards, setCards] = useState(column.cards);
     const open = Boolean(anchorEl);
+    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
+    let cards = column.cards
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
-    
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
@@ -31,13 +32,6 @@ const Column = (props) => {
 
     const [newCardTitle, setNewCardTitle] = useState('')
     const onNewCardTitleChange = (e) => setNewCardTitle(e.target.value)
-
-    useEffect(() => {
-        if (newCardTextareaRef && newCardTextareaRef.current) {
-            newCardTextareaRef.current.focus()
-            newCardTextareaRef.current.select()
-        }
-    }, [openNewCardForm])
 
     const addNewCard = () => {
         if (!newCardTitle) {
@@ -52,14 +46,18 @@ const Column = (props) => {
         toggleOpenNewCardForm()
     }
 
-    const updateCards = (card) => {
-        var newCards = cards.map(obj => {
-            if (obj._id === card._id)
-                return card;
-            return obj;
-        })
-        setCards(newCards)
+    const handleDeleteAllCard = (e) => {
+        e.preventDefault();
+
+        handleClose()
     }
+
+    useEffect(() => {
+        if (newCardTextareaRef && newCardTextareaRef.current) {
+            newCardTextareaRef.current.focus()
+            newCardTextareaRef.current.select()
+        }
+    }, [openNewCardForm])
 
     return (
         <div className='column'>
@@ -89,17 +87,17 @@ const Column = (props) => {
                         PaperProps={{
                             style: {
                                 maxHeight: ITEM_HEIGHT * 4.5,
-                                width: '20ch',
+                                width: 'max-content',
                             },
                         }}
                     >
-                        <MenuItem onClick={handleClose}>
+                        <MenuItem onClick={() => {
+                            toggleOpenNewCardForm();
+                            handleClose()
+                        }}>
                             Thêm thẻ
                         </MenuItem>
-                        <MenuItem onClick={handleClose}>
-                            Xóa thẻ
-                        </MenuItem>
-                        <MenuItem onClick={handleClose}>
+                        <MenuItem onClick={handleDeleteAllCard}>
                             Xóa tất cả thẻ
                         </MenuItem>
                     </Menu>
@@ -124,9 +122,7 @@ const Column = (props) => {
                         <Draggable disabled={isLeader} key={index}>
                             <Card
                                 card={card}
-                                updateCards={updateCards}
                                 isLeader={isLeader}
-                                columnTitle={column.title}
                             />
                         </Draggable>
                     ))}

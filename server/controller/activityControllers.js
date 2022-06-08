@@ -355,19 +355,6 @@ module.exports.searchUsersNotCollaborators = (req, res) => {
         })
 }
 
-module.exports.getJoin = (req, res) => {
-    const cardId = req.params.cardId;
-
-    ActivityCard.findById(cardId)
-        .populate('userJoin')
-        .populate('groupJoin')
-        .then(result => {
-            res.status(200).send(result);
-        }).catch(err => {
-            res.status(500).send({ error: err.message })
-        })
-}
-
 module.exports.update = (req, res) => {
     const activityId = req.params.activityId;
     const { title, startDate, endDate } = req.body;
@@ -544,6 +531,33 @@ module.exports.upload = async (req, res) => {
     }).catch(err => {
         res.status(500).json({ error: "Update card err - " + err.message })
     })
+}
+
+module.exports.getCard = (req, res) => {
+    const cardId = req.params.cardId;
+
+    ActivityCard.findById(cardId)
+        .populate('userJoin')
+        .populate('groupJoin')
+        .then(result => {
+            async.forEach(result.comments, function (item, callback) {
+                User.populate(item, { "path": "author" }, function (err, output) {
+                    if (err) {
+                        res.status(500).send({ error: err.message })
+                        return;
+                    }
+                    callback();
+                })
+            }, function (err) {
+                if (err) {
+                    res.status(500).send({ error: err.message })
+                    return;
+                }
+                res.status(200).send(result)
+            })
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
 }
 
 module.exports.updateCardDescription = (req, res) => {
