@@ -19,7 +19,7 @@ const style = {
 };
 const Card = (props) => {
   const [showFormCardDetail, setShowFormCardDetail] = useState(false);
-  const { card, updateCards, isLeader, columnTitle } = props
+  const { card, isLeader, getColumnsActivity } = props
   return (
     <div>
       <Modal
@@ -34,9 +34,8 @@ const Card = (props) => {
           <CardDetail
             setShowForm={setShowFormCardDetail}
             card={card}
-            updateCards={updateCards}
             isLeader={isLeader}
-            columnTitle={columnTitle}
+            getColumnsActivity={getColumnsActivity}
           />
         </Box>
       </Modal>

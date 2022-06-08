@@ -24,5 +24,6 @@ router.delete('/delete/:activityId', activityController.delete)
 router.post('/card/upload', upload.array('file'), activityController.upload)
 router.get('/card/:cardId', activityController.getCard)
 router.patch('/card/description/:cardId', activityController.updateCardDescription)
+router.delete('/card/:cardId', activityController.deleteCard)
 
 module.exports = router;

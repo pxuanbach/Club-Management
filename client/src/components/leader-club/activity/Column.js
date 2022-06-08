@@ -14,7 +14,7 @@ const Column = (props) => {
     const { activityId } = useParams();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
+    const { column, onCardDrop, getColumnsActivity, handleCreateCard, isLeader } = props
     let cards = column.cards
 
     const handleClick = (event) => {
@@ -123,6 +123,7 @@ const Column = (props) => {
                             <Card
                                 card={card}
                                 isLeader={isLeader}
+                                getColumnsActivity={getColumnsActivity}
                             />
                         </Draggable>
                     ))}

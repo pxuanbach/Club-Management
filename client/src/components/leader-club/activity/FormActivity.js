@@ -189,6 +189,7 @@ const FormActivity = ({ match, isLeader }) => {
               <Column
                 isLeader={isLeader}
                 column={column}
+                getColumnsActivity={getColumnsActivity}
                 onCardDrop={onCardDrop}
                 onUpdateColumn={onUpdateColumn}
                 handleCreateCard={handleCreateCard}

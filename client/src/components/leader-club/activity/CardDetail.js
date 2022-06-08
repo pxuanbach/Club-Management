@@ -7,6 +7,7 @@ import {
     Tooltip, AvatarGroup, Snackbar, Alert, Popover,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import BlockUi from 'react-block-ui';
 import './CardDetail.css'
 import axiosInstance from '../../../helper/Axios';
 import UserCard from '../../card/UserCard';
@@ -16,11 +17,12 @@ import CustomDialog from '../../dialog/CustomDialog';
 import { UserContext } from '../../../UserContext';
 import SeverityOptions from '../../../helper/SeverityOptions'
 
-const CardDetail = ({ setShowForm, card, isLeader }) => {
+const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const { activityId } = useParams()
     const { user } = useContext(UserContext);
     const inputFile = useRef(null);
     const newCardTextareaRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [anchorUser, setAnchorUser] = useState(null);
     const [anchorFindGroup, setAnchorFindGroup] = useState(null);
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
@@ -55,6 +57,7 @@ const CardDetail = ({ setShowForm, card, isLeader }) => {
 
     const handleFileChange = (event) => {
         if (isFileImage(event.target.files[0])) {
+            setIsLoading(true)
             //event.target.files[0]
             var formData = new FormData();
             formData.append("file", event.target.files[0]);
@@ -69,6 +72,8 @@ const CardDetail = ({ setShowForm, card, isLeader }) => {
             }).catch(err => {
                 //err.response.data.error
                 showSnackbar(err.response.data.error, SeverityOptions.error)
+            }).finally(() => {
+                setIsLoading(false)
             })
         } else {
             showSnackbar('Tệp tải lên nên có định dạng excel, image.', SeverityOptions.warning)
@@ -139,7 +144,15 @@ const CardDetail = ({ setShowForm, card, isLeader }) => {
     }
 
     const deleteCard = () => {
-
+        axiosInstance.delete(`/activity/card/${card._id}`)
+            .then(response => {
+                //response.data
+                getColumnsActivity(activityId)
+                onExitClick();
+            }).catch(err => {
+                //err.response.data.error
+                showSnackbar(err.response.data.error, SeverityOptions.error)
+            })
     }
 
     const getCardInfo = () => {
@@ -169,7 +182,7 @@ const CardDetail = ({ setShowForm, card, isLeader }) => {
     }, [])
 
     return (
-        <div>
+        <BlockUi tag="div" blocking={isLoading}>
             <CustomDialog
                 open={openDialog}
                 setOpen={setOpenDialog}
@@ -178,7 +191,7 @@ const CardDetail = ({ setShowForm, card, isLeader }) => {
                 handleAgree={deleteCard}
             />
             <Snackbar
-                autoHideDuration={2000}
+                autoHideDuration={5000}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={openSnackbar}
                 onClose={() => setOpenSnackbar(false)}
@@ -377,7 +390,7 @@ const CardDetail = ({ setShowForm, card, isLeader }) => {
 
 
             </div>
-        </div>
+        </BlockUi>
     )
 }
 

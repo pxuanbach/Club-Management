@@ -2,6 +2,7 @@ const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
 const User = require('../models/User')
 const Group = require('../models/Group')
+const mongoose = require('mongoose')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const async = require('async')
@@ -486,30 +487,33 @@ module.exports.addCollaborators = (req, res) => {
     })
 }
 
-module.exports.delete = (req, res) => {
-    const activityId = req.params.activityId;
+module.exports.delete = async (req, res) => {
+    try {
+        const activityId = req.params.activityId;
+        let activity = await Activity.findById(activityId);
+        const boards = activity.boards;
+        const mergeCards = boards[0].cards.concat(boards[1].cards, boards[2].cards, boards[3].cards)
+        //console.log(mergeCards)
+        async.forEach(mergeCards, async function (item, callback) {
+            let card = await ActivityCard.findById(item);
 
-    Activity.findByIdAndDelete(activityId, function (err, doc) {
-        if (err) {
-            res.status(500).send({ error: "Load activity err - " + err.message })
-            return;
-        }
-
-        async.forEach(doc.boards, function (item, callback) {
-            ActivityCard.deleteMany({ _id: { $in: item.cards } })
-                .then(() => {
-                    callback();
-                }).catch(err => {
-                    res.status(500).send({ error: "Card delete err - " + err.message })
-                })
+            card.remove().then(() => {
+                if (typeof callback === 'function') {
+                    return callback()
+                }
+            })
         }, function (err) {
             if (err) {
                 res.status(500).send({ error: "Card deleted err - " + err.message })
                 return;
             }
-            res.status(200).send(doc)
+            activity.remove().then(() => {
+                res.status(200).send(activity)
+            })
         })
-    })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
 
 //card
@@ -576,4 +580,31 @@ module.exports.updateCardDescription = (req, res) => {
     }).catch(err => {
         res.status(500).json({ error: "Update card err - " + err.message })
     })
+}
+
+module.exports.deleteCard = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        let card = await ActivityCard.findById(cardId)
+
+        Activity.findById(card.activity, function (error, activity) {
+            if (error) {
+                res.status(500).json({ error: error.message })
+            }
+            activity.boards.forEach(column => {
+                if (isElementInArray(card._id, column.cards)) {
+                    var newCards = column.cards.filter(c => c.toString() !== card._id.toString())
+                    column.cards = newCards
+                }
+            })
+            activity.save()
+                .then(() => {
+                    card.remove().then(() => {
+                        res.status(200).send({ message: "remove success", data: card })
+                    })
+                })
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
