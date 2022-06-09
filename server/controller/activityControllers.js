@@ -537,6 +537,30 @@ module.exports.upload = async (req, res) => {
     })
 }
 
+module.exports.addComment = async (req, res) => {
+    try {
+        const { cardId, content, author } = req.body;
+        let now = Date.now();
+        //console.log(cardId, content, author)
+
+        let card = await ActivityCard.findById(cardId);
+        const comment = {
+            content,
+            createdAt: now,
+            author
+        }
+
+        card.comments.push(comment)
+
+        card.save().then(result => {
+            res.status(200).send(result)
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+
+}
+
 module.exports.getCard = (req, res) => {
     const cardId = req.params.cardId;
 
@@ -580,6 +604,25 @@ module.exports.updateCardDescription = (req, res) => {
     }).catch(err => {
         res.status(500).json({ error: "Update card err - " + err.message })
     })
+}
+
+module.exports.deleteComment = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const { commentId } = req.body;
+        let card = await ActivityCard.findById(cardId)
+
+        const newComments = card.comments
+            .filter(comment => comment._id.toString() !== commentId)
+        
+        card.comments = newComments;
+
+        card.save().then(result => {
+            res.status(200).send(result)
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
 
 module.exports.deleteCard = async (req, res) => {

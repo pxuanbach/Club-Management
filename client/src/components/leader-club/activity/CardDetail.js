@@ -3,8 +3,9 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import {
-    Button, TextareaAutosize, IconButton, Avatar, Box,
-    Tooltip, AvatarGroup, Snackbar, Alert, Popover,
+    Button, TextareaAutosize, Avatar, Box,
+    Tooltip, AvatarGroup, Snackbar, Alert,
+    Popover,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import BlockUi from 'react-block-ui';
@@ -14,6 +15,7 @@ import UserCard from '../../card/UserCard';
 import FindGroupCard from '../../card/FindGroupCard';
 import SelectedFiles from './file-item/SelectedFiles';
 import CustomDialog from '../../dialog/CustomDialog';
+import Comments from './comment/Comments'
 import { UserContext } from '../../../UserContext';
 import SeverityOptions from '../../../helper/SeverityOptions'
 
@@ -32,6 +34,8 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const [groupJoin, setGroupJoin] = useState([]);
     const [files, setFiles] = useState([]);
     const [description, setDescription] = useState();
+    const [comment, setComment] = useState();
+    const [comments, setComments] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [options, setOptions] = useState(false);
@@ -89,34 +93,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
         setAnchorEl(null);
     };
 
-    const showhideFunction = () => {
-        var actionList = document.getElementById("actionOfText");
-        if (actionList.className === "not-display") {
-            actionList.className = "display";
-        } else {
-            actionList.className = "not-display";
-        }
-    }
-
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
-
-    const handleSaveDescription = (e) => {
-        e.preventDefault();
-        //console.log(description)
-        axiosInstance.patch(`/activity/card/description/${card._id}`,
-            JSON.stringify({
-                "description": description
-            }), {
-            headers: { "Content-Type": "application/json" }
-        }).then(response => {
-            //response.data
-            getCardInfo()
-            toggleOpenNewCardForm();
-        }).catch(err => {
-            //err.response.data.error
-            showSnackbar(err.response.data.error, SeverityOptions.error)
-        })
-    }
 
     const handleJoinCard = (e) => {
         e.preventDefault();
@@ -143,6 +120,68 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
         }
     }
 
+    const handleSaveDescription = (e) => {
+        e.preventDefault();
+        //console.log(description)
+
+        axiosInstance.patch(`/activity/card/description/${card._id}`,
+            JSON.stringify({
+                "description": description
+            }), {
+            headers: { "Content-Type": "application/json" }
+        }).then(response => {
+            //response.data
+            getCardInfo()
+            toggleOpenNewCardForm();
+        }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        })
+
+    }
+
+    const handleSaveComment = (e) => {
+        e.preventDefault();
+        if (comment.trim() !== '') {
+            setIsLoading(true)
+            axiosInstance.post(`/activity/card/addcomment`,
+                JSON.stringify({
+                    "cardId": card._id,
+                    "content": comment,
+                    "author": user._id
+                }), {
+                headers: { "Content-Type": "application/json" }
+            }).then(response => {
+                //response.data
+                getCardInfo()
+                setComment('')
+            }).catch(err => {
+                //err.response.data.error
+                showSnackbar(err.response.data.error, SeverityOptions.error)
+            }).finally(() => {
+                setIsLoading(false)
+            })
+        }
+    }
+
+    const handleDeleteComment = (commentId) => {
+        setIsLoading(true)
+        axiosInstance.patch(`/activity/card/deletecomment/${card._id}`,
+            JSON.stringify({
+                "commentId": commentId,
+            }), {
+            headers: { "Content-Type": "application/json" }
+        }).then(response => {
+            //response.data
+            getCardInfo()
+        }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        }).finally(() => {
+            setIsLoading(false)
+        })
+    }
+
     const deleteCard = () => {
         axiosInstance.delete(`/activity/card/${card._id}`)
             .then(response => {
@@ -163,6 +202,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                 setGroupJoin(response.data.groupJoin)
                 setFiles(response.data.files)
                 setDescription(response.data.description)
+                setComments(response.data.comments)
             }).catch(err => {
                 //err.response.data.error
                 showSnackbar(err.response.data.error, true)
@@ -295,50 +335,34 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                         </div>
                     </div>
                     <div style={{ display: 'flex', width: '100%' }}>
-                        <i style={{ marginTop: '35px', fontSize: '20px', paddingRight: '15px', color: '#1B264D' }} class="fa-solid fa-list-check"></i>
+                        <i style={{ marginTop: '35px', fontSize: '20px', paddingRight: '8px', color: '#1B264D' }}
+                            class="fa-solid fa-comments"></i>
+
                         <div className='description-activity'>
-                            <h4>Hoạt động</h4>
+                            <h4>Bình luận</h4>
                             <div className='comment-area' >
                                 <TextareaAutosize
-                                    aria-label="minimum height"
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
                                     minRows={1}
+                                    maxRows={3}
                                     placeholder="Viết bình luận..."
                                     className='textarea-enter-comment'
-                                    onClick={() => showhideFunction()}
-                                // ref={newCardTextareaRef}
                                 />
-                                <div id="actionOfText" className="not-display">
-                                    <div className='btn-save-text'>Lưu</div>
-                                    <div className='list-action-for-text'>
-                                        <Tooltip title="Đính kèm">
-                                            <IconButton className='icon-button-text'>
-                                                <i class="fa-solid fa-paperclip"></i>
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Đề cập thành viên">
-                                            <IconButton className='icon-button-text'>
-                                                <AlternateEmailIcon
-                                                    sx={{
-                                                        fontSize: 20,
-                                                        color: "#1B264D",
-                                                    }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Thêm biểu tượng cảm xúc">
-                                            <IconButton className='icon-button-text'>
-                                                <SentimentSatisfiedAltIcon
-                                                    sx={{
-                                                        fontSize: 20,
-                                                        color: "#1B264D",
-                                                    }}
-                                                />
-                                            </IconButton>
-                                        </Tooltip>
+                                <div id="actionOfText">
+                                    <div onClick={handleSaveComment}
+                                        className='btn-save-text'>
+                                        Lưu
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {user && <Comments
+                        comments={comments}
+                        user={user}
+                        handleDeleteComment={handleDeleteComment}
+                    />}
                 </div>
                 <div className='div-right-card-detail'>
                     <div className='action-1'>

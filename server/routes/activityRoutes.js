@@ -22,8 +22,10 @@ router.patch('/addcollaborators/:activityId', activityController.addCollaborator
 router.delete('/delete/:activityId', activityController.delete)
 
 router.post('/card/upload', upload.array('file'), activityController.upload)
+router.post('/card/addcomment', activityController.addComment)
 router.get('/card/:cardId', activityController.getCard)
 router.patch('/card/description/:cardId', activityController.updateCardDescription)
+router.patch('/card/deletecomment/:cardId', activityController.deleteComment)
 router.delete('/card/:cardId', activityController.deleteCard)
 
 module.exports = router;
