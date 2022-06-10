@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Tooltip, Modal, TextField, Snackbar, Alert } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { styled } from '@mui/material/styles';
+import {
+  Box, Button, Modal,
+  Snackbar, Alert
+} from '@mui/material';
 import { useRouteMatch } from 'react-router-dom';
 import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
@@ -11,15 +12,6 @@ import Collaborators from '../action/Collaborators';
 import { Buffer } from 'buffer';
 import CustomDialog from '../../../dialog/CustomDialog';
 import './TabContent.css';
-
-const CustomTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#1B264D',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#1B264D',
-  },
-});
 
 const style = {
   position: 'absolute',
@@ -210,48 +202,24 @@ const TabContent = ({ match, club_id, isLeader }) => {
             onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
           />
           <i onClick={handleSearchActivities} class="fa-solid fa-magnifying-glass"></i>
-          {/* <Box
-            sx={{
-              '& > :not(style)': { width: '30ch' },
-            }}
-          >
-            <CustomTextField
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              id="search-field-tabcontent"
-              label="Tìm kiếm hoạt động"
-              variant="standard"
-              onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
-            />
-
-          </Box>
-          <Tooltip title='Tìm kiếm' placement='right-start'>
-            <Button
-              variant="text"
-              disableElevation
-              onClick={handleSearchActivities}
-            >
-              <SearchIcon sx={{ color: '#1B264D' }} />
-            </Button>
-          </Tooltip> */}
         </div>
-      </div>  
+      </div>
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
           <div className='div-search-tabmember'>
-            
-            {isLeader ? 
-            (<Button
-              onClick={() => {
-                setShowFormAdd(true)
-              }}
-              className='btn-add-tabcontent'
-              variant="contained"
-              disableElevation
-              style={{ background: '#1B264D' }}>
-              Thêm hoạt động
-            </Button>) : <></>}
+
+            {isLeader ?
+              (<Button
+                onClick={() => {
+                  setShowFormAdd(true)
+                }}
+                className='btn-add-tabcontent'
+                variant="contained"
+                disableElevation
+                style={{ background: '#1B264D' }}>
+                Thêm hoạt động
+              </Button>) : <></>}
           </div>
         </div>
         <div className='div-body-content' >

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab, Typography, CircularProgress, Box } from '@mui/material';
 import "./Member.css"
 import TabMember from './TabMember';
 import TabGroup from './TabGroup';
 import axiosInstance from '../../../helper/Axios';
-import { useRouteMatch } from 'react-router-dom'
+import { useRouteMatch } from 'react-router-dom';
+import { UserContext } from '../../../UserContext'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -35,6 +36,7 @@ TabPanel.propTypes = {
 
 export default function BasicTabs() {
   const { path } = useRouteMatch();
+  const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
   const [club, setClub] = useState();
   const [value, setValue] = useState(0);
@@ -59,26 +61,29 @@ export default function BasicTabs() {
 
   return (
     <div >
-      <Box sx={{ width: '100%', height: '100%', }}>
-        <Box className='header-member' sx={{ borderBottom: 'none', borderColor: 'divider' }} >
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
-            <Tab label="Thành viên"/>
-            <Tab label="Nhóm" />
-          </Tabs>
-        </Box>
-        {isLoading ?
-          <Box className='loading-temp'>
-            <CircularProgress />
+      {user && (
+        <Box sx={{ width: '100%', height: '100%', }}>
+          <Box className='header-member' sx={{ borderBottom: 'none', borderColor: 'divider' }} >
+            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
+              <Tab label="Thành viên" />
+              <Tab label="Nhóm" />
+            </Tabs>
           </Box>
-          : <div>
-            <TabPanel className='body-member' value={value} index={0}>
-              <TabMember club={club}></TabMember>
-            </TabPanel>
-            <TabPanel className='body-member' value={value} index={1}>
-              <TabGroup club={club}></TabGroup>
-            </TabPanel>
-          </div>}
-      </Box>
+          {isLoading ?
+            <Box className='loading-temp'>
+              <CircularProgress />
+            </Box>
+            : <div>
+              <TabPanel className='body-member' value={value} index={0}>
+                <TabMember club={club}></TabMember>
+              </TabPanel>
+              <TabPanel className='body-member' value={value} index={1}>
+                <TabGroup club={club}></TabGroup>
+              </TabPanel>
+            </div>}
+        </Box>
+      )}
+
     </div>
   );
 }

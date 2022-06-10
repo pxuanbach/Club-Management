@@ -19,6 +19,7 @@ router.patch('/updateboards/:activityId', activityController.updateBoards)
 router.patch('/updatecolumn/:activityId', activityController.updateColumn)
 router.patch('/updatecollaborators/:activityId', activityController.updateCollaborators)
 router.patch('/addcollaborators/:activityId', activityController.addCollaborators)
+router.patch('/deleteallcards/:activityId', activityController.deleteAllCards)
 router.delete('/delete/:activityId', activityController.delete)
 
 router.post('/card/upload', upload.array('file'), activityController.upload)

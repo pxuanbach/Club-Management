@@ -275,7 +275,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                             </div>
                         </div>
                         <div>
-                            <h5 style={{ fontSize: '16px', marginBottom: 5 }}>Nhóm tham gia</h5>
+                            <h5 style={{ color: '#1B264D', fontSize: '16px', marginBottom: 5 }}>Nhóm tham gia</h5>
                             <div className="avatar-display">
                                 <AvatarGroup total={groupJoin.length}>
                                     {groupJoin.map((group, index) => (

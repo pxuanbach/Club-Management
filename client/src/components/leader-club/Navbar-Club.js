@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../UserContext'
 import './Navbar-Club.css'
-import Tooltip from '@mui/material/Tooltip'
+import { Tooltip, Box, CircularProgress } from '@mui/material'
 import { useParams, Link, useHistory } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 
-const NavbarClub = ({club}) => {
+const NavbarClub = ({ club }) => {
     const history = useHistory();
+    const { user } = useContext(UserContext);
     let { club_id, club_name } = useParams();
-    const { user, setUser } = useContext(UserContext);
     const [pathName, setPathName] = useState('message')
-    
+
     useEffect(() => {
         return history.listen((location) => {
             setPathName(location.pathname.split('/')[4])
@@ -20,7 +20,7 @@ const NavbarClub = ({club}) => {
 
     return (
         <nav className='div-left-nav'>
-            <div className="nav-club">
+            {user ? (<div className="nav-club">
                 <div className='div-back'>
                     <Link to='/clubs' className="btn-back">
                         <i class="fa-solid fa-angle-left"></i>
@@ -36,49 +36,47 @@ const NavbarClub = ({club}) => {
 
                 <div className='list-btn-navclub'>
                     <Tooltip title="Hoạt động" placement="right-start">
-                        <Link 
-                        to={`/club/${club_id}/${club_name}/activity`} 
-                        className={pathName === 'activity' ? 'navclub-selected' : ''}>
+                        <Link
+                            to={`/club/${club_id}/${club_name}/activity`}
+                            className={pathName === 'activity' ? 'navclub-selected' : ''}>
                             <i class="fa-solid fa-list-check"></i>
                             Hoạt động
                         </Link>
                     </Tooltip>
                     <Tooltip title="Thành viên" placement="left-start">
-                        <Link 
-                        to={`/club/${club_id}/${club_name}/member`}
-                        className={pathName === 'member' ? 'navclub-selected' : ''}>
+                        <Link
+                            to={`/club/${club_id}/${club_name}/member`}
+                            className={pathName === 'member' ? 'navclub-selected' : ''}>
                             <i class="fa-solid fa-user-group"></i>
                             Thành viên
                         </Link>
                     </Tooltip>
                     <Tooltip title="Lịch hoạt động" placement="left-start">
-                        <Link 
-                        to={`/club/${club_id}/${club_name}/calendar`}
-                        className={pathName === 'calendar' ? 'navclub-selected' : ''}>
+                        <Link
+                            to={`/club/${club_id}/${club_name}/calendar`}
+                            className={pathName === 'calendar' ? 'navclub-selected' : ''}>
                             <i class="fa-solid fa-calendar-days"></i>
                             Lịch hoạt động
                         </Link>
                     </Tooltip>
                     <Tooltip title="Tin nhắn" placement="left-start">
-                        <Link 
-                        to={`/club/${club_id}/${club_name}/message`}
-                        className={pathName === 'message' ? 'navclub-selected' : ''}>
+                        <Link
+                            to={`/club/${club_id}/${club_name}/message`}
+                            className={pathName === 'message' ? 'navclub-selected' : ''}>
                             <i class="fa-solid fa-comment-dots"></i>
                             Tin nhắn
                         </Link>
                     </Tooltip>
                     <Tooltip title="Quỹ câu lạc bộ" placement="left-start">
-                        <Link 
-                        to={`/club/${club_id}/${club_name}/fund`}
-                        className={pathName === 'fund' ? 'navclub-selected' : ''}>
+                        <Link
+                            to={`/club/${club_id}/${club_name}/fund`}
+                            className={pathName === 'fund' ? 'navclub-selected' : ''}>
                             <i class="fa-solid fa-hand-holding-dollar"></i>
                             Qũy CLB
                         </Link>
                     </Tooltip>
                 </div>
-
-
-            </div>
+            </div>) : (<></>)}
         </nav>
     )
 }

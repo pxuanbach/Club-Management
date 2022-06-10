@@ -487,6 +487,56 @@ module.exports.addCollaborators = (req, res) => {
     })
 }
 
+module.exports.deleteAllCards = async (req, res) => {
+    try {
+        const activityId = req.params.activityId;
+        const { columnId } = req.body;
+
+        let activity = await Activity.findById(activityId)
+        let listCardId = []
+        activity.boards.forEach(column => {
+            if (column._id.toString() === columnId) {
+                listCardId = JSON.parse(JSON.stringify(column.cards))
+                column.cards = []
+            }
+        })
+
+        async.forEach(listCardId, async function (item, callback) {
+            let card = await ActivityCard.findById(item);
+
+            card.remove().then(() => {
+                if (typeof callback === 'function') {
+                    return callback()
+                }
+            })
+        }, function (err) {
+            if (err) {
+                res.status(500).send({ error: "Card deleted err - " + err.message })
+                return;
+            }
+            activity.save().then(result => {
+                async.forEach(result.boards, function (item, callback) {
+                    ActivityCard.populate(item, { "path": "cards" }, function (err, output) {
+                        if (err) {
+                            res.status(500).send({ error: err.message })
+                            return;
+                        }
+                        callback();
+                    })
+                }, function (err) {
+                    if (err) {
+                        res.status(500).send({ error: err.message })
+                        return;
+                    }
+                    res.status(200).send(result)
+                })
+            })
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
 module.exports.delete = async (req, res) => {
     try {
         const activityId = req.params.activityId;
@@ -614,7 +664,7 @@ module.exports.deleteComment = async (req, res) => {
 
         const newComments = card.comments
             .filter(comment => comment._id.toString() !== commentId)
-        
+
         card.comments = newComments;
 
         card.save().then(result => {
