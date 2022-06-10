@@ -14,7 +14,7 @@ const UserCard = ({ user }) => {
 
     return (
         <Box>
-            <Card sx={{maxWidth: '270px'}}>
+            <Card sx={{width: '300px'}}>
                 <CardHeader className='card__header'
                     avatar={<Avatar src={user.img_url} />}
                     title={user.name}
