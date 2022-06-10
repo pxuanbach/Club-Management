@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -12,21 +12,23 @@ const options = [
 ];
 const ITEM_HEIGHT = 48;
 
-const ClubItem = ({club}) => {
+const ClubItem = ({ club }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-      };
-    
-      const handleClose = () => {
+    // const handleClick = (e) => {
+    //     if (e && e.stopPropagation) e.stopPropagation();
+    //     setAnchorEl(e.currentTarget);
+    // };
+
+    const handleClose = (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
         setAnchorEl(null);
-      };
+    };
 
     return (
         <div className='card-team'>
-            <div className='div-menu'>
+            {/* <div className='div-menu'>
                 <IconButton
                     aria-label="more"
                     id="long-button"
@@ -52,16 +54,17 @@ const ClubItem = ({club}) => {
                         },
                     }}
                 >
-                    {options.map((option) => (
-                        <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
-                            {option}
-                        </MenuItem>
-                    ))}
+                    <MenuItem onClick={handleClose}>
+                        Ẩn
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        Xóa
+                    </MenuItem>
                 </Menu>
-            </div>
+            </div> */}
             <a style={{ textDecoration: 'none' }}>
                 <div className='image-team'>
-                    <Avatar sx={{width: 110, height: 110}} src={club.img_url}/>
+                    <Avatar sx={{ width: 110, height: 110 }} src={club.img_url} />
                 </div>
                 <div className='name-team'>
                     {club.name}
