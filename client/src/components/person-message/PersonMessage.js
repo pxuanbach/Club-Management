@@ -13,10 +13,16 @@ let socket;
 
 const PersonMessage = () => {
     const { user } = useContext(UserContext);
+    const [isFindUser, setIsFindUser] = useState(false);
     const [message, setMessage] = useState();
     const [rooms, setRooms] = useState([]);
     const [currentRoom, setCurrentRoom] = useState();
     const [messages, setMessages] = useState([]);
+
+    const handleToggleFindUser = (e) => {
+        e.preventDefault();
+        setIsFindUser(true);
+    }
 
     const sendMessage = (event) => {
         event.preventDefault();
@@ -46,6 +52,7 @@ const PersonMessage = () => {
     useEffect(() => {
         socket.on('message', message => {
             setMessages([...messages, message])
+            socket.emit('get-list-room', user._id)
         })
     }, [messages]);
 
@@ -69,7 +76,8 @@ const PersonMessage = () => {
             <div className='container-left'>
                 <div className='header-left'>
                     <h2>Message</h2>
-                    <div className='btn-icon-create'>
+                    <div className='btn-icon-create'
+                        onClick={handleToggleFindUser}>
                         <i class="fa-solid fa-square-pen"></i>
                     </div>
                 </div>

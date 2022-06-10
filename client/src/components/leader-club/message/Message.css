@@ -110,11 +110,14 @@ body {
     overflow: auto;
   }
   .messages .message {
-    clear: both;
+    display: flex;
     overflow: hidden;
     margin-bottom: 5px;
     transition: all 0.5s linear;
     opacity: 0;
+  }
+  .messages .message.left{
+    justify-content: flex-start;
   }
   .messages .message.left .avatar {
     background-color: #f5886e;
@@ -122,15 +125,22 @@ body {
     margin-top: 21px;
     margin-left: 5px;
   }
-  .messages .message.left .text_wrapper {
+  .messages .message.left .content{
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .messages .message.left .content .text_wrapper {
     background-color: #ffffff;
     margin-left: 10px;
-    
   }
-  .messages .message.left .name-people {
-    margin-left: 55px;
+  .messages .message.left .content .name-people {
+    margin-left: 10px;
     margin-bottom: 3px;
-    
+  }
+  .messages .message.left .content .create-time {
+    position: absolute;
+    right: 0;
+    bottom: 0;
   }
   .messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
     right: 100%;
@@ -143,6 +153,9 @@ body {
     background-color: #fdbf68;
     float: right;
   } */
+  .messages .message.right{
+    justify-content: flex-end;
+  }
   .messages .message.right .text_wrapper {
     background-color: #1B264D;
     margin-top: 5px;
@@ -158,7 +171,9 @@ body {
   }
   .messages .message.right .name-people {
     display: none;
-    
+  }
+  .messages .message.right .create-time{
+    float: right;
   }
   .messages .message.appeared {
     opacity: 1;
@@ -172,6 +187,10 @@ body {
   }
   .messages .message .name-people {
       color: #1B264D; 
+  }
+  .messages .message .create-time{
+    color: #1B264D;
+    font-size: 14px;
   }
   .messages .message .text_wrapper {
     display: inline-block;

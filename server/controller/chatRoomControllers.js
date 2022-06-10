@@ -61,34 +61,41 @@ module.exports = function (socket, io) {
             //console.log(result)
             let arrData = []
             async.forEach(result, function (item, callback) {
-                Club.findById(item._id).then(club => {
-                    Message.find({ room_id: item._id })
-                        .sort({ createdAt: -1 })
-                        .limit(1)
-                        .then(msg => {
-                            //console.log(club.name, msg[0].content)
-                            const data = {
-                                room_id: item._id,
-                                imgUrl: club.img_url,
-                                name: club.name,
-                                lastMessage: msg[0].content
-                            }
-                            arrData.push(data)
-                            callback();
-                        }).catch(err => {
-                            console.log("Message query err - " + err.message)
-                            return;
-                        })
-                }).catch(err => {
-                    console.log("Club query err - " + err.message)
-                    return;
-                })
+                if (item._id.split('_').length > 1) {   //id_id
+
+                } else {
+                    Club.findById(item._id).then(club => {
+                        Message.find({ room_id: item._id })
+                            .sort({ createdAt: -1 })
+                            .limit(1)
+                            .then(msg => {
+                                //console.log(club.name, msg[0].content)
+                                const data = {
+                                    room_id: item._id,
+                                    imgUrl: club.img_url,
+                                    name: club.name,
+                                    lastMessage: msg[0].content,
+                                    createdAt: msg[0].createdAt
+                                }
+                                arrData.push(data)
+                                callback();
+                            }).catch(err => {
+                                console.log("Message query err - " + err.message)
+                                return;
+                            })
+                    }).catch(err => {
+                        console.log("Club query err - " + err.message)
+                        return;
+                    })
+                }
             }, function (err) {
                 if (err) {
                     console.log("Foreach err - " + err.message)
                     return;
                 }
-                socket.emit('output-list-room', arrData)
+                socket.emit('output-list-room', arrData.sort(function (a, b) {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                }))
             })
 
         })
