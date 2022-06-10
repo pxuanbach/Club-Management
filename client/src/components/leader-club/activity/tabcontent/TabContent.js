@@ -200,46 +200,58 @@ const TabContent = ({ match, club_id, isLeader }) => {
         \nChúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến hoạt động này!`}
         handleAgree={handleDeleteActivity}
       />
+      <div className='div-header'>
+        <div className='div-search'>
+          <input
+            value={search}
+            type="text"
+            placeholder="Tìm kiếm hoạt động"
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
+          />
+          <i onClick={handleSearchActivities} class="fa-solid fa-magnifying-glass"></i>
+          {/* <Box
+            sx={{
+              '& > :not(style)': { width: '30ch' },
+            }}
+          >
+            <CustomTextField
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              id="search-field-tabcontent"
+              label="Tìm kiếm hoạt động"
+              variant="standard"
+              onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
+            />
+
+          </Box>
+          <Tooltip title='Tìm kiếm' placement='right-start'>
+            <Button
+              variant="text"
+              disableElevation
+              onClick={handleSearchActivities}
+            >
+              <SearchIcon sx={{ color: '#1B264D' }} />
+            </Button>
+          </Tooltip> */}
+        </div>
+      </div>  
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
           <div className='div-search-tabmember'>
-            <Box
-              sx={{
-                '& > :not(style)': { width: '30ch' },
+            
+            {isLeader ? 
+            (<Button
+              onClick={() => {
+                setShowFormAdd(true)
               }}
-            >
-              <CustomTextField
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                id="search-field-tabcontent"
-                label="Tìm kiếm hoạt động"
-                variant="standard"
-                onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
-              />
-
-            </Box>
-            <Tooltip title='Tìm kiếm' placement='right-start'>
-              <Button
-                variant="text"
-                disableElevation
-                onClick={handleSearchActivities}
-              >
-                <SearchIcon sx={{ color: '#1B264D' }} />
-              </Button>
-            </Tooltip>
-            {isLeader ?
-              (<Button
-                onClick={() => {
-                  setShowFormAdd(true)
-                }}
-                className='btn-add-tabcontent'
-                variant="contained"
-                disableElevation
-                style={{ background: '#1B264D' }}>
-                Thêm hoạt động
-              </Button>) : <></>}
-
+              className='btn-add-tabcontent'
+              variant="contained"
+              disableElevation
+              style={{ background: '#1B264D' }}>
+              Thêm hoạt động
+            </Button>) : <></>}
           </div>
         </div>
         <div className='div-body-content' >
