@@ -26,8 +26,8 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
     };
 
     const handleSelectRoom = (e) => {
-        console.log(e.currentTarget);
-        setCurrentRoom(room)
+        e.preventDefault();
+        setCurrentRoom(JSON.parse(JSON.stringify(room)))
     }
 
     return (

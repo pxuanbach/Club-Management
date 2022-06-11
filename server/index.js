@@ -54,20 +54,6 @@ io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/chatRoomControllers')(socket, io);
 
-    socket.on('join', ({ user_id, room_id }) => {
-        const { error, user } = addUser({
-            socket_id: socket.id,
-            user_id,
-            room_id
-        })
-        socket.join(room_id);
-        if (error) {
-            console.log('join error', error)
-        } else {
-            console.log('join user', user)
-        }
-    })
-
     socket.on('disconnect', () => {
         const user = removeUser(socket.id);
         console.log('A user disconnected', user)

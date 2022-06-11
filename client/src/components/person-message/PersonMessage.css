@@ -49,6 +49,7 @@
     border: 1px solid #b4b0b0;
     border-radius: 30px;
     align-items: center;
+    position: relative;
 }
 .div-search-mess input{
     border: none;
@@ -63,6 +64,7 @@
 .div-search-mess > i{
     font-size: 1.2rem;
     margin-right: 15px;
+    cursor: pointer;
 }
 .container-item-message{
     height: 80vh;
