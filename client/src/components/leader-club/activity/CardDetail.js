@@ -38,7 +38,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const [comments, setComments] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
-    const [options, setOptions] = useState(false);
+    const [options, setOptions] = useState();
     const openUserCard = Boolean(anchorUser);
     const openFindGroup = Boolean(anchorFindGroup);
 

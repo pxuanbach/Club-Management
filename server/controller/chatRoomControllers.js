@@ -5,6 +5,7 @@ const ChatRoom = require('../models/ChatRoom')
 const mongoose = require('mongoose');
 const async = require('async')
 const { addUser, getUser } = require('../helper/ChatRoomHelper');
+const { uniqueArray } = require('../helper/ArrayHelper')
 
 module.exports = function (socket, io) {
     socket.on('join', ({ user_id, room_id }) => {
@@ -20,7 +21,7 @@ module.exports = function (socket, io) {
             console.log('join user', user)
         }
     })
-    
+
     socket.on('search-user', searchValue => {
         User.find({
             $or: [
@@ -51,6 +52,7 @@ module.exports = function (socket, io) {
                 console.log("không tìm thấy")
                 const newRoom = await ChatRoom.create({ room_id })
                 roomId = newRoom.room_id;
+                io.emit("chat-room-created", roomId)
             }
         }
         const msgToStore = {
@@ -64,9 +66,10 @@ module.exports = function (socket, io) {
         msg.save().then(m =>
             m.populate('author')
                 .execPopulate()
-                .then(result => {
+                .then(async (result) => {
                     //console.log('send mess', result)
-                    io.emit('message', result);
+                    io.to(roomId).emit('message', result);
+                    io.emit('reload-list-room', result)
                     callback();
                 })
         )
@@ -82,85 +85,80 @@ module.exports = function (socket, io) {
             })
     })
 
-    socket.on('get-list-room', user_id => {
-        //console.log(user_id)
-        Message.aggregate([
-            {
-                $match: {
-                    author: mongoose.Types.ObjectId(user_id)
-                }
-            },
-            {
-                $group: {
-                    _id: "$room_id",
-                }
-            },
-        ], function (err, result) {
+    socket.on('get-list-room', async (user_id) => {
+        let roomIdArr = await getListRoomId(user_id)
+        roomIdArr = uniqueArray(roomIdArr)
+        //console.log(roomIdArr)
+        let arrData = [];
+
+        async.forEach(roomIdArr, function (item, callback) {
+            Message.find({ room_id: item })
+                .sort({ createdAt: -1 })
+                .limit(1)
+                .then(msg => {
+                    const splitRoomId = item.split('_');     //id_id
+                    if (splitRoomId.length > 1) {
+                        const receiver = splitRoomId[0] === user_id ? splitRoomId[1] : splitRoomId[0];
+                        User.findById(receiver)
+                        .then(user => {
+                            const data = {
+                                room_id: item,
+                                imgUrl: user.img_url,
+                                name: user.name,
+                                lastMessage: msg[0].content,
+                                createdAt: msg[0].createdAt
+                            }
+                            arrData.push(data)
+                            callback();
+                        })
+                    } else {
+                        Club.findById(item).then(club => {
+                            const data = {
+                                room_id: item,
+                                imgUrl: club.img_url,
+                                name: club.name,
+                                lastMessage: msg[0].content,
+                                createdAt: msg[0].createdAt
+                            }
+                            arrData.push(data)
+                            callback();
+                        })
+                    }
+                })
+        }, function (err) {
             if (err) {
-                console.log("Query err - " + err.message)
+                console.log("Foreach err - " + err.message)
                 return;
             }
-            //console.log(result)
-            let arrData = []
-            async.forEach(result, function (item, callback) {
-                const splitRoomId = item._id.split('_');     //id_id
-                if (splitRoomId.length > 1) {
-                    const receiver = splitRoomId[0] === user_id ? splitRoomId[1] : splitRoomId[0];
-                    User.findById(receiver).then(user => {
-                        Message.find({ room_id: item._id })
-                            .sort({ createdAt: -1 })
-                            .limit(1)
-                            .then(msg => {
-                                //console.log(club.name, msg[0].content)
-                                const data = {
-                                    room_id: item._id,
-                                    imgUrl: user.img_url,
-                                    name: user.name,
-                                    lastMessage: msg[0].content,
-                                    createdAt: msg[0].createdAt
-                                }
-                                arrData.push(data)
-                                callback();
-                            }).catch(err => {
-                                console.log("Message query err - " + err.message)
-                                return;
-                            })
-                    })
-                } else {
-                    Club.findById(item._id).then(club => {
-                        Message.find({ room_id: item._id })
-                            .sort({ createdAt: -1 })
-                            .limit(1)
-                            .then(msg => {
-                                //console.log(club.name, msg[0].content)
-                                const data = {
-                                    room_id: item._id,
-                                    imgUrl: club.img_url,
-                                    name: club.name,
-                                    lastMessage: msg[0].content,
-                                    createdAt: msg[0].createdAt
-                                }
-                                arrData.push(data)
-                                callback();
-                            }).catch(err => {
-                                console.log("Message query err - " + err.message)
-                                return;
-                            })
-                    }).catch(err => {
-                        console.log("Club query err - " + err.message)
-                        return;
-                    })
-                }
-            }, function (err) {
-                if (err) {
-                    console.log("Foreach err - " + err.message)
-                    return;
-                }
-                socket.emit('output-list-room', arrData.sort(function (a, b) {
-                    return new Date(b.createdAt) - new Date(a.createdAt);
-                }))
-            })
-
+            socket.emit('output-list-room', arrData.sort(function (a, b) {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            }))
         })
     })
 }
+
+async function getListRoomId(userId) {
+    let roomIdArr = []
+    const roomIdFromMessage = await Message.aggregate([
+        {
+            $match: {
+                author: mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            $group: {
+                _id: "$room_id",
+            }
+        },
+    ])
+    roomIdFromMessage.forEach(room => {
+        roomIdArr.push(room._id)
+    })
+
+    const roomIdFromChatRoom = await ChatRoom.find({ room_id: { $regex: userId } })
+    roomIdFromChatRoom.forEach(room => {
+        roomIdArr.push(room.room_id)
+    })
+
+    return roomIdArr;
+}   

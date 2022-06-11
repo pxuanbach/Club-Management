@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import {
     Avatar, Divider, Box, CircularProgress,
     Tooltip, List, ListItem, ListItemText,
-    ListItemAvatar,
+    ListItemAvatar, Snackbar, Alert,
     ListItemButton
 } from '@mui/material';
 import io from 'socket.io-client';
@@ -13,6 +13,7 @@ import MessagesList from '../leader-club/message/Message-List';
 import Input from '../leader-club/message/Input';
 import { ENDPT } from '../../helper/Helper';
 import { UserContext } from '../../UserContext';
+import SeverityOptions from '../../helper/SeverityOptions'
 
 let socket;
 
@@ -21,11 +22,20 @@ const PersonMessage = () => {
     const [isFindUser, setIsFindUser] = useState(false);
     const [search, setSearch] = useState();
     const [message, setMessage] = useState();
-    const [userSelected, setUserSelected] = useState();
     const [users, setUsers] = useState([]);
     const [rooms, setRooms] = useState([]);
     const [currentRoom, setCurrentRoom] = useState();
     const [messages, setMessages] = useState([]);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [options, setOptions] = useState();
+
+    const showSnackbar = (message, options) => {
+        setOptions(options)
+        setAlertMessage(message)
+        setOpenSnackbar(true)
+    }
+
 
     const handleToggleFindUser = (e) => {
         e.preventDefault();
@@ -54,14 +64,26 @@ const PersonMessage = () => {
             createdAt: ""
         }
         setRooms([...rooms, data])
+        setCurrentRoom(data)
         setIsFindUser(false);
     }
 
     const sendMessage = (event) => {
         event.preventDefault();
+        if (!currentRoom) {
+            showSnackbar("Bạn chưa chọn phòng trò chuyện", SeverityOptions.error)
+            setMessage('')
+            return;
+        }
         if (message) {
-            console.log(message, currentRoom)
-            socket.emit('sendMessage', user._id, 'text', message, currentRoom.room_id, () => setMessage(''))
+            //console.log(message, currentRoom)
+            socket.emit('sendMessage',
+                user._id,
+                'text',
+                message,
+                currentRoom.room_id,
+                () => setMessage('')
+            )
         }
     }
 
@@ -77,7 +99,24 @@ const PersonMessage = () => {
     }, [])
 
     useEffect(() => {
-        console.log(currentRoom)
+        socket.on('output-list-room', roomList => {
+            //console.log("current room", currentRoom)
+            setRooms(roomList)
+            //console.log("current room 2", currentRoom)
+        })
+        socket.on('reload-list-room', (message) => {
+            //console.log(rooms)
+            const currentRooms = JSON.parse(JSON.stringify(rooms))
+            const isRoomExist = currentRooms.find(room => room.room_id === message.room_id)
+            //console.log("isRoomExist", isRoomExist)
+            //console.log(rooms, message.room_id)
+            if (isRoomExist) {
+                socket.emit('get-list-room', user._id)
+            }
+        })
+    }, [rooms])
+
+    useEffect(() => {
         socket.emit('join', { user_id: user?._id, room_id: currentRoom?.room_id })
         socket.emit('get-messages-history', currentRoom?.room_id)
         socket.on('output-messages', messages => {
@@ -88,32 +127,20 @@ const PersonMessage = () => {
 
     useEffect(() => {
         socket.on('message', message => {
-            // console.log('message sended', message)
-            // console.log("message", message.room_id)
-            // console.log("current room", currentRoom)
-            // console.log("user id", message.author._id === user._id)
-            const checkUserId = message.author._id === user._id;
-            const checkRoomId = (message.room_id === currentRoom?.room_id);
-            if (checkRoomId || checkUserId) {
-                setMessages([...messages, message])
-            }
-            const isRoomExist = rooms.find(room => room.room_id === message.room_id)
-            if (isRoomExist) {
-                socket.emit('get-list-room', user._id)
-            }
+            setMessages([...messages, message])
         })
     }, [messages]);
 
     useEffect(() => {
         if (user) {
             socket.emit('get-list-room', user._id)
-            socket.on('output-list-room', roomList => {
-                //console.log("current room", currentRoom, roomList[0])
-                setRooms(roomList)
-                if (currentRoom === undefined) {
-                    setCurrentRoom(JSON.parse(JSON.stringify(roomList[0])))
+            socket.on('chat-room-created', roomId => {
+                const splitRoomId = roomId.split('_');
+                if (splitRoomId.length > 1) {
+                    if (splitRoomId[0] === user._id || splitRoomId[1] === user._id) {
+                        socket.emit('get-list-room', user._id)
+                    }
                 }
-                //console.log("current room 2", currentRoom)
             })
         }
     }, [user])
@@ -123,6 +150,14 @@ const PersonMessage = () => {
     }
     return (
         <div className='container-private-message'>
+            <Snackbar
+                autoHideDuration={5000}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={openSnackbar}
+                onClose={() => setOpenSnackbar(false)}
+            >
+                <Alert severity={options}>{alertMessage}</Alert>
+            </Snackbar>
             <div className='container-left'>
                 <div className='header-left'>
                     <h2>Message</h2>
@@ -190,14 +225,14 @@ const PersonMessage = () => {
             <div className='container-right'>
                 <div className='div-message-body'>
                     <div className='div-mess'>
-                        {currentRoom && <div className='header-mess'>
+                        {currentRoom ? <div className='header-mess'>
                             <Avatar src={currentRoom.imgUrl} sx={{ width: 43, height: 43 }} />
                             <div className='name-mess'>{currentRoom.name}</div>
                             <div id="todoicon" className='todo-icon'>
                                 <i class="fa-solid fa-phone"></i>
                                 <i class="fa-solid fa-video"></i>
                             </div>
-                        </div>}
+                        </div> : <></>}
                         <div className='body-mess'>
                             <MessagesList
                                 user={user}
