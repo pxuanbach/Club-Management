@@ -15,6 +15,7 @@ import axiosInstance from '../../helper/Axios';
 import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 import { Buffer } from 'buffer';
+import FileDownload from 'js-file-download'
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -38,7 +39,7 @@ const style = {
 };
 
 const ManageClub = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [clubSelected, setClubSelected] = useState()
   const [openDialog, setOpenDialog] = useState(false);
   const [showFormAdd, setShowFormAdd] = useState(false);
@@ -79,23 +80,23 @@ const ManageClub = () => {
     event.stopPropagation();
     //socket.emit('block-unblock-club', param._id)
     const res = await axiosInstance.patch(`/club/block/${param._id}`)
-    .then(response => {
-      const updateClubs = clubs.map((elm) => {
-        if (elm._id === response.data._id) {
-          return {
-            ...elm,
-            isblocked: response.data.isblocked
+      .then(response => {
+        const updateClubs = clubs.map((elm) => {
+          if (elm._id === response.data._id) {
+            return {
+              ...elm,
+              isblocked: response.data.isblocked
+            }
           }
-        }
-        return elm;
-      });
-  
-      setClubs(updateClubs)
-    }).catch(err => {
-      //console.log(err.response.data)
-      setAlertMessage(err.response.data.error)
-      setOpenSnackbar(true);
-    })
+          return elm;
+        });
+
+        setClubs(updateClubs)
+      }).catch(err => {
+        //console.log(err.response.data)
+        setAlertMessage(err.response.data.error)
+        setOpenSnackbar(true);
+      })
 
     const data = res.data;
 
@@ -109,7 +110,7 @@ const ManageClub = () => {
         }
         return elm;
       });
-  
+
       setClubs(updateClubs)
     }
   }
@@ -197,13 +198,29 @@ const ManageClub = () => {
             <Button style={{ color: '#1B264D' }} disableElevation onClick={(event) => {
               handleDelete(event, value.row)
             }}>
-              <ClearIcon/>
+              <ClearIcon />
             </Button>
           </Tooltip>
         )
       }
     }
   ];
+
+  const handleExportClubs = (e) => {
+    e.preventDefault()
+    axiosInstance.get('/export/clubs', {
+      headers: {"Content-Type": "application/vnd.ms-excel"},
+      responseType: 'blob'
+    })
+      .then(response => {
+        //console.log(response)
+        FileDownload(response.data, Date.now() + '-caulacbo.xlsx')
+      }).catch(err => {
+        console.log(err)
+        setAlertMessage(err.response)
+        setOpenSnackbar(true);
+      })
+  }
 
   const getListClub = async () => {
     let isAdmin = user?.username.includes('admin');
@@ -242,7 +259,7 @@ const ManageClub = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAdd={setShowFormAdd} clubs={clubs} setClubs={setClubs}/>
+          <AddClub setShowFormAdd={setShowFormAdd} clubs={clubs} setClubs={setClubs} />
         </Box>
       </Modal>
       <Modal
@@ -256,7 +273,7 @@ const ManageClub = () => {
         <Box sx={style}>
           <UpdateClub
             club={clubSelected}
-            clubs={clubs} 
+            clubs={clubs}
             setClubs={setClubs}
             setShowFormUpdate={setShowFormUpdate}
           />
@@ -289,7 +306,7 @@ const ManageClub = () => {
                 variant="text"
                 disableElevation
                 onClick={handleSearch}>
-                <SearchIcon sx={{color: '#1B264D'}}/>
+                <SearchIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
             <Tooltip title='Làm mới' placement='right-start'>
@@ -298,7 +315,7 @@ const ManageClub = () => {
                 variant="outlined"
                 disableElevation
                 onClick={getListClub}>
-                <RefreshIcon sx={{color: '#1B264D'}}/>
+                <RefreshIcon sx={{ color: '#1B264D' }} />
               </Button>
             </Tooltip>
           </div>
@@ -320,6 +337,7 @@ const ManageClub = () => {
               <span>Nhập file</span>
             </Button>
             <Button
+              onClick={handleExportClubs}
               style={{ background: '#1B264D' }}
               variant="contained"
               disableElevation

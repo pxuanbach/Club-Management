@@ -4,6 +4,7 @@ import {
   Snackbar, Alert
 } from '@mui/material';
 import { useRouteMatch } from 'react-router-dom';
+import FileDownload from 'js-file-download';
 import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
@@ -107,6 +108,20 @@ const TabContent = ({ match, club_id, isLeader }) => {
     } else {
       getActivities()
     }
+  }
+
+  const handleExportActivity = (activity) => {
+    axiosInstance.get(`/export/activity/${activity._id}`,
+      {
+        headers: { "Content-Type": "application/vnd.ms-excel" },
+        responseType: 'blob'
+      })
+      .then(response => {
+        //console.log(response)
+        FileDownload(response.data, Date.now() + '-hoatdong.xlsx')
+      }).catch(err => {
+        showSnackbar(err.response.data.error)
+      })
   }
 
   const getActivities = () => {
@@ -232,6 +247,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
                 setOpenDialog={setOpenDialog}
                 setShowCollaborators={setShowCollaborators}
                 setActivitySelected={setActivitySelected}
+                handleExportActivity={handleExportActivity}
               />
             </div>
           ))}

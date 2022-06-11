@@ -15,7 +15,8 @@ const ITEM_HEIGHT = 48;
 
 export default function ActivityItem({
   activity, link, setShowFormUpdate, setOpenDialog, 
-  setActivitySelected, setShowCollaborators
+  setActivitySelected, setShowCollaborators,
+  handleExportActivity
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -80,6 +81,12 @@ export default function ActivityItem({
             setOpenDialog(true)
           }}>
             Xóa
+          </MenuItem>
+          <MenuItem onClick={() => {
+            handleExportActivity(activity)
+            handleClose()
+          }}>
+            Báo cáo
           </MenuItem>
         </Menu>
       </div>
