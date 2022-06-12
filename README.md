@@ -51,6 +51,11 @@
   
 
   <img src="https://user-images.githubusercontent.com/71374867/172016066-b6c923df-001f-4c1c-b824-cca33028f360.png" alt="..." width="1000" />
+  
+  + Chọn một task công việc:
+  
+
+  <img src="https://user-images.githubusercontent.com/71374867/173212425-8ba54949-2a86-477f-aac5-9d0f4a68ba05.png" alt="..." width="1000" />
 
 - Quản lý thành viên
 
