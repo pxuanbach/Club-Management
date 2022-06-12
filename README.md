@@ -76,16 +76,19 @@
    <img src="https://user-images.githubusercontent.com/71374867/172016260-ef380f01-24fe-4257-ab23-c3dc30010f11.png" alt="..." width="1000" />
 
 ## Thư viện và công nghệ
-- [React JS](https://reactjs.org/).
-- [MongoDB](https://www.mongodb.com/).
+- [Socket.IO](https://socket.io/).
+- [xlsx](https://www.npmjs.com/package/xlsx).
 ### Frontend
-- [HTML](https://www.w3schools.com/html/).
-- [CSS](https://www.w3schools.com/css/).
+- [React JS](https://reactjs.org/).
+- [Material-UI](https://mui.com/).
 ### Backend
 - [Nodejs](https://nodejs.org/en/).
 - [Express](https://expressjs.com/).
-- [JavaScript](https://www.javascript.com/).
 - [JSON Web Token](https://jwt.io/).
+- [Mongoose](https://mongoosejs.com/).
+### Database
+- [MongoDB](https://www.mongodb.com/).
+- [Cloudinary](https://cloudinary.com/).
 ## Database Diagram
 ![image](https://user-images.githubusercontent.com/71374867/172015322-a99c53c9-84a0-4736-843c-b0abb183c445.png)
 ## Tác giả
