@@ -36,11 +36,15 @@ const PersonMessage = () => {
         setOpenSnackbar(true)
     }
 
-
     const handleToggleFindUser = (e) => {
         e.preventDefault();
         setIsFindUser(!isFindUser);
         setUsers([])
+    }
+
+    const handleRefresh = (e) => {
+        e.preventDefault();
+        socket.emit('get-list-room', user._id)
     }
 
     const handleSearch = (e) => {
@@ -64,7 +68,7 @@ const PersonMessage = () => {
         ]
         const currentRooms = JSON.parse(JSON.stringify(rooms))
         const isRoomExist = currentRooms.find(room =>
-            room.room_id === roomIdArr[0] 
+            room.room_id === roomIdArr[0]
             || room.room_id === roomIdArr[1]
         )
         if (isRoomExist) {
@@ -176,12 +180,21 @@ const PersonMessage = () => {
             <div className='container-left'>
                 <div className='header-left'>
                     <h2>Message</h2>
-                    <Tooltip title="Tạo cuộc trò chuyện mới">
-                        <div className='btn-icon-create'
-                            onClick={handleToggleFindUser}>
-                            <i class="fa-solid fa-square-pen"></i>
-                        </div>
-                    </Tooltip>
+                    <div style={{display: 'flex', gap: '10px'}}>
+                        <Tooltip title="Tạo cuộc trò chuyện mới">
+                            <div className='btn-icon-create'
+                                onClick={handleToggleFindUser}>
+                                <i class="fa-solid fa-square-pen"></i>
+                            </div>
+                        </Tooltip>
+                        <Tooltip title="Làm mới">
+                            <div className='btn-icon-refresh'
+                                onClick={handleRefresh}>
+                                <i class="fa-solid fa-arrow-rotate-right"></i>
+                            </div>
+                        </Tooltip>
+                    </div>
+
                 </div>
                 <div className='container-search-mess'>
                     <div className='div-search-mess'>

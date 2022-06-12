@@ -14,7 +14,6 @@ const ITEM_HEIGHT = 48;
 const ItemMessage = ({ room, setCurrentRoom }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const isClubRoom = room.room_id.split('_').length <= 1
 
     const handleClick = (e) => {
         if (e && e.stopPropagation) e.stopPropagation();
@@ -25,12 +24,6 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
         if (e && e.stopPropagation) e.stopPropagation();
         setAnchorEl(null);
     };
-
-    const handleDeleteMessages = (e) => {
-        if (e && e.stopPropagation) e.stopPropagation();
-        //room.room_id
-        handleClose();
-    }
 
     const handleSelectRoom = (e) => {
         e.preventDefault();
@@ -49,8 +42,8 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
                     <h3>{room.name}</h3>
                     <p className="latest-message">{room.lastMessage}</p>
                 </div>
-                {isClubRoom ? <></> :
-                <div className='div-menu-item-mess'>
+
+                {/* <div className='div-menu-item-mess'>
                     <IconButton
                         aria-label="more"
                         id="long-button"
@@ -80,7 +73,7 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
                             Xóa
                         </MenuItem>
                     </Menu>
-                </div>}
+                </div> */}
             </div>
         </div>
     )
