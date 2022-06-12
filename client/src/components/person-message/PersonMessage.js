@@ -40,6 +40,7 @@ const PersonMessage = () => {
     const handleToggleFindUser = (e) => {
         e.preventDefault();
         setIsFindUser(!isFindUser);
+        setUsers([])
     }
 
     const handleSearch = (e) => {
@@ -56,15 +57,29 @@ const PersonMessage = () => {
     }
 
     const handleSelectUser = (e, userSelected) => {
-        const data = {
-            room_id: user._id + "_" + userSelected._id,
-            imgUrl: userSelected.img_url,
-            name: userSelected.name,
-            lastMessage: "",
-            createdAt: ""
+        e.preventDefault();
+        const roomIdArr = [
+            user._id + "_" + userSelected._id,
+            userSelected._id + "_" + user._id
+        ]
+        const currentRooms = JSON.parse(JSON.stringify(rooms))
+        const isRoomExist = currentRooms.find(room =>
+            room.room_id === roomIdArr[0] 
+            || room.room_id === roomIdArr[1]
+        )
+        if (isRoomExist) {
+            setCurrentRoom(isRoomExist)
+        } else {
+            const data = {
+                room_id: user._id + "_" + userSelected._id,
+                imgUrl: userSelected.img_url,
+                name: userSelected.name,
+                lastMessage: "",
+                createdAt: ""
+            }
+            setRooms([...rooms, data])
+            setCurrentRoom(data)
         }
-        setRooms([...rooms, data])
-        setCurrentRoom(data)
         setIsFindUser(false);
     }
 
@@ -108,9 +123,9 @@ const PersonMessage = () => {
             //console.log(rooms)
             const currentRooms = JSON.parse(JSON.stringify(rooms))
             const isRoomExist = currentRooms.find(room => room.room_id === message.room_id)
-            //console.log("isRoomExist", isRoomExist)
+            const isRoomClub = user.clubs.find(club => club === message.room_id)
             //console.log(rooms, message.room_id)
-            if (isRoomExist) {
+            if (isRoomExist || isRoomClub) {
                 socket.emit('get-list-room', user._id)
             }
         })
@@ -184,12 +199,17 @@ const PersonMessage = () => {
                             borderRadius: '5px',
                             backgroundColor: '#fff',
                             width: '100%',
+                            minHeight: '300px',
                             zIndex: 99,
                         }}>
                             {users.map((user, index) => (
                                 <ListItem key={index}
                                     alignItems="flex-start"
-                                    sx={{ padding: "0px 10px" }}>
+                                    sx={{
+                                        padding: "0px 10px",
+                                        overflow: 'hidden',
+                                        width: '100%',
+                                    }}>
                                     <ListItemButton onClick={(e) => handleSelectUser(e, user)}>
                                         <ListItemAvatar>
                                             <Avatar src={user.img_url} />
@@ -228,10 +248,6 @@ const PersonMessage = () => {
                         {currentRoom ? <div className='header-mess'>
                             <Avatar src={currentRoom.imgUrl} sx={{ width: 43, height: 43 }} />
                             <div className='name-mess'>{currentRoom.name}</div>
-                            <div id="todoicon" className='todo-icon'>
-                                <i class="fa-solid fa-phone"></i>
-                                <i class="fa-solid fa-video"></i>
-                            </div>
                         </div> : <></>}
                         <div className='body-mess'>
                             <MessagesList
@@ -243,7 +259,6 @@ const PersonMessage = () => {
                             <div className='chat-todo'>
                                 <i class="fa-solid fa-paperclip"></i>
                                 <i class="fa-solid fa-file-image"></i>
-                                <i class="fa-solid fa-microphone"></i>
                             </div>
                             <div className='div-text-chat'>
                                 <Input

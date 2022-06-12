@@ -30,7 +30,7 @@ module.exports = function (socket, io) {
                 { email: { $regex: searchValue } }
             ]
         }).limit(8).then(result => {
-            console.log(searchValue, result)
+            //console.log(searchValue, result)
             socket.emit('user-searched', result)
         })
     })
@@ -86,8 +86,7 @@ module.exports = function (socket, io) {
     })
 
     socket.on('get-list-room', async (user_id) => {
-        let roomIdArr = await getListRoomId(user_id)
-        roomIdArr = uniqueArray(roomIdArr)
+        const roomIdArr = await getListRoomId(user_id)
         //console.log(roomIdArr)
         let arrData = [];
 
@@ -100,29 +99,34 @@ module.exports = function (socket, io) {
                     if (splitRoomId.length > 1) {
                         const receiver = splitRoomId[0] === user_id ? splitRoomId[1] : splitRoomId[0];
                         User.findById(receiver)
-                        .then(user => {
-                            const data = {
-                                room_id: item,
-                                imgUrl: user.img_url,
-                                name: user.name,
-                                lastMessage: msg[0].content,
-                                createdAt: msg[0].createdAt
-                            }
-                            arrData.push(data)
-                            callback();
-                        })
+                            .then(user => {
+                                if (msg.length > 0) {
+                                    const data = {
+                                        room_id: item,
+                                        imgUrl: user.img_url,
+                                        name: user.name,
+                                        lastMessage: msg[0].content,
+                                        createdAt: msg[0].createdAt
+                                    }
+                                    arrData.push(data)
+                                }
+                                callback();
+                            })
                     } else {
-                        Club.findById(item).then(club => {
-                            const data = {
-                                room_id: item,
-                                imgUrl: club.img_url,
-                                name: club.name,
-                                lastMessage: msg[0].content,
-                                createdAt: msg[0].createdAt
-                            }
-                            arrData.push(data)
-                            callback();
-                        })
+                        Club.findById(item)
+                            .then(club => {
+                                if (msg.length > 0) {
+                                    const data = {
+                                        room_id: item,
+                                        imgUrl: club.img_url,
+                                        name: club.name,
+                                        lastMessage: msg[0].content,
+                                        createdAt: msg[0].createdAt
+                                    }
+                                    arrData.push(data)
+                                }
+                                callback();
+                            })
                     }
                 })
         }, function (err) {
@@ -138,27 +142,17 @@ module.exports = function (socket, io) {
 }
 
 async function getListRoomId(userId) {
-    let roomIdArr = []
-    const roomIdFromMessage = await Message.aggregate([
-        {
-            $match: {
-                author: mongoose.Types.ObjectId(userId)
-            }
-        },
-        {
-            $group: {
-                _id: "$room_id",
-            }
-        },
-    ])
-    roomIdFromMessage.forEach(room => {
-        roomIdArr.push(room._id)
+    let roomIdArr = [];
+    const user = await User.findById(userId).lean();
+    user.clubs.forEach(club => {
+        const clubId = club.toString();
+        roomIdArr.push(clubId)
     })
 
     const roomIdFromChatRoom = await ChatRoom.find({ room_id: { $regex: userId } })
     roomIdFromChatRoom.forEach(room => {
         roomIdArr.push(room.room_id)
     })
-
-    return roomIdArr;
+    //console.log("unique", uniqueArray(roomIdArr))
+    return uniqueArray(roomIdArr);
 }   

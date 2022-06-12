@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import "./Message.css"
 import MessagesList from './Message-List';
-import MessageOption from './MessageOption'
 import Input from './Input';
 import io from 'socket.io-client';
 import { ENDPT } from '../../../helper/Helper'
@@ -13,17 +12,6 @@ const Message = ({ club_id }) => {
   const [message, setMessage] = useState();
   const [messages, setMessages] = useState([]);
   const { user } = useContext(UserContext);
-
-  const showhideFunction = () => {
-    var menuList = document.getElementById("extend");
-    if (menuList.className == "extendOff") {
-      menuList.className = "extendOn";
-      document.getElementById("todoicon").style.right = "28%";
-    } else {
-      menuList.className = "extendOff";
-      document.getElementById("todoicon").style.right = "1%";
-    }
-  }
 
   const sendMessage = (event) => {
     event.preventDefault();
@@ -61,12 +49,7 @@ const Message = ({ club_id }) => {
       {user && (<>
         <div className='div-mess'>
           <div className='header-mess'>
-            {/* <div className='name-mess'>Tin nhắn chung</div> */}
-            <div id="todoicon" className='todo-icon'>
-              <i class="fa-solid fa-phone"></i>
-              <i class="fa-solid fa-video"></i>
-              <i class="fa-solid fa-circle-info" onClick={() => showhideFunction()} ></i>
-            </div>
+            <div className='name-mess'>Tin nhắn chung</div>
           </div>
           <div className='body-mess'>
             <MessagesList user={user} messages={messages} />
@@ -86,9 +69,6 @@ const Message = ({ club_id }) => {
             </div>
 
           </div>
-        </div>
-        <div id="extend" className="extendOff">
-          <MessageOption></MessageOption>
         </div>
       </>)}
     </div>
