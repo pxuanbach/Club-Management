@@ -87,3 +87,15 @@ module.exports.getScheduler = async (req, res) => {
         res.status(500).send({ error: "Activity find err - " + err.message })
     })
 }
+
+module.exports.getClubScheduler = async (req, res) => {
+    const clubId = req.params.clubId;
+
+    Activity.find({club: clubId})
+    .populate('club')
+    .then(result => {
+        res.status(200).send(result)
+    }).catch(err => {
+        res.status(500).send({ error: "Activity find err - " + err.message })
+    })
+}

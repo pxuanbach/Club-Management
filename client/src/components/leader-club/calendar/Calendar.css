@@ -1,8 +1,4 @@
 .body-calendar{
-    width: 78vw;
-    position: fixed;
-    
+    width: 100%;
+    background-color: aqua;
 }
-
-
-@tailwind utilities;
