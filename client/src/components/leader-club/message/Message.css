@@ -238,6 +238,9 @@ body {
   font-size: 18px;
   font-weight: 400;
 }
+.messages .message .text_wrapper .message_file{
+  
+}
 
 
 /* component input + send input */

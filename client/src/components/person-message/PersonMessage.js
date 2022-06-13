@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import {
     Avatar, Divider, Box, CircularProgress,
     Tooltip, List, ListItem, ListItemText,
@@ -12,14 +12,17 @@ import ItemMessage from './ItemMessage'
 import MessagesList from '../leader-club/message/Message-List';
 import Input from '../leader-club/message/Input';
 import { ENDPT } from '../../helper/Helper';
+import { UploadImageMessage } from '../../helper/UploadImage'
 import { UserContext } from '../../UserContext';
+import PreviewFileDialog from '../dialog/PreviewFileDialog'
 import SeverityOptions from '../../helper/SeverityOptions'
 
 let socket;
 
 const PersonMessage = () => {
+    const inputFile = useRef(null);
+    const [file, setFile] = useState();
     const { user } = useContext(UserContext);
-    const [isFindUser, setIsFindUser] = useState(false);
     const [search, setSearch] = useState();
     const [message, setMessage] = useState();
     const [users, setUsers] = useState([]);
@@ -29,6 +32,7 @@ const PersonMessage = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [options, setOptions] = useState();
+    const [openDialog, setOpenDialog] = useState(false);
 
     const showSnackbar = (message, options) => {
         setOptions(options)
@@ -36,27 +40,43 @@ const PersonMessage = () => {
         setOpenSnackbar(true)
     }
 
-    const handleToggleFindUser = (e) => {
-        e.preventDefault();
-        setIsFindUser(!isFindUser);
-        setUsers([])
-    }
-
     const handleRefresh = (e) => {
         e.preventDefault();
         socket.emit('get-list-room', user._id)
     }
 
+    function isFileImage(file) {
+        const fileType = file.type;
+        return fileType.includes('spreadsheetml.sheet')
+            || fileType.includes('ms-excel')
+            || fileType.includes('image');
+    }
+
+    const handleFileChange = (event) => {
+        if (isFileImage(event.target.files[0])) {
+            setFile(event.target.files[0]);
+            setOpenDialog(true)
+        } else {
+            showSnackbar('Tệp tải lên nên có định dạng excel, image.', SeverityOptions.warning)
+        }
+    };
+
+    const handleChangeSearch = (e) => {
+        e.preventDefault();
+        if (e.target.value === '') {
+            setUsers([])
+        }
+        setSearch(e.target.value)
+        socket.emit('search-user', e.target.value)
+    }
+
     const handleSearch = (e) => {
         e.preventDefault();
-        if (isFindUser) {
-            if (search) {
-                socket.emit('search-user', search)
-            } else {
-                setUsers([])
-            }
-        } else {
 
+        if (search) {
+            socket.emit('search-user', search)
+        } else {
+            setUsers([])
         }
     }
 
@@ -84,7 +104,25 @@ const PersonMessage = () => {
             setRooms([...rooms, data])
             setCurrentRoom(data)
         }
-        setIsFindUser(false);
+        setSearch('')
+        setUsers([])
+    }
+
+    const handleSendFile = async () => {
+        if (!currentRoom) {
+            showSnackbar("Bạn chưa chọn phòng trò chuyện", SeverityOptions.error)
+            return;
+        }
+        const res = await UploadImageMessage(file);
+
+        socket.emit('sendMessage',
+            user._id,
+            file.type.includes('image') ? 'image' : 'file',
+            res.url,
+            currentRoom.room_id,
+            () => {}
+        )
+        setFile(null)
     }
 
     const sendMessage = (event) => {
@@ -177,16 +215,19 @@ const PersonMessage = () => {
             >
                 <Alert severity={options}>{alertMessage}</Alert>
             </Snackbar>
+            <PreviewFileDialog
+                open={openDialog}
+                setOpen={setOpenDialog}
+                title="Xác nhận nội dung"
+                file={file}
+                resetFile={() => inputFile.current.value = ""}
+                contentText={`Bạn có chắc muốn gửi tệp \b${file?.name}\b?`}
+                handleAgree={handleSendFile}
+            />
             <div className='container-left'>
                 <div className='header-left'>
                     <h2>Message</h2>
-                    <div style={{display: 'flex', gap: '10px'}}>
-                        <Tooltip title="Tạo cuộc trò chuyện mới">
-                            <div className='btn-icon-create'
-                                onClick={handleToggleFindUser}>
-                                <i class="fa-solid fa-square-pen"></i>
-                            </div>
-                        </Tooltip>
+                    <div style={{ display: 'flex', gap: '10px' }}>
                         <Tooltip title="Làm mới">
                             <div className='btn-icon-refresh'
                                 onClick={handleRefresh}>
@@ -202,11 +243,11 @@ const PersonMessage = () => {
                             value={search}
                             type="text"
                             placeholder="Tìm kiếm"
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={handleChangeSearch}
                             onKeyPress={event => event.key === 'Enter' ? handleSearch(event) : null}
                         />
                         <i onClick={handleSearch} class="fa-solid fa-magnifying-glass"></i>
-                        {isFindUser ? <List sx={{
+                        {search ? <List sx={{
                             position: 'absolute',
                             top: '37px',
                             borderRadius: '5px',
@@ -270,8 +311,11 @@ const PersonMessage = () => {
                         </div>
                         <div className='div-chat'>
                             <div className='chat-todo'>
-                                <i class="fa-solid fa-paperclip"></i>
-                                <i class="fa-solid fa-file-image"></i>
+                                <i onClick={() => inputFile.current.click()} class="fa-solid fa-file-image"></i>
+                                <input style={{ display: 'none' }} 
+                                type="file" 
+                                ref={inputFile} 
+                                onChange={handleFileChange} />
                             </div>
                             <div className='div-text-chat'>
                                 <Input

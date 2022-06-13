@@ -4,16 +4,35 @@ import {
     DialogContentText, DialogTitle
 } from '@mui/material';
 
-const CustomDialog = ({ open, setOpen, title, contentText, handleAgree }) => {
+const styleContainer = {
+    display: 'flex',
+    justifyContent: 'center',
+    maxWidth: '300px',
+    maxHeight: '300px',
+    margin: '0px auto 5px',
+    overflow: 'hidden',
+}
+
+const styleImg = {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'cover',
+    objectPosition: "center",
+}
+
+const PreviewFileDialog = ({ 
+    open, setOpen, title, file, resetFile, contentText, handleAgree 
+}) => {
 
     const handleClose = () => {
         setOpen(false)
+        resetFile()
     }
 
     const ConvertBoldText = (text) => {
         const newText = text.split('\b');
-        for(let i = 0; i < newText.length; i++) {
-            if (i%2 !== 0) {
+        for (let i = 0; i < newText.length; i++) {
+            if (i % 2 !== 0) {
                 newText[i] = <b>{newText[i]}</b>
             }
         }
@@ -39,6 +58,10 @@ const CustomDialog = ({ open, setOpen, title, contentText, handleAgree }) => {
                     {title}
                 </DialogTitle>
                 <DialogContent>
+                    {file?.type.includes('image') ?
+                        (<div style={styleContainer}>
+                            <img style={styleImg} src={URL.createObjectURL(file)}></img>
+                        </div>) : (<></>)}
                     <DialogContentText id="alert-dialog-description">
                         {ConvertNewlineText(contentText)}
                     </DialogContentText>
@@ -66,4 +89,4 @@ const CustomDialog = ({ open, setOpen, title, contentText, handleAgree }) => {
     )
 }
 
-export default CustomDialog
+export default PreviewFileDialog

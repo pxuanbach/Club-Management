@@ -23,7 +23,19 @@ const UploadImageUser = async (file) => {
     return res.data;
 }
 
+const UploadImageMessage = async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', 'Club-Management/Messages')
+    formData.append('upload_preset', upload_preset)
+
+    let res = await Axios.post(cloudinary_API, formData);
+
+    return res.data;
+}
+
 export {
     UploadImageClub,
-    UploadImageUser
+    UploadImageUser,
+    UploadImageMessage
 }
