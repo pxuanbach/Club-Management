@@ -38,7 +38,7 @@ const Club = () => {
             <Activity match={`/club/${club_id}/${club_name}/activity`} club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/calendar`}>
-            <Calendar />
+            <Calendar club_id={club_id}/>
           </Route>
           <Route path={`/club/${club_id}/${club_name}/message`}>
             <Message club_id={club_id}/>

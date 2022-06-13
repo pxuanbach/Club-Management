@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Avatar, Chip, Box } from '@mui/material'
+import { Avatar, Chip, Box, Tooltip } from '@mui/material'
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import './SelectedFiles.css';
 import SeverityOptions from '../../../../helper/SeverityOptions';
@@ -46,21 +46,22 @@ const SelectedFiles = ({
             <h5 style={{ color: '#1B264D', }}>Tệp đính kèm</h5>
             <div className='selected-file__list'>
                 {files.map((file, index) => (
-                    <Chip className='selected-file__item' sx={{ maxWidth: '162px' }}
-                        key={index}
-                        avatar={<Avatar src={file.url}>
-                            <FilePresentIcon sx={{ color: '#388E3C', backgroundColor: '#fff' }} />
-                        </Avatar>}
-                        label={<a href={file.url} target="_blank">
-                            {file.original_filename}
-                        </a>}
-                        onDelete={(e) => {
-                            e.preventDefault();
-                            setCurrentFile(file);
-                            setOpenDialog(true);
-                        }}
-                        clickable
-                    />
+                    <Tooltip key={index} title={file.original_filename}>
+                        <Chip className='selected-file__item' sx={{ maxWidth: '162px' }}
+                            avatar={<Avatar src={file.url}>
+                                <FilePresentIcon sx={{ color: '#388E3C', backgroundColor: '#fff' }} />
+                            </Avatar>}
+                            label={<a href={file.url} target="_blank">
+                                {file.original_filename}
+                            </a>}
+                            onDelete={(e) => {
+                                e.preventDefault();
+                                setCurrentFile(file);
+                                setOpenDialog(true);
+                            }}
+                            clickable
+                        />
+                    </Tooltip>
                 ))}
             </div>
         </Box>

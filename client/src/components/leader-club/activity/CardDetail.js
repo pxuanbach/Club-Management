@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import {
     Button, TextareaAutosize, Avatar, Box,
@@ -15,6 +13,7 @@ import UserCard from '../../card/UserCard';
 import FindGroupCard from '../../card/FindGroupCard';
 import SelectedFiles from './file-item/SelectedFiles';
 import CustomDialog from '../../dialog/CustomDialog';
+import PreviewFileDialog from '../../dialog/PreviewFileDialog';
 import Comments from './comment/Comments'
 import { UserContext } from '../../../UserContext';
 import SeverityOptions from '../../../helper/SeverityOptions'
@@ -29,9 +28,11 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const [anchorFindGroup, setAnchorFindGroup] = useState(null);
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
     const [userSelected, setUserSelected] = useState()
     const [userJoin, setUserJoin] = useState([]);
     const [groupJoin, setGroupJoin] = useState([]);
+    const [file, setFile] = useState();
     const [files, setFiles] = useState([]);
     const [description, setDescription] = useState();
     const [comment, setComment] = useState();
@@ -61,28 +62,32 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
 
     const handleFileChange = (event) => {
         if (isFileImage(event.target.files[0])) {
-            setIsLoading(true)
-            //event.target.files[0]
-            var formData = new FormData();
-            formData.append("file", event.target.files[0]);
-            formData.append("cardId", card._id)
-            axiosInstance.post('/activity/card/upload',
-                formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            }).then(response => {
-                //response.data
-                setFiles(response.data.files);
-                showSnackbar('Tệp tải lên thành công.', SeverityOptions.success)
-            }).catch(err => {
-                //err.response.data.error
-                showSnackbar(err.response.data.error, SeverityOptions.error)
-            }).finally(() => {
-                setIsLoading(false)
-            })
+            setFile(event.target.files[0])
+            setOpenPreviewDialog(true)
         } else {
             showSnackbar('Tệp tải lên nên có định dạng excel, image.', SeverityOptions.warning)
         }
     };
+
+    const handleSendFile = () => {
+        setIsLoading(true)
+        var formData = new FormData();
+        formData.append("file", file);
+        formData.append("cardId", card._id)
+        axiosInstance.post('/activity/card/upload',
+            formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        }).then(response => {
+            //response.data
+            setFiles(response.data.files);
+            showSnackbar('Tệp tải lên thành công.', SeverityOptions.success)
+        }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        }).finally(() => {
+            setIsLoading(false)
+        })
+    }
 
     const handleShowPopover = (event, user, setAnchorEl) => {
         setAnchorEl(event.currentTarget);
@@ -229,6 +234,15 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                 title="Xóa thẻ"
                 contentText={`Bạn có chắc muốn xóa thẻ này?`}
                 handleAgree={deleteCard}
+            />
+            <PreviewFileDialog
+                open={openPreviewDialog}
+                setOpen={setOpenPreviewDialog}
+                title="Xác nhận nội dung"
+                file={file}
+                resetFile={() => inputFile.current.value = ""}
+                contentText={`Bạn có chắc muốn gửi tệp \b${file?.name}\b?`}
+                handleAgree={handleSendFile}
             />
             <Snackbar
                 autoHideDuration={5000}

@@ -1,34 +1,164 @@
-import React, { useState, useContext, useEffect } from "react";
-import "./Calendar.css";
-import { getMonth } from "../../../util";
-import CalendarHeader from "../calendar/CalendarHeader";
-import Sidebar from "../calendar/Sidebar";
-import Month from "../calendar/Month";
-import GlobalContext from "../../../context/GlobalContext";
-import EventModal from "../calendar/EventModal";
-function Calendar() {
-  const [currenMonth, setCurrentMonth] = useState(getMonth());
-  const { monthIndex, showEventModal } = useContext(GlobalContext);
+import React, { useContext, useState, useEffect } from 'react'
+import {
+  Paper, Snackbar, Alert, Tooltip, styled,
+  IconButton, Box, CircularProgress, Grid
+} from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import GroupsIcon from '@mui/icons-material/Groups';
+import { useHistory, useRouteMatch, useParams } from 'react-router-dom'
+import { ViewState } from '@devexpress/dx-react-scheduler';
+import {
+  Scheduler,
+  Appointments,
+  MonthView,
+  Toolbar,
+  DateNavigator,
+  TodayButton,
+  AppointmentTooltip,
+} from '@devexpress/dx-react-scheduler-material-ui';
+import { UserContext } from '../../../UserContext';
+import axiosInstance from '../../../helper/Axios'
+import applyColor from '../../scheduler/ApplyColor';
+
+const StyledGroupIcon = styled(GroupsIcon)(({ theme: { palette } }) => ({
+  [`&.appointment-icon`]: {
+    color: palette.action.active,
+  },
+}));
+
+const Appointment = ({
+  children, style, ...restProps
+}) => {
+  return (
+    <Appointments.Appointment
+      {...restProps}
+      style={{
+        ...style,
+        backgroundColor: restProps.data.color,
+        borderRadius: '8px',
+      }}
+    >
+      {children}
+    </Appointments.Appointment>
+  )
+};
+
+
+const Header = (({
+  children, appointmentData, ...restProps
+}) => {
+  const history = useHistory();
+  const url = `/club/${appointmentData.club._id}/${appointmentData.club.name}/activity/${appointmentData._id}`
+  return (
+    <AppointmentTooltip.Header
+      {...restProps}
+      appointmentData={appointmentData}
+    >
+      <Tooltip title="Đi thẳng đến hoạt động" placement="right-start">
+        <IconButton
+          /* eslint-disable-next-line no-alert */
+          onClick={() => {
+            history.push(url)
+          }}
+          size="large"
+        >
+          <ArrowForwardIcon />
+        </IconButton>
+      </Tooltip>
+    </AppointmentTooltip.Header>
+  )
+});
+
+const Content = (({
+  children, appointmentData, ...restProps
+}) => (
+  <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
+    <Grid container alignItems="center">
+      <Grid item xs={2} sx={{ textAlign: 'center' }}>
+        <StyledGroupIcon className='appointment-icon' />
+      </Grid>
+      <Grid item xs={10}>
+        <span>{appointmentData.club.name}</span>
+      </Grid>
+    </Grid>
+  </AppointmentTooltip.Content>
+));
+
+const Calendar = ({ club_id }) => {
+  const date = new Date();
+  const { user } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [scheduler, setScheduler] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showSnackbar = (message) => {
+    setAlertMessage(message)
+    setOpenSnackbar(true);
+  }
+
+  const getScheduler = () => {
+    setIsLoading(true)
+    axiosInstance.get(`/scheduler/club/${club_id}`)
+      .then((response) => {
+        //response.data
+        const newData = applyColor(response.data)
+        setScheduler(newData)
+      }).catch(err => {
+        //err.response.data.error
+        console.log(err)
+        showSnackbar(err.response.data.error)
+      })
+    setIsLoading(false)
+  }
 
   useEffect(() => {
-    setCurrentMonth(getMonth(monthIndex));
-  }, [monthIndex]);
+    getScheduler()
+  }, [])
 
   return (
-    <div className="body-calendar">
-    <React.Fragment>
-      {showEventModal && <EventModal />}
+    <div>
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="error">{alertMessage}</Alert>
+      </Snackbar>
+      {user && <React.Fragment>
+        <Paper className='scheduler-content'>
+          <h1>Lịch hoạt động</h1>
+          {/* <button onClick={() => console.log(scheduler)}>Click</button> */}
+          {isLoading ?
+            <Box className='loading-temp'>
+              <CircularProgress />
+            </Box>
+            : (<Scheduler
+              data={scheduler}
+            >
+              <ViewState
+                defaultCurrentDate={date}
+                currentViewName="Month"
+              />
+              <MonthView />
+              <Toolbar />
+              <DateNavigator />
+              <TodayButton />
+              <Appointments
+                appointmentComponent={Appointment}
+              />
+              <AppointmentTooltip
+                headerComponent={Header}
+                contentComponent={Content}
+                showCloseButton
+              />
+            </Scheduler>)}
 
-      <div className="h-screen flex flex-col">
-        <CalendarHeader />
-        <div className="flex flex-1">
-          <Sidebar />
-          <Month month={currenMonth} />
-        </div>
-      </div>
-    </React.Fragment>
+        </Paper>
+      </React.Fragment>}
     </div>
-  );
+  )
 }
 
-export default Calendar;
+export default Calendar

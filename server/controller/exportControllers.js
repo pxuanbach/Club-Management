@@ -12,7 +12,6 @@ const convertClubsToExport = (clubs) => {
         const data = {
             "Mã": club._id.toString(),
             "Tên": club.name,
-            "Mô tả": club.description,
             "Quỹ": club.fund,
             "Trưởng câu lạc bộ": club.leader.name,
             "Email trưởng câu lạc bộ": club.leader.email,
@@ -36,7 +35,6 @@ const convertUsersToExport = (users) => {
             "Mã sinh viên": user.username,
             "Tên": user.name,
             "Giới tính": user.gender,
-            "Mô tả": user.description,
             "Email": user.email,
             "Số điện thoại": user.phone,
             "Facebook": user.facebook
