@@ -242,6 +242,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
             <div key={activity._id} className='item-work'>
               <ActivityItem
                 activity={activity}
+                isLeader={isLeader}
                 link={path + '/' + activity._id}
                 setShowFormUpdate={setShowFormUpdate}
                 setOpenDialog={setOpenDialog}

@@ -14,6 +14,7 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    original_filename: String,
     room_id: {
         type: String,
         required: true

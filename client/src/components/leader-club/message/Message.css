@@ -194,7 +194,9 @@ body {
 .messages .message.right .message_text {
   color: #ffffff;
 }
-
+.messages .message.right .message_file a{
+  color: #fff;
+}
 .messages .message.right .name-people {
   display: none;
 }
@@ -239,9 +241,14 @@ body {
   font-weight: 400;
 }
 .messages .message .text_wrapper .message_file{
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
+.messages .message .text_wrapper .message_file a{
+  text-underline-offset: 0.15em;
+  padding-bottom: 0.15em;
+}
 
 /* component input + send input */
 .bottom_wrapper {

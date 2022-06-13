@@ -27,6 +27,7 @@ router.post('/card/addcomment', activityController.addComment)
 router.get('/card/:cardId', activityController.getCard)
 router.patch('/card/description/:cardId', activityController.updateCardDescription)
 router.patch('/card/deletecomment/:cardId', activityController.deleteComment)
+router.patch('/card/deletefile/:cardId', activityController.deleteFile)
 router.delete('/card/:cardId', activityController.deleteCard)
 
 module.exports = router;

@@ -294,9 +294,12 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                     </div>
                     <Box className="display-member-attend" sx={{ paddingTop: 2 }}>
                         <SelectedFiles
+                            cardId={card._id}
                             files={files}
+                            setFiles={setFiles}
                             isLeader={isLeader}
                             showSnackbar={showSnackbar}
+                            setIsLoading={setIsLoading}
                         />
                     </Box>
                     <div style={{ display: 'flex', width: '100%', marginTop: 20 }}>

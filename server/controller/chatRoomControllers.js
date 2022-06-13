@@ -7,6 +7,24 @@ const async = require('async')
 const { addUser, getUser } = require('../helper/ChatRoomHelper');
 const { uniqueArray } = require('../helper/ArrayHelper')
 
+function convertLastMessage(message) {
+    let lastMessage = '';
+    switch (message.type) {
+        case "text":
+            lastMessage = message.content;
+            break;
+        case "image":
+            lastMessage = "[Hình ảnh]"
+            break;
+        case "file":
+            lastMessage = "[Tệp]"
+            break;
+        default:
+            break;
+    }
+    return lastMessage;
+}
+
 module.exports = function (socket, io) {
     socket.on('join', ({ user_id, room_id }) => {
         const { error, user } = addUser({
@@ -35,7 +53,9 @@ module.exports = function (socket, io) {
         })
     })
 
-    socket.on('sendMessage', async (user_id, type, content, room_id, callback) => {
+    socket.on('sendMessage', async (
+        user_id, type, original_filename, content, room_id, callback
+    ) => {
         const user = getUser({ user_id, room_id });
         //console.log('send message user', user)
         let roomId = room_id; //change if room doesn't exist
@@ -58,6 +78,7 @@ module.exports = function (socket, io) {
         const msgToStore = {
             author: user_id,
             type,
+            original_filename,
             content,
             room_id: roomId,
         }
@@ -101,11 +122,12 @@ module.exports = function (socket, io) {
                         User.findById(receiver)
                             .then(user => {
                                 if (msg.length > 0) {
+                                    const lastMessage = convertLastMessage(msg[0])
                                     const data = {
                                         room_id: item,
                                         imgUrl: user.img_url,
                                         name: user.name,
-                                        lastMessage: msg[0].content,
+                                        lastMessage,
                                         createdAt: msg[0].createdAt
                                     }
                                     arrData.push(data)
@@ -116,11 +138,12 @@ module.exports = function (socket, io) {
                         Club.findById(item)
                             .then(club => {
                                 if (msg.length > 0) {
+                                    const lastMessage = convertLastMessage(msg[0])
                                     const data = {
                                         room_id: item,
                                         imgUrl: club.img_url,
                                         name: club.name,
-                                        lastMessage: msg[0].content,
+                                        lastMessage,
                                         createdAt: msg[0].createdAt
                                     }
                                     arrData.push(data)

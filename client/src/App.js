@@ -50,7 +50,7 @@ function App() {
             <Route path="/info" component={Info}/>
             <Route path="/club/:club_id/:club_name" component={Club}/>
             <Route path='/login' component={Login}/>
-            <Route component={NotFound}/>
+            <Route path='*' component={NotFound}/>
           </Switch>
         </UserContext.Provider>
       </div>

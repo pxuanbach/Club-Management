@@ -15,7 +15,8 @@ import { ENDPT } from '../../helper/Helper';
 import { UploadImageMessage } from '../../helper/UploadImage'
 import { UserContext } from '../../UserContext';
 import PreviewFileDialog from '../dialog/PreviewFileDialog'
-import SeverityOptions from '../../helper/SeverityOptions'
+import SeverityOptions from '../../helper/SeverityOptions';
+import axiosInstance from '../../helper/Axios'
 
 let socket;
 
@@ -25,7 +26,7 @@ const PersonMessage = () => {
     const { user } = useContext(UserContext);
     const [search, setSearch] = useState();
     const [message, setMessage] = useState();
-    const [users, setUsers] = useState([]);
+    const [roomsFinded, setRoomsFinded] = useState([]);
     const [rooms, setRooms] = useState([]);
     const [currentRoom, setCurrentRoom] = useState();
     const [messages, setMessages] = useState([]);
@@ -64,7 +65,7 @@ const PersonMessage = () => {
     const handleChangeSearch = (e) => {
         e.preventDefault();
         if (e.target.value === '') {
-            setUsers([])
+            setRoomsFinded([])
         }
         setSearch(e.target.value)
         socket.emit('search-user', e.target.value)
@@ -76,11 +77,11 @@ const PersonMessage = () => {
         if (search) {
             socket.emit('search-user', search)
         } else {
-            setUsers([])
+            setRoomsFinded([])
         }
     }
 
-    const handleSelectUser = (e, userSelected) => {
+    const handleSelectChatRoom = (e, userSelected) => {
         e.preventDefault();
         const roomIdArr = [
             user._id + "_" + userSelected._id,
@@ -105,7 +106,7 @@ const PersonMessage = () => {
             setCurrentRoom(data)
         }
         setSearch('')
-        setUsers([])
+        setRoomsFinded([])
     }
 
     const handleSendFile = async () => {
@@ -113,16 +114,26 @@ const PersonMessage = () => {
             showSnackbar("Bạn chưa chọn phòng trò chuyện", SeverityOptions.error)
             return;
         }
-        const res = await UploadImageMessage(file);
+        var formData = new FormData();
+        formData.append("file", file);
 
-        socket.emit('sendMessage',
-            user._id,
-            file.type.includes('image') ? 'image' : 'file',
-            res.url,
-            currentRoom.room_id,
-            () => {}
-        )
-        setFile(null)
+        axiosInstance.post('/upload',
+            formData, {
+            headers: { "Content-Type": "multipart/form-data", }
+        }).then(response => {
+            socket.emit('sendMessage',
+                user._id,
+                file.type.includes('image') ? 'image' : 'file',
+                response.data.original_filename,
+                response.data.url,
+                currentRoom.room_id,
+                () => { }
+            )
+        }).catch(err => {
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        }).finally(() => {
+            setFile(null)
+        })
     }
 
     const sendMessage = (event) => {
@@ -137,6 +148,7 @@ const PersonMessage = () => {
             socket.emit('sendMessage',
                 user._id,
                 'text',
+                '',
                 message,
                 currentRoom.room_id,
                 () => setMessage('')
@@ -147,7 +159,7 @@ const PersonMessage = () => {
     useEffect(() => {
         socket = io(ENDPT);
         socket.on('user-searched', userList => {
-            setUsers(userList)
+            setRoomsFinded(userList)
         })
         return () => {
             socket.emit('disconnect');
@@ -256,7 +268,7 @@ const PersonMessage = () => {
                             minHeight: '300px',
                             zIndex: 99,
                         }}>
-                            {users.map((user, index) => (
+                            {roomsFinded.map((user, index) => (
                                 <ListItem key={index}
                                     alignItems="flex-start"
                                     sx={{
@@ -264,7 +276,7 @@ const PersonMessage = () => {
                                         overflow: 'hidden',
                                         width: '100%',
                                     }}>
-                                    <ListItemButton onClick={(e) => handleSelectUser(e, user)}>
+                                    <ListItemButton onClick={(e) => handleSelectChatRoom(e, user)}>
                                         <ListItemAvatar>
                                             <Avatar src={user.img_url} />
                                         </ListItemAvatar>
@@ -312,10 +324,10 @@ const PersonMessage = () => {
                         <div className='div-chat'>
                             <div className='chat-todo'>
                                 <i onClick={() => inputFile.current.click()} class="fa-solid fa-file-image"></i>
-                                <input style={{ display: 'none' }} 
-                                type="file" 
-                                ref={inputFile} 
-                                onChange={handleFileChange} />
+                                <input style={{ display: 'none' }}
+                                    type="file"
+                                    ref={inputFile}
+                                    onChange={handleFileChange} />
                             </div>
                             <div className='div-text-chat'>
                                 <Input

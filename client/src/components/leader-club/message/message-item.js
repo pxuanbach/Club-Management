@@ -1,6 +1,7 @@
 import React from 'react';
 import { Avatar } from '@mui/material';
-import moment from 'moment'
+import moment from 'moment';
+import FilePresentIcon from '@mui/icons-material/FilePresent';
 
 const styleContainer = {
     display: 'flex',
@@ -19,9 +20,9 @@ const styleImg = {
 }
 
 const MessageItem = ({ user, message }) => {
-    let isAppearch = user._id === message.author._id ? "message right appeared" : "message left appeared"
+    let isAppearch = user._id === message.author._id 
     return (
-        <div className={isAppearch}>
+        <div className={isAppearch ? "message right appeared" : "message left appeared"}>
             <div className="avatar">
                 {user._id === message.author._id ? <></> : <Avatar src={message.author.img_url} />}
             </div>
@@ -38,7 +39,10 @@ const MessageItem = ({ user, message }) => {
                         </span>}
                     {message.type === 'file' &&
                         <div className='message_file'>
-                            <a href={message.content} target="_blank"></a>
+                            <FilePresentIcon sx={{ color: isAppearch ? "#fff" : '#388E3C' }}/>
+                            <a href={message.content} target="_blank">
+                                {message.original_filename}
+                            </a>
                         </div>}
                 </div>
                 <div className='create-time'>{moment(message.createdAt).fromNow()}</div>
