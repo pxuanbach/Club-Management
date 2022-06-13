@@ -15,7 +15,8 @@ const ITEM_HEIGHT = 48;
 
 export default function ActivityItem({
   activity, link, setShowFormUpdate, setOpenDialog, 
-  setActivitySelected, setShowCollaborators
+  setActivitySelected, setShowCollaborators,
+  handleExportActivity, isLeader
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -34,7 +35,7 @@ export default function ActivityItem({
 
   return (
     <Card sx={{ width: 250, position: 'relative' }}>
-      <div className='activity-item-menu'>
+      {isLeader && <div className='activity-item-menu'>
         <IconButton
           aria-label="more"
           id="long-button"
@@ -81,8 +82,14 @@ export default function ActivityItem({
           }}>
             Xóa
           </MenuItem>
+          <MenuItem onClick={() => {
+            handleExportActivity(activity)
+            handleClose()
+          }}>
+            Báo cáo
+          </MenuItem>
         </Menu>
-      </div>
+      </div>}
       <CardMedia
         component="img"
         height="120"

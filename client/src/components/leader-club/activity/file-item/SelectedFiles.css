@@ -1,0 +1,9 @@
+.selected-file__list{
+    padding-top: 5px;
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    max-width: 515px;
+}

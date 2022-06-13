@@ -1,26 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Tooltip, Modal, TextField, Snackbar, Alert } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { styled } from '@mui/material/styles';
+import {
+  Box, Button, Modal,
+  Snackbar, Alert
+} from '@mui/material';
 import { useRouteMatch } from 'react-router-dom';
+import FileDownload from 'js-file-download';
 import axiosInstance from '../../../../helper/Axios';
 import ActivityItem from '../ActivityItem';
 import AddActivity from '../action/AddActivity';
 import UpdateActivity from '../action/UpdateActivity';
-import DeleteActivity from '../action/DeleteActivity';
 import Collaborators from '../action/Collaborators';
 import { Buffer } from 'buffer';
-
+import CustomDialog from '../../../dialog/CustomDialog';
 import './TabContent.css';
-
-const CustomTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#1B264D',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#1B264D',
-  },
-});
 
 const style = {
   position: 'absolute',
@@ -89,6 +81,18 @@ const TabContent = ({ match, club_id, isLeader }) => {
     setActivities(activitiesDeleted)
   }
 
+  const handleDeleteActivity = async () => {
+    axiosInstance.delete(`/activity/delete/${activitySelected._id}`)
+      .then(response => {
+        //response.data
+        activityDeleted(response.data)
+      }).catch(err => {
+        //err.response.data.error
+        showSnackbar(err.response.data.error)
+      })
+
+  }
+
   const handleSearchActivities = (e) => {
     e.preventDefault();
     if (search) {
@@ -104,6 +108,20 @@ const TabContent = ({ match, club_id, isLeader }) => {
     } else {
       getActivities()
     }
+  }
+
+  const handleExportActivity = (activity) => {
+    axiosInstance.get(`/export/activity/${activity._id}`,
+      {
+        headers: { "Content-Type": "application/vnd.ms-excel" },
+        responseType: 'blob'
+      })
+      .then(response => {
+        //console.log(response)
+        FileDownload(response.data, Date.now() + '-hoatdong.xlsx')
+      }).catch(err => {
+        showSnackbar(err.response.data.error)
+      })
   }
 
   const getActivities = () => {
@@ -181,12 +199,13 @@ const TabContent = ({ match, club_id, isLeader }) => {
           />
         </Box>
       </Modal>
-      <DeleteActivity
+      <CustomDialog
         open={openDialog}
         setOpen={setOpenDialog}
-        activity={activitySelected}
-        activityDeleted={activityDeleted}
-        showSnackbar={showSnackbar}
+        title="Xóa hoạt động"
+        contentText={`Bạn có chắc muốn xóa hoạt động \b${activitySelected ? activitySelected.title : ''}\b không?
+        \nChúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến hoạt động này!`}
+        handleAgree={handleDeleteActivity}
       />
       <div className='div-header'>
         <div className='div-search'>
@@ -198,49 +217,24 @@ const TabContent = ({ match, club_id, isLeader }) => {
             onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
           />
           <i onClick={handleSearchActivities} class="fa-solid fa-magnifying-glass"></i>
-          {/* <Box
-            sx={{
-              '& > :not(style)': { width: '30ch' },
-            }}
-          >
-            <CustomTextField
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              id="search-field-tabcontent"
-              label="Tìm kiếm hoạt động"
-              variant="standard"
-              onKeyPress={event => event.key === 'Enter' ? handleSearchActivities(event) : null}
-            />
-
-          </Box>
-          <Tooltip title='Tìm kiếm' placement='right-start'>
-            <Button
-              variant="text"
-              disableElevation
-              onClick={handleSearchActivities}
-            >
-              <SearchIcon sx={{ color: '#1B264D' }} />
-            </Button>
-          </Tooltip> */}
         </div>
-      </div>  
+      </div>
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <h2 className='name-content'>Bảng hoạt động</h2>
           <div className='div-search-tabmember'>
-            
-            {isLeader ? 
-            (<Button
-              onClick={() => {
-                setShowFormAdd(true)
-              }}
-              className='btn-add-tabcontent'
-              variant="contained"
-              disableElevation
-              style={{ background: '#1B264D' }}>
-              Thêm hoạt động
-            </Button>) : <></>}
-            
+
+            {isLeader ?
+              (<Button
+                onClick={() => {
+                  setShowFormAdd(true)
+                }}
+                className='btn-add-tabcontent'
+                variant="contained"
+                disableElevation
+                style={{ background: '#1B264D' }}>
+                Thêm hoạt động
+              </Button>) : <></>}
           </div>
         </div>
         <div className='div-body-content' >
@@ -248,11 +242,13 @@ const TabContent = ({ match, club_id, isLeader }) => {
             <div key={activity._id} className='item-work'>
               <ActivityItem
                 activity={activity}
+                isLeader={isLeader}
                 link={path + '/' + activity._id}
                 setShowFormUpdate={setShowFormUpdate}
                 setOpenDialog={setOpenDialog}
                 setShowCollaborators={setShowCollaborators}
                 setActivitySelected={setActivitySelected}
+                handleExportActivity={handleExportActivity}
               />
             </div>
           ))}

@@ -14,12 +14,13 @@ const style = {
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
-  p: 4,
-
+  p: 3,
+  height: '100%',
+  overflowY: 'scroll'
 };
 const Card = (props) => {
   const [showFormCardDetail, setShowFormCardDetail] = useState(false);
-  const { card, isLeader, columnTitle } = props
+  const { card, isLeader, getColumnsActivity } = props
   return (
     <div>
       <Modal
@@ -35,7 +36,7 @@ const Card = (props) => {
             setShowForm={setShowFormCardDetail}
             card={card}
             isLeader={isLeader}
-            columnTitle={columnTitle}
+            getColumnsActivity={getColumnsActivity}
           />
         </Box>
       </Modal>

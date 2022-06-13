@@ -11,7 +11,7 @@ const createJWT = id => {
 }
 
 const alertError = (err) => {
-    let errors = { username: '', password: '', name: '', email: '' }
+    let errors = { username: '', password: '', name: '', email: '', phone: '' }
     if (err.message === 'incorrect email') {
         errors.email = 'Email không tồn tại';
     }
@@ -22,9 +22,11 @@ const alertError = (err) => {
         if (err.message.includes('username')) {
             errors.username = 'Tài khoản đã tồn tại'
         }
-
         if (err.message.includes('email')) {
             errors.email = 'Email đã được sử dụng';
+        }
+        if (err.message.includes('phone')) {
+            errors.phone = 'Số điện thoại đã được sử dụng';
         }
         return errors;
     }
@@ -48,12 +50,7 @@ const alertError = (err) => {
     return errors;
 }
 
-module.exports.signup = async (req, res) => {
-    const files = req.files
-    const { username, password, name, email } = req.body;
-    let img_url = '';
-    let cloudinary_id = '';
-
+async function uploadAvatar(files, public_id) {
     if (files.length > 0) {
         const { path } = files[0]
 
@@ -62,24 +59,55 @@ module.exports.signup = async (req, res) => {
             folder: 'Club-Management/User-Avatar'
         }).catch(error => {
             console.log(error)
-            res.status(400).json({
-                error
-            })
+            return {
+                url: '',
+                public_id: ''
+            }
         })
         fs.unlinkSync(path)
-        img_url = newPath.url;
-        cloudinary_id = newPath.public_id;
+        if (public_id !== '') {
+            await cloudinary.uploader.destroy(public_id, function (result) {
+                console.log("destroy image", result);
+            }).catch(err => {
+                console.log("destroy image err ", err.message)
+            })
+        }
+        return {
+            url: newPath.url,
+            public_id: newPath.public_id
+        }
     }
+    return {
+        url: '',
+        public_id: ''
+    }
+}
+
+module.exports.signup = async (req, res) => {
+    const files = req.files
+    const { username, password, name, email } = req.body;
 
     try {
-        const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
-        res.status(201).json(ConvertUser(user));
+        const user = await User.create({
+            username,
+            password,
+            name,
+            email
+        });
+        const uploadData = await uploadAvatar(files, '');
+        user.img_url = uploadData.url;
+        user.cloudinary_id = uploadData.public_id;
+        user.save().then(result => {
+            res.status(201).send(ConvertUser(result));
+        }).catch(err => {
+            res.status(400).send({ error: err.message })
+        })
+
     } catch (error) {
         let errors = alertError(error);
         console.log('This is ERROR', error.message)
-        res.status(400).json({ errors })
+        res.status(400).send({ errors })
     }
-    res.send()
 }
 
 module.exports.login = async (req, res) => {
@@ -123,4 +151,87 @@ module.exports.verifyuser = (req, res, next) => {
 module.exports.logout = (req, res) => {
     res.cookie('jwt', "", { maxAge: 1 })
     res.status(200).json({ logout: true })
+}
+
+module.exports.update = async (req, res) => {
+    const token = req.cookies.jwt;
+    const files = req.files
+    const { name, gender, phone, email, description, facebook } = req.body
+    try {
+        if (token) {
+            jwt.verify(token, 'club secret', async (err, decodedToken) => {
+                console.log('decoded Token', decodedToken);
+                if (err) {
+                    console.log("decoded err ", err.message)
+                    res.status(400).send({ error: err.message })
+                } else {
+
+                    let user = await User.findById(decodedToken.id)
+                    user.name = name;
+                    user.gender = gender;
+                    user.phone = "0" + phone;
+                    user.email = email;
+                    user.description = description;
+                    user.facebook = facebook
+
+                    const uploadData = await uploadAvatar(files, user.cloudinary_id);
+                    if (uploadData.url !== "") {
+                        user.img_url = uploadData.url;
+                        user.cloudinary_id = uploadData.public_id;
+                    }
+
+                    user.save().then(result => {
+                        res.status(200).send(result)
+                    }).catch(error => {
+                        let errors = alertError(error);
+                        console.log("catch ", error.message)
+                        res.status(400).json({ errors })
+                    })
+                }
+            })
+        } else {
+            res.status(400).send({ error: "Không tìm thấy token" })
+        }
+    } catch (error) {
+        let errors = alertError(error);
+        console.log("catch ", error.message)
+        res.status(400).json({ errors })
+    }
+}
+
+module.exports.changePassword = (req, res) => {
+    const token = req.cookies.jwt;
+    const { password, newPassword } = req.body;
+    console.log()
+
+    if (token) {
+        jwt.verify(token, 'club secret', async (err, decodedToken) => {
+            console.log('decoded Token', decodedToken);
+            if (err) {
+                console.log("decoded err ", err.message)
+                res.status(400).send({ error: err.message })
+            } else {
+                try {
+                    let user = await User.findById(decodedToken.id)
+                    const isUser = await User.login(user.username, password);
+
+                    if (isUser) {
+                        user.password = newPassword;
+                    }
+
+                    user.save().then(result => {
+                        res.status(200).send({ message: "Đổi mật khẩu thành công!" })
+                    }).catch(err => {
+                        res.status(400).send({ error: "Save err - " + err.message })
+                    })
+                } catch (error) {
+                    let errors = alertError(error);
+                    console.log("catch ", error.message)
+                    res.status(400).json({ errors })
+                }
+            }
+        })
+    } else {
+        res.status(400).send({ error: "Không tìm thấy token" })
+    }
 }

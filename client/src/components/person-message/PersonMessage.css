@@ -37,6 +37,24 @@
     font-size: 1.6rem;
     
 }
+.btn-icon-refresh{
+    width: 38px;
+    height: 38px;
+    background-color: #d7d4d4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.btn-icon-refresh:hover{
+    background-color: #bfbbbb;
+}
+.btn-icon-refresh > i {
+    color: #1B264D;
+    font-size: 1.3rem;
+    
+}
 .container-search-mess{
     display: flex;
     align-items: center;
@@ -49,6 +67,7 @@
     border: 1px solid #b4b0b0;
     border-radius: 30px;
     align-items: center;
+    position: relative;
 }
 .div-search-mess input{
     border: none;
@@ -63,6 +82,7 @@
 .div-search-mess > i{
     font-size: 1.2rem;
     margin-right: 15px;
+    cursor: pointer;
 }
 .container-item-message{
     height: 80vh;

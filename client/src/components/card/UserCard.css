@@ -1,0 +1,11 @@
+.card__header{
+    background-color: #0079BF;
+}
+.card__header .MuiCardHeader-title{
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+}
+.card__header .MuiCardHeader-subheader{
+    color: #f2f4f8;
+}

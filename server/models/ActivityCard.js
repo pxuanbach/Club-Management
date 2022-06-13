@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+const Activity = require('./Activity')
+const async = require('async');
+const cloudinary = require('../helper/Cloudinary')
+const { isElementInArray } = require('../helper/ArrayHelper')
 
 const activityCardSchema = new mongoose.Schema({
     activity: {
@@ -10,9 +14,10 @@ const activityCardSchema = new mongoose.Schema({
         required: true
     },
     description: String,
-    file: [{
+    files: [{
+        original_filename: String,
         url: String,
-        cloudId: String,
+        public_id: String,
     }],
     userJoin: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +36,26 @@ const activityCardSchema = new mongoose.Schema({
         }
     }]
 })
+
+activityCardSchema.pre('remove', function (next) {
+    var card = this;
+
+    async.forEach(card.files, async function (item, callback) {
+        await cloudinary.uploader.destroy(item.public_id)
+            .catch(err => {
+                console.log("destroy image err ", err.message)
+            })
+        if (typeof callback === 'function') {
+            return callback()
+        }
+    }, function (err) {
+        if (err) {
+            throw Error("Card delete err - " + err.message);
+        }
+    })
+
+    next();
+});
 
 const ActivityCard = mongoose.model('activityCards', activityCardSchema)
 module.exports = ActivityCard;

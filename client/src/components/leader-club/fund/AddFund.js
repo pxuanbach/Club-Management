@@ -72,7 +72,7 @@ const AddFund = ({ setShowFormAdd, club_id, user, fundHistoryCreated, showSnackb
 
     function isFileImage(file) {
         //console.log(file.type)
-        return file.type.includes('spreadsheetml.sheet');
+        return file.type.includes('spreadsheetml.sheet') || file.type.includes('ms-excel');
     }
 
     const handleFileChange = (event) => {

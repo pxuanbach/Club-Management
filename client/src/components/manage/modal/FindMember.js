@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react'
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import io from 'socket.io-client'
-import { ENDPT } from '../../../helper/Helper';
+import { Buffer } from 'buffer';
 import './FindMember.css'
-
-let socket
+import axiosInstance from '../../../helper/Axios';
 
 const FindMember = ({
     title,
@@ -18,25 +16,22 @@ const FindMember = ({
     const [openAutoComplete, setOpenAutoComplete] = useState(false);
     const [users, setUsers] = useState([])
 
-    const handleSearchMembers = event => {
+    const handleSearchMembers = async event => {
         event.preventDefault();
-        socket.emit('search-user', event.target.value)
-    }
+        //socket.emit('search-user', event.target.value)
+        if (event.target.value.trim()) {
+            const encodedSearch = new Buffer(event.target.value).toString('base64');
+            const res = await axiosInstance.get(`/user/search/${encodedSearch}`)
 
-    useEffect(() => {
-        socket = io(ENDPT);
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
+            const data = res.data;
+            //console.log(data)
+            if (data) {
+                setUsers(data)
+            }
+        } else {
+            setUsers([])
         }
-    }, [ENDPT])
-
-    useEffect(() => {
-        socket.on('output-search-user', result => {
-            setUsers(result)
-            //console.log(result)
-        })
-    }, [users])
+    }
 
     if (memberSelected) {
         setErrorText('')
@@ -44,7 +39,7 @@ const FindMember = ({
     return (
         <div className='add-member'>
             <Autocomplete id='search-members'
-                fullWidth 
+                fullWidth
                 open={openAutoComplete}
                 onOpen={() => {
                     setOpenAutoComplete(true);

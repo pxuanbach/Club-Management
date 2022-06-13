@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Container, Draggable } from 'react-smooth-dnd'
 import { Snackbar, Alert } from '@mui/material';
 import BlockUi from 'react-block-ui';
@@ -10,9 +10,10 @@ import 'font-awesome/css/font-awesome.min.css'
 import { Link, useParams } from 'react-router-dom'
 import axiosInstance from '../../../helper/Axios'
 import { cloneDeep } from 'lodash';
-
+import { UserContext } from '../../../UserContext';
 
 const FormActivity = ({ match, isLeader }) => {
+  const { user } = useContext(UserContext);
   const { activityId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [columns, setColumns] = useState([])
@@ -77,6 +78,23 @@ const FormActivity = ({ match, isLeader }) => {
         //response.data
         setColumns(response.data.boards)
         setIsLoading(false)
+      }).catch(err => {
+        //err.response.data.error
+        showSnackbar(err.response.data.error)
+      })
+  }
+
+  const handleDeleteAllCards = (activityId, columnId) => {
+    axiosInstance.patch(`/activity/deleteallcards/${activityId}`,
+      JSON.stringify({
+        "columnId": columnId
+      }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(response => {
+        //response.data
+        setColumns(response.data.boards)
+        setIsLoading(false);
       }).catch(err => {
         //err.response.data.error
         showSnackbar(err.response.data.error)
@@ -162,42 +180,45 @@ const FormActivity = ({ match, isLeader }) => {
       >
         <Alert severity="error">{alertMessage}</Alert>
       </Snackbar>
-      <div className='div-back'>
-        <Link className="btn-back"
-          style={{ color: 'white' }}
-          to={`${match}`}
-        >
-          <i class="fa-solid fa-angle-left"></i>
-          Trở về
-        </Link>
-      </div>
-      <div className='board-columns'>
-        <Container
-          orientation='horizontal'
-          onDrop={onColumnDrop}
-          getChildPayload={index => columns[index]}
-          dragHandleSelector=".column-drag-handle"
-          dropPlaceholder={{
-            animationDuration: 150,
-            showOnTop: true,
-            className: 'column-drop-preview'
-          }}
+      {user && <>
+        <div className='div-back'>
+          <Link className="btn-back"
+            style={{ color: 'white' }}
+            to={`${match}`}
+          >
+            <i class="fa-solid fa-angle-left"></i>
+            Trở về
+          </Link>
+        </div>
+        <div className='board-columns'>
+          <Container
+            orientation='horizontal'
+            onDrop={onColumnDrop}
+            getChildPayload={index => columns[index]}
+            dragHandleSelector=".column-drag-handle"
+            dropPlaceholder={{
+              animationDuration: 150,
+              showOnTop: true,
+              className: 'column-drop-preview'
+            }}
+          >
+            {columns.map((column, index) => (
+              <Draggable key={index}>
+                <Column
+                  isLeader={isLeader}
+                  column={column}
+                  getColumnsActivity={getColumnsActivity}
+                  onCardDrop={onCardDrop}
+                  onUpdateColumn={onUpdateColumn}
+                  handleCreateCard={handleCreateCard}
+                  handleDeleteAllCards={handleDeleteAllCards}
+                />
+              </Draggable>
+            ))}
+          </Container>
 
-        >
-          {columns.map((column, index) => (
-            <Draggable key={index}>
-              <Column
-                isLeader={isLeader}
-                column={column}
-                onCardDrop={onCardDrop}
-                onUpdateColumn={onUpdateColumn}
-                handleCreateCard={handleCreateCard}
-              />
-            </Draggable>
-          ))}
-        </Container>
-
-      </div>
+        </div>
+      </>}
     </BlockUi>
   )
 }

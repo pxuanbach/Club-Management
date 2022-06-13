@@ -11,6 +11,7 @@ const groupRoutes = require('./routes/groupRoutes');
 const fundRoutes = require('./routes/fundRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const schedulerRoutes = require('./routes/schedulerRoutes');
+const exportRoutes = require('./routes/exportRoutes')
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -36,6 +37,7 @@ app.use('/group', groupRoutes);
 app.use('/fund', fundRoutes);
 app.use('/activity', activityRoutes);
 app.use('/scheduler', schedulerRoutes);
+app.use('/export', exportRoutes);
 
 //Connect DB
 mongoose
@@ -53,20 +55,6 @@ const { addUser, removeUser } = require('./helper/ChatRoomHelper');
 io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/chatRoomControllers')(socket, io);
-
-    socket.on('join', ({ user_id, room_id }) => {
-        const { error, user } = addUser({
-            socket_id: socket.id,
-            user_id,
-            room_id
-        })
-        socket.join(room_id);
-        if (error) {
-            console.log('join error', error)
-        } else {
-            console.log('join user', user)
-        }
-    })
 
     socket.on('disconnect', () => {
         const user = removeUser(socket.id);

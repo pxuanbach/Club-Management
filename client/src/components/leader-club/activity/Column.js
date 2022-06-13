@@ -7,21 +7,32 @@ import { Button, TextareaAutosize } from '@mui/material'
 import { Container, Draggable } from 'react-smooth-dnd'
 import './Column.scss'
 import Card from './Card'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom';
+import CustomDialog from '../../dialog/CustomDialog'
 
 const ITEM_HEIGHT = 48;
 const Column = (props) => {
     const { activityId } = useParams();
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
     const open = Boolean(anchorEl);
+    const {
+        column,
+        onCardDrop,
+        getColumnsActivity,
+        handleCreateCard,
+        isLeader,
+        handleDeleteAllCards
+    } = props
+    let cards = column.cards
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const { column, onCardDrop, onUpdateColumn, handleCreateCard, isLeader } = props
-    const cards = column.cards
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
@@ -30,13 +41,6 @@ const Column = (props) => {
 
     const [newCardTitle, setNewCardTitle] = useState('')
     const onNewCardTitleChange = (e) => setNewCardTitle(e.target.value)
-
-    useEffect(() => {
-        if (newCardTextareaRef && newCardTextareaRef.current) {
-            newCardTextareaRef.current.focus()
-            newCardTextareaRef.current.select()
-        }
-    }, [openNewCardForm])
 
     const addNewCard = () => {
         if (!newCardTitle) {
@@ -51,9 +55,31 @@ const Column = (props) => {
         toggleOpenNewCardForm()
     }
 
+    const handleDeleteAllCard = (e) => {
+        e.preventDefault();
+        setOpenDialog(true)
+        handleClose();
+    }
+
+    useEffect(() => {
+        if (newCardTextareaRef && newCardTextareaRef.current) {
+            newCardTextareaRef.current.focus()
+            newCardTextareaRef.current.select()
+        }
+    }, [openNewCardForm])
 
     return (
         <div className='column'>
+            <CustomDialog
+                open={openDialog}
+                setOpen={setOpenDialog}
+                title="Xóa tất cả thẻ"
+                contentText={`Bạn có chắc muốn xóa tất cả thẻ của cột \b${column.title}\b không?
+                \nChúng tôi sẽ xóa toàn bộ các bản ghi liên quan đến thẻ trong cột này!`}
+                handleAgree={() => {
+                    handleDeleteAllCards(activityId, column._id)
+                }}
+            />
             <header className='column-drag-handle'>
                 <div className='column-title'>
                     {column.title}
@@ -80,17 +106,17 @@ const Column = (props) => {
                         PaperProps={{
                             style: {
                                 maxHeight: ITEM_HEIGHT * 4.5,
-                                width: '20ch',
+                                width: 'max-content',
                             },
                         }}
                     >
-                        <MenuItem onClick={handleClose}>
+                        <MenuItem onClick={() => {
+                            toggleOpenNewCardForm();
+                            handleClose()
+                        }}>
                             Thêm thẻ
                         </MenuItem>
-                        <MenuItem onClick={handleClose}>
-                            Xóa thẻ
-                        </MenuItem>
-                        <MenuItem onClick={handleClose}>
+                        <MenuItem onClick={handleDeleteAllCard}>
                             Xóa tất cả thẻ
                         </MenuItem>
                     </Menu>
@@ -116,7 +142,7 @@ const Column = (props) => {
                             <Card
                                 card={card}
                                 isLeader={isLeader}
-                                columnTitle={column.title}
+                                getColumnsActivity={getColumnsActivity}
                             />
                         </Draggable>
                     ))}

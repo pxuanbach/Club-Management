@@ -5,7 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import 'react-block-ui/style.css';
 import Column from '../leader-club/activity/Column'
 import 'font-awesome/css/font-awesome.min.css'
-import { useParams, useHistory, Redirect } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
 import axiosInstance from '../../helper/Axios';
 import { UserContext } from '../../UserContext';
 import './ActivityDetail.css'
@@ -66,6 +66,15 @@ const ActivityDetail = () => {
             >
                 <Alert severity="error">{alertMessage}</Alert>
             </Snackbar>
+            <div className='div-back'>
+                <Link className="btn-back"
+                    style={{ color: 'white' }}
+                    to="/scheduler"
+                >
+                    <i class="fa-solid fa-angle-left"></i>
+                    Trở về
+                </Link>
+            </div>
             <div className='activity-detail-title'>
                 <span>{activity?.club?.name}</span>
                 <ChevronRightIcon fontSize='large' />

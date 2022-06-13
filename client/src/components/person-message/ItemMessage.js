@@ -15,27 +15,35 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleClick = (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        setAnchorEl(e.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleClose = (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
         setAnchorEl(null);
     };
 
+    const handleSelectRoom = (e) => {
+        e.preventDefault();
+        setCurrentRoom(JSON.parse(JSON.stringify(room)))
+        console.log(room)
+    }
 
     return (
-        <div className="item-message"
-            onClick={() => {
-                setCurrentRoom(room)
-            }}>
-            <Avatar src={room.imgUrl} sx={{ width: 58, height: 58 }} />
+        <div className="item-message" onClick={handleSelectRoom}>
+            <Avatar
+                src={room.imgUrl}
+                sx={{ width: 58, height: 58 }}
+            />
             <div className="content-message">
                 <div className='content'>
                     <h3>{room.name}</h3>
                     <p className="latest-message">{room.lastMessage}</p>
                 </div>
-                <div className='div-menu-item-mess'>
+
+                {/* <div className='div-menu-item-mess'>
                     <IconButton
                         aria-label="more"
                         id="long-button"
@@ -61,13 +69,11 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
                             },
                         }}
                     >
-                        {options.map((option) => (
-                            <MenuItem key={option} selected={option === 'Ẩn'} onClick={handleClose}>
-                                {option}
-                            </MenuItem>
-                        ))}
+                        <MenuItem onClick={handleDeleteMessages}>
+                            Xóa
+                        </MenuItem>
                     </Menu>
-                </div>
+                </div> */}
             </div>
         </div>
     )

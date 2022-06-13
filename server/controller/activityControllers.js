@@ -1,10 +1,11 @@
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
 const User = require('../models/User')
-const Club = require('../models/Club')
+const cloudinary = require('../helper/Cloudinary')
+const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
-const { isElementInArray } = require('../helper/ArrayHelper')
+const { isElementInArray, isElementInArrayObject } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
     if (isElementInArray(userId, card.userJoin)) {
@@ -18,6 +19,50 @@ function isUserJoined(userId, card) {
     })
 
     return false;
+}
+
+function isGroupJoined(groupId, card) {
+    if (isElementInArrayObject(groupId, card.groupJoin)) {
+        return true;
+    }
+    return false;
+}
+
+async function uploadFile(files, public_id) {
+    if (files.length > 0) {
+        const { path } = files[0]
+
+        const newPath = await cloudinary.uploader.upload(path, {
+            resource_type: 'auto',
+            folder: 'Club-Management/Activity'
+        }).catch(error => {
+            console.log(error)
+            return {
+                original_filename: '',
+                url: '',
+                public_id: '',
+            }
+        })
+        fs.unlinkSync(path)
+        if (public_id !== '') {
+            await cloudinary.uploader.destroy(public_id, function (result) {
+                console.log("destroy image", result);
+            }).catch(err => {
+                console.log("destroy image err ", err.message)
+            })
+        }
+        //console.log("upload function", newPath)
+        return {
+            original_filename: newPath.original_filename,
+            url: newPath.url,
+            public_id: newPath.public_id
+        }
+    }
+    return {
+        original_filename: '',
+        url: '',
+        public_id: '',
+    }
 }
 
 module.exports.create = (req, res) => {
@@ -103,21 +148,44 @@ module.exports.createCard = (req, res) => {
     })
 }
 
-module.exports.join = (req, res) => {
+module.exports.userJoin = (req, res) => {
     const { userId, cardId } = req.body
-    
+
     ActivityCard.findById(cardId)
         .populate('groupJoin')
         .then(card => {
             //check user joined?
             if (isUserJoined(userId, card)) {
-                res.status(200).send({ message: "user joined" })
+                res.status(200).send({ message: "Bạn đã tham gia", success: false })
             } else {
                 ActivityCard.updateOne(
                     { _id: cardId },
                     { $push: { userJoin: userId } }
                 ).then(() => {
-                    res.status(200).send()
+                    res.status(200).send({ message: "Tham gia thành công!", success: true })
+                }).catch(err => {
+                    res.status(500).json({ error: "Update card err - " + err.message })
+                })
+            }
+        }).catch(err => {
+            res.status(500).json({ error: "Query card err - " + err.message })
+        })
+}
+
+module.exports.groupJoin = (req, res) => {
+    const { groupId, cardId } = req.body;
+
+    ActivityCard.findById(cardId)
+        .populate('groupJoin')
+        .then(card => {
+            if (isGroupJoined(groupId, card)) {
+                res.status(200).send({ message: "Nhóm đã tham gia", success: false })
+            } else {
+                ActivityCard.updateOne(
+                    { _id: cardId },
+                    { $push: { groupJoin: groupId } }
+                ).then(() => {
+                    res.status(200).send({ message: "Nhóm tham gia thành công!", success: true })
                 }).catch(err => {
                     res.status(500).json({ error: "Update card err - " + err.message })
                 })
@@ -286,19 +354,6 @@ module.exports.searchUsersNotCollaborators = (req, res) => {
         })
 }
 
-module.exports.getJoin = (req, res) => {
-    const cardId = req.params.cardId;
-
-    ActivityCard.findById(cardId)
-        .populate('userJoin')
-        .populate('groupJoin')
-        .then(result => {
-            res.status(200).send(result);
-        }).catch(err => {
-            res.status(500).send({ error: err.message })
-        })
-}
-
 module.exports.update = (req, res) => {
     const activityId = req.params.activityId;
     const { title, startDate, endDate } = req.body;
@@ -430,28 +485,239 @@ module.exports.addCollaborators = (req, res) => {
     })
 }
 
-module.exports.delete = (req, res) => {
-    const activityId = req.params.activityId;
+module.exports.deleteAllCards = async (req, res) => {
+    try {
+        const activityId = req.params.activityId;
+        const { columnId } = req.body;
 
-    Activity.findByIdAndDelete(activityId, function (err, doc) {
-        if (err) {
-            res.status(500).send({ error: "Load activity err - " + err.message })
-            return;
-        }
+        let activity = await Activity.findById(activityId)
+        let listCardId = []
+        activity.boards.forEach(column => {
+            if (column._id.toString() === columnId) {
+                listCardId = JSON.parse(JSON.stringify(column.cards))
+                column.cards = []
+            }
+        })
 
-        async.forEach(doc.boards, function (item, callback) {
-            ActivityCard.deleteMany({ _id: { $in: item.cards } })
-                .then(() => {
-                    callback();
-                }).catch(err => {
-                    res.status(500).send({ error: "Card delete err - " + err.message })
-                })
+        async.forEach(listCardId, async function (item, callback) {
+            let card = await ActivityCard.findById(item);
+
+            card.remove().then(() => {
+                if (typeof callback === 'function') {
+                    return callback()
+                }
+            })
         }, function (err) {
             if (err) {
                 res.status(500).send({ error: "Card deleted err - " + err.message })
                 return;
             }
-            res.status(200).send(doc)
+            activity.save().then(result => {
+                async.forEach(result.boards, function (item, callback) {
+                    ActivityCard.populate(item, { "path": "cards" }, function (err, output) {
+                        if (err) {
+                            res.status(500).send({ error: err.message })
+                            return;
+                        }
+                        callback();
+                    })
+                }, function (err) {
+                    if (err) {
+                        res.status(500).send({ error: err.message })
+                        return;
+                    }
+                    res.status(200).send(result)
+                })
+            })
         })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports.delete = async (req, res) => {
+    try {
+        const activityId = req.params.activityId;
+        let activity = await Activity.findById(activityId);
+        const boards = activity.boards;
+        const mergeCards = boards[0].cards.concat(boards[1].cards, boards[2].cards, boards[3].cards)
+        //console.log(mergeCards)
+        async.forEach(mergeCards, async function (item, callback) {
+            let card = await ActivityCard.findById(item);
+
+            card.remove().then(() => {
+                if (typeof callback === 'function') {
+                    return callback()
+                }
+            })
+        }, function (err) {
+            if (err) {
+                res.status(500).send({ error: "Card deleted err - " + err.message })
+                return;
+            }
+            activity.remove().then(() => {
+                res.status(200).send(activity)
+            })
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+//card
+module.exports.upload = async (req, res) => {
+    const files = req.files;
+    const { cardId } = req.body;
+
+    const uploadData = await uploadFile(files, '');
+    //console.log(uploadData)
+    ActivityCard.updateOne(
+        { _id: cardId },
+        { $push: { files: uploadData } }
+    ).then(() => {
+        ActivityCard.findById(cardId).then(result => {
+            res.status(200).send(result)
+        }).catch(err => {
+            res.status(500).json({ error: "Result err - " + err.message })
+        })
+    }).catch(err => {
+        res.status(500).json({ error: "Update card err - " + err.message })
     })
+}
+
+module.exports.addComment = async (req, res) => {
+    try {
+        const { cardId, content, author } = req.body;
+        let now = Date.now();
+        //console.log(cardId, content, author)
+
+        let card = await ActivityCard.findById(cardId);
+        const comment = {
+            content,
+            createdAt: now,
+            author
+        }
+
+        card.comments.push(comment)
+
+        card.save().then(result => {
+            res.status(200).send(result)
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+
+}
+
+module.exports.getCard = (req, res) => {
+    const cardId = req.params.cardId;
+
+    ActivityCard.findById(cardId)
+        .populate('userJoin')
+        .populate('groupJoin')
+        .then(result => {
+            async.forEach(result.comments, function (item, callback) {
+                User.populate(item, { "path": "author" }, function (err, output) {
+                    if (err) {
+                        res.status(500).send({ error: err.message })
+                        return;
+                    }
+                    callback();
+                })
+            }, function (err) {
+                if (err) {
+                    res.status(500).send({ error: err.message })
+                    return;
+                }
+                res.status(200).send(result)
+            })
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
+}
+
+module.exports.updateCardDescription = (req, res) => {
+    const cardId = req.params.cardId;
+    const { description } = req.body;
+
+    ActivityCard.updateOne(
+        { _id: cardId },
+        { description }
+    ).then(() => {
+        ActivityCard.findById(cardId).then(result => {
+            res.status(200).send(result)
+        }).catch(err => {
+            res.status(500).json({ error: "Result err - " + err.message })
+        })
+    }).catch(err => {
+        res.status(500).json({ error: "Update card err - " + err.message })
+    })
+}
+
+module.exports.deleteComment = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const { commentId } = req.body;
+        let card = await ActivityCard.findById(cardId)
+
+        const newComments = card.comments
+            .filter(comment => comment._id.toString() !== commentId)
+
+        card.comments = newComments;
+
+        card.save().then(result => {
+            res.status(200).send(result)
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports.deleteFile = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const {public_id} = req.body;
+        await cloudinary.uploader.destroy(public_id, function (result) {
+            console.log("destroy image", result);
+        })
+
+        let card = await ActivityCard.findById(cardId)
+
+        const newFiles = card.files.filter(file => file.public_id !== public_id)
+
+        card.files = newFiles;
+
+        card.save().then(result => {
+            res.status(200).send(result)
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports.deleteCard = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        let card = await ActivityCard.findById(cardId)
+
+        Activity.findById(card.activity, function (error, activity) {
+            if (error) {
+                res.status(500).json({ error: error.message })
+            }
+            activity.boards.forEach(column => {
+                if (isElementInArray(card._id, column.cards)) {
+                    var newCards = column.cards.filter(c => c.toString() !== card._id.toString())
+                    column.cards = newCards
+                }
+            })
+            activity.save()
+                .then(() => {
+                    card.remove().then(() => {
+                        res.status(200).send({ message: "remove success", data: card })
+                    })
+                })
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }

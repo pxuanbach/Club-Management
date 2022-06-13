@@ -1,6 +1,6 @@
 function isElementInArray(key, array) {
     for (let i = 0; i < array.length; i++) {
-        if (array[i].toString() === key) {
+        if (array[i].toString() === key.toString()) {
             return true;
         }
     }

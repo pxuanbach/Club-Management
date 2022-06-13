@@ -1,20 +1,54 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import {
   Button, Avatar, Box, MenuItem, FormControl,
-  Select, TextField, CircularProgress, InputLabel,
-  OutlinedInput, InputAdornment, IconButton, FormHelperText
+  Select, TextField, CircularProgress, Alert,
+  OutlinedInput, InputAdornment, IconButton,
+  FormHelperText, Snackbar
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import NumberFormat from "react-number-format";
 import './Info.css'
 import KeyIcon from '@mui/icons-material/Key';
 import ImageInfo from '../../assets/logoweb.png'
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../UserContext';
+import axiosInstance from '../../helper/Axios';
+
+function NumberFormatCustom(props) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      prefix="0"
+      onValueChange={values => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value
+          }
+        });
+      }}
+    />
+  );
+}
+
 
 const Info = () => {
+  const inputAvatarImage = useRef(null);
   const { user, setUser } = useContext(UserContext);
   const [isEdit, setIsEdit] = useState(false);
+  const [avatarImage, setAvatarImage] = useState();
+  const [name, setName] = useState('');
   const [gender, setGender] = useState('');
+  const [phone, setPhone] = useState('');
+  const [phoneErr, setPhoneErr] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailErr, setEmailErr] = useState('');
+  const [description, setDescription] = useState('');
+  const [facebook, setFacebook] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -24,14 +58,122 @@ const Info = () => {
   const [newPasswordErr, setNewPasswordErr] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordErr, setConfirmPasswordErr] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showSnackbar = (message) => {
+    setAlertMessage(message)
+    setOpenSnackbar(true);
+  }
+
+  function isFileImage(file) {
+    return file && file['type'].split('/')[0] === 'image';
+  }
+
+  const handleImageChange = (event) => {
+    if (isFileImage(event.target.files[0])) {
+      setAvatarImage(event.target.files[0]);
+    } else {
+      alert('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...')
+    }
+  };
 
   const handleChange = (event) => {
     setGender(event.target.value);
   };
 
+  const toggleEditMode = (e) => {
+    e.preventDefault();
+    setIsEdit(!isEdit);
+    //reset state
+    setName('')
+    setGender(user.gender)
+    setPhone('')
+    setEmail('')
+    setDescription('')
+    setFacebook('')
+    setAvatarImage(null)
+  }
+
+  const validatePassword = () => {
+    let isOk = true;
+    if (!password) {
+      setPasswordErr("Mật khẩu trống");
+      isOk = false;
+    }
+    if (!newPassword) {
+      setNewPasswordErr("Mật khẩu mới trống")
+      isOk = false;
+    }
+    if (!confirmPassword) {
+      setConfirmPasswordErr("Mật khẩu nhập lại trống")
+      isOk = false;
+    }
+    if (newPassword !== confirmPassword) {
+      setNewPasswordErr("Mật khẩu mới không khớp")
+      setConfirmPasswordErr("Mật khẩu nhập lại không khớp")
+      isOk = false;
+    }
+    return isOk;
+  }
+
   const handleSaveInfo = (e) => {
     e.preventDefault();
+    //console.log(name, gender, phone, email, description, facebook)
+    var formData = new FormData();
+    formData.append("file", avatarImage);
+    formData.append("name", name ? name : user.name)
+    formData.append("gender", gender)
+    formData.append("phone", phone ? phone : user.phone)
+    formData.append("email", email ? email : user.email)
+    formData.append("description", description ? description : user.description)
+    formData.append("facebook", facebook ? facebook : user.facebook)
 
+    axiosInstance.put(`/update`,
+      formData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then(response => {
+      //response.data
+      //console.log(response.data)
+      showSnackbar("Thông tin cập nhật thành công!")
+      setUser(response.data)
+    }).catch(err => {
+      //err.response.data
+      console.log(err.response.data)
+      if (err.response.data.errors) {
+        setPhoneErr(err.response.data.errors.phone)
+        setEmailErr(err.response.data.errors.email)
+      }
+    })
+  }
+
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+    if (validatePassword()) {
+      axiosInstance.patch('/changepassword',
+        JSON.stringify({
+          "password": password,
+          "newPassword": newPassword
+        }), {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" }
+      }).then(response => {
+        //response.data
+        showSnackbar("Đổi mật khẩu thành công!")
+      }).catch(err => {
+        const data = err.response.data;
+        if (data.errors) {
+          setPasswordErr(err.response.data.errors.password)
+        }
+        if (data.error) {
+          if (data.error.includes('6 ký tự'))
+            setNewPasswordErr("Mật khẩu ít hơn 6 ký tự")
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -42,6 +184,14 @@ const Info = () => {
 
   return (
     <div className='page-infor' style={{ display: "flex" }}>
+      <Snackbar
+        autoHideDuration={2000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity="success">{alertMessage}</Alert>
+      </Snackbar>
       {!user ?
         <Box className='loading-temp'>
           <CircularProgress />
@@ -52,20 +202,33 @@ const Info = () => {
           <div className='container-info'>
             <div className='header-title-info'>
               <h4 className='title-profile-1'>Thông tin chung</h4>
-              <h5 onClick={() => setIsEdit(!isEdit)}>Chỉnh sửa</h5>
+              <h5 onClick={toggleEditMode}>Chỉnh sửa</h5>
             </div>
 
             <div style={{ display: "flex", paddingTop: 10 }}>
               <div className='div-action-image'>
                 <div className='image'>
-                  <Avatar sx={{ width: 120, height: 120 }} src={user.img_url} />
+                  <input type="file" style={{ display: 'none' }} ref={inputAvatarImage} onChange={handleImageChange} />
+                  <Avatar
+                    sx={{ width: 120, height: 120, cursor: isEdit ? 'pointer' : 'auto' }}
+                    src={avatarImage ? URL.createObjectURL(avatarImage)
+                      : user.img_url}
+                    onClick={isEdit ? () => { inputAvatarImage.current.click() } : null}
+                  />
                 </div>
-                <Button variant='text' sx={{ textTransform: "none", }}>Xóa ảnh</Button>
+                <Button disabled={!isEdit}
+                  variant='text'
+                  sx={{ textTransform: "none", }}
+                  onClick={() => { inputAvatarImage.current.click() }}>
+                  Đổi ảnh
+                </Button>
               </div>
               <div style={{ flex: 1, paddingLeft: 40 }}>
                 <div className='div-text-profile'>
                   <label>Họ và tên:</label>
                   {isEdit ? <TextField
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     sx={{ minWidth: 280 }}
                     placeholder={user.name}
                     size="small"
@@ -86,21 +249,36 @@ const Info = () => {
                       </Select>
                     </FormControl>
                   </Box> : <p id='textresult2'>{user.gender}</p>}
-
-
                 </div>
                 <div className='div-text-profile'>
                   <label>Số điện thoại:</label>
                   {isEdit ? <TextField
+                    error={phoneErr}
+                    helperText={phoneErr}
+                    value={phone}
+                    onChange={(e) => {
+                      setPhoneErr('')
+                      setPhone(e.target.value)
+                    }}
                     sx={{ minWidth: 280 }}
                     placeholder={user.phone}
                     size="small"
+                    InputProps={{
+                      inputComponent: NumberFormatCustom
+                    }}
                   /> : <p id='textresult3'>{user.phone}</p>}
 
                 </div>
                 <div className='div-text-profile'>
                   <label>Địa chỉ email:</label>
                   {isEdit ? <TextField
+                    error={emailErr}
+                    helperText={emailErr}
+                    value={email}
+                    onChange={(e) => {
+                      setEmailErr('')
+                      setEmail(e.target.value)
+                    }}
                     sx={{ minWidth: 280 }}
                     placeholder={user.email}
                     size="small"
@@ -115,6 +293,8 @@ const Info = () => {
             </div>
             <div className='div-text-profile'>
               {isEdit ? <TextField
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 sx={{ minWidth: 420, marginRight: 3 }}
                 placeholder={user.description}
                 size="small"
@@ -136,12 +316,18 @@ const Info = () => {
             <div className='div-text-profile'>
               <label>Facebook:</label>
               {isEdit ? <TextField
+                value={facebook}
+                onChange={(e) => setFacebook(e.target.value)}
                 sx={{ minWidth: 300, marginRight: 3 }}
                 placeholder={user.facebook}
                 size="small"
                 fullWidth
               />
-                : <p id='textresult6'>{user.facebook}</p>}
+                : <a href={user.facebook}
+                  target="_blank"
+                  id='textresult6'>
+                  {user.facebook}
+                </a>}
 
             </div>
             {isEdit ? <div className='stack-right'>
@@ -150,7 +336,7 @@ const Info = () => {
                 Lưu
               </Button>
               <Button variant='outlined'
-                onClick={() => setIsEdit(false)}>
+                onClick={toggleEditMode}>
                 Hủy
               </Button>
             </div> : <></>}
@@ -163,7 +349,7 @@ const Info = () => {
           <img className='imageInfo' src={ImageInfo} alt="ảnh logo" />
           <h1 className='name-logo'>School Club Management</h1>
         </div>
-        <div style={{ border: "1px solid #ccc", borderRadius: 5, margin: 20, marginLeft: 0, marginTop: 20, height: "50vh", backgroundColor: 'white' }}>
+        <div style={{ border: "1px solid #ccc", borderRadius: 5, margin: 20, marginLeft: 0, marginTop: 20, height: "auto", backgroundColor: 'white' }}>
           <div style={{ display: "flex", borderBottom: "1px solid #ccc", alignItems: "center" }}>
             <div style={{ padding: 10, paddingLeft: 25 }}>
               <KeyIcon sx={{ fontSize: "2.5rem", transform: "rotate(-45deg)" }}></KeyIcon>
@@ -182,6 +368,7 @@ const Info = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => {
+                    setPasswordErr('')
                     setPassword(e.target.value)
                   }}
                   endAdornment={
@@ -207,6 +394,7 @@ const Info = () => {
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => {
+                    setNewPasswordErr('')
                     setNewPassword(e.target.value)
                   }}
                   endAdornment={
@@ -232,6 +420,7 @@ const Info = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => {
+                    setConfirmPasswordErr('')
                     setConfirmPassword(e.target.value)
                   }}
                   endAdornment={
@@ -250,11 +439,11 @@ const Info = () => {
               </FormControl>
             </div>
             <div style={{ padding: 20 }} >
-              <label style={{ color: "#1976d2", marginLeft: 100, cursor: 'pointer' }}>Bạn quên mật khẩu ?</label>
+              <label style={{ color: "#1976d2", marginLeft: 100, cursor: 'pointer' }}>Bạn quên mật khẩu?</label>
             </div>
           </div>
           <div className='list-action-password'>
-            <Button variant='outlined'>Lưu thay đổi</Button>
+            <Button variant='outlined' onClick={handleChangePassword}>Lưu thay đổi</Button>
           </div>
         </div>
 

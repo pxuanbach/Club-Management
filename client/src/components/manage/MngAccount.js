@@ -12,6 +12,7 @@ import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 import axiosInstance from '../../helper/Axios';
 import { Buffer } from 'buffer';
+import FileDownload from 'js-file-download'
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -98,6 +99,22 @@ const ManageAccount = () => {
     event.stopPropagation();
     setUserSelected(param)
     setOpenDialog(true)
+  }
+
+  const handleExportUsers = (e) => {
+    e.preventDefault()
+    axiosInstance.get('/export/users', {
+      headers: { "Content-Type": "application/vnd.ms-excel" },
+      responseType: 'blob'
+    })
+      .then(response => {
+        //console.log(response)
+        FileDownload(response.data, Date.now() + '-nguoidung.xlsx')
+      }).catch(err => {
+        console.log(err)
+        setAlertMessage(err.response)
+        setOpenSnackbar(true);
+      })
   }
 
   const getUsers = async () => {
@@ -240,6 +257,7 @@ const ManageAccount = () => {
               <span>Nhập file</span>
             </Button>
             <Button
+              onClick={handleExportUsers}
               style={{ background: '#1B264D' }}
               variant="contained"
               disableElevation
