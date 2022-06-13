@@ -68,7 +68,7 @@ const PersonMessage = () => {
             setRoomsFinded([])
         }
         setSearch(e.target.value)
-        socket.emit('search-user', e.target.value)
+        socket.emit('search-user', e.target.value, user._id)
     }
 
     const handleSearch = (e) => {
@@ -81,24 +81,29 @@ const PersonMessage = () => {
         }
     }
 
-    const handleSelectChatRoom = (e, userSelected) => {
+    const handleSelectChatRoom = (e, roomSelected) => {
         e.preventDefault();
-        const roomIdArr = [
-            user._id + "_" + userSelected._id,
-            userSelected._id + "_" + user._id
-        ]
+        let isRoomExist = null;
         const currentRooms = JSON.parse(JSON.stringify(rooms))
-        const isRoomExist = currentRooms.find(room =>
-            room.room_id === roomIdArr[0]
-            || room.room_id === roomIdArr[1]
-        )
+        if (roomSelected.email === '') {
+            isRoomExist = currentRooms.find(room => room.room_id === roomSelected._id)
+        } else {
+            const roomIdArr = [
+                user._id + "_" + roomSelected._id,
+                roomSelected._id + "_" + user._id
+            ]
+            isRoomExist = currentRooms.find(room =>
+                room.room_id === roomIdArr[0]
+                || room.room_id === roomIdArr[1]
+            )
+        }
         if (isRoomExist) {
             setCurrentRoom(isRoomExist)
         } else {
             const data = {
-                room_id: user._id + "_" + userSelected._id,
-                imgUrl: userSelected.img_url,
-                name: userSelected.name,
+                room_id: user._id + "_" + roomSelected._id,
+                imgUrl: roomSelected.img_url,
+                name: roomSelected.name,
                 lastMessage: "",
                 createdAt: ""
             }
@@ -158,8 +163,8 @@ const PersonMessage = () => {
 
     useEffect(() => {
         socket = io(ENDPT);
-        socket.on('user-searched', userList => {
-            setRoomsFinded(userList)
+        socket.on('user-searched', roomList => {
+            setRoomsFinded(roomList)
         })
         return () => {
             socket.emit('disconnect');
@@ -268,7 +273,7 @@ const PersonMessage = () => {
                             minHeight: '300px',
                             zIndex: 99,
                         }}>
-                            {roomsFinded.map((user, index) => (
+                            {roomsFinded.map((room, index) => (
                                 <ListItem key={index}
                                     alignItems="flex-start"
                                     sx={{
@@ -276,13 +281,13 @@ const PersonMessage = () => {
                                         overflow: 'hidden',
                                         width: '100%',
                                     }}>
-                                    <ListItemButton onClick={(e) => handleSelectChatRoom(e, user)}>
+                                    <ListItemButton onClick={(e) => handleSelectChatRoom(e, room)}>
                                         <ListItemAvatar>
-                                            <Avatar src={user.img_url} />
+                                            <Avatar src={room.img_url} />
                                         </ListItemAvatar>
                                         <ListItemText
-                                            primary={user.name}
-                                            secondary={user.email}
+                                            primary={room.name}
+                                            secondary={room.email}
                                         />
                                     </ListItemButton>
 

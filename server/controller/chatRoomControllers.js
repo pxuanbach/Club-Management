@@ -40,16 +40,48 @@ module.exports = function (socket, io) {
         }
     })
 
-    socket.on('search-user', searchValue => {
+    socket.on('search-user', (searchValue, user_id) => {
+        let roomsFinded = []
         User.find({
             $or: [
                 { username: { $regex: searchValue } },
                 { name: { $regex: searchValue } },
                 { email: { $regex: searchValue } }
             ]
-        }).limit(8).then(result => {
-            //console.log(searchValue, result)
-            socket.emit('user-searched', result)
+        }).limit(5).then(users => {
+            users.forEach(user => {
+                const room = {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    img_url: user.img_url,
+                }
+                roomsFinded.push(room)
+            })
+            Club.find({
+                $and: [
+                    {
+                        $or: [
+                            { treasurer: user_id },
+                            { leader: user_id },
+                            { members: user_id },
+                        ]
+                    },
+                    { name: { $regex: searchValue } }
+                ]
+            })
+                .limit(5).then(clubs => {
+                    clubs.forEach(club => {
+                        const room = {
+                            _id: club._id,
+                            name: club.name,
+                            email: '',
+                            img_url: club.img_url,
+                        }
+                        roomsFinded.push(room)
+                    })
+                    socket.emit('user-searched', roomsFinded)
+                })
         })
     })
 
