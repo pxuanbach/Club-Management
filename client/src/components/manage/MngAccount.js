@@ -12,7 +12,8 @@ import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 import axiosInstance from '../../helper/Axios';
 import { Buffer } from 'buffer';
-import FileDownload from 'js-file-download'
+import FileDownload from 'js-file-download';
+import SeverityOptions from '../../helper/SeverityOptions';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -38,12 +39,17 @@ const style = {
 const ManageAccount = () => {
   const { user, setUser } = useContext(UserContext);
   const [openModalAdd, setOpenModalAdd] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const [search, setSearch] = useState();
-  const [userSelected, setUserSelected] = useState();
   const [users, setUsers] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [options, setOptions] = useState();
+
+  const showSnackbar = (message, options) => {
+    setOptions(options)
+    setAlertMessage(message)
+    setOpenSnackbar(true)
+}
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -90,15 +96,8 @@ const ManageAccount = () => {
 
       }).catch(err => {
         //console.log(err.response.data)
-        setAlertMessage(err.response.data.error)
-        setOpenSnackbar(true);
+        showSnackbar(err.response.data.error, SeverityOptions.error)
       })
-  }
-
-  const handleDeleteUser = (event, param) => {
-    event.stopPropagation();
-    setUserSelected(param)
-    setOpenDialog(true)
   }
 
   const handleExportUsers = (e) => {
@@ -111,9 +110,7 @@ const ManageAccount = () => {
         //console.log(response)
         FileDownload(response.data, Date.now() + '-nguoidung.xlsx')
       }).catch(err => {
-        console.log(err)
-        setAlertMessage(err.response)
-        setOpenSnackbar(true);
+        showSnackbar(err.response.data.error, SeverityOptions.error)
       })
   }
 
@@ -187,12 +184,12 @@ const ManageAccount = () => {
   return (
     <div className='container'>
       <Snackbar
-        autoHideDuration={3000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={openSnackbar}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity="error">{alertMessage}</Alert>
+        <Alert severity={options}>{alertMessage}</Alert>
       </Snackbar>
       <Modal
         open={openModalAdd}
@@ -205,6 +202,7 @@ const ManageAccount = () => {
             handleClose={handleCloseAdd}
             users={users}
             setUsers={setUsers}
+            showSnackbar={showSnackbar}
           />
         </Box>
       </Modal>

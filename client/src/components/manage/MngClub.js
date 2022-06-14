@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import {
-  Avatar, TextField, Button, Tooltip, Box, 
+  Avatar, TextField, Button, Tooltip, Box,
   Modal, Alert, Snackbar, Popover
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -18,6 +18,7 @@ import { Redirect } from 'react-router-dom'
 import { Buffer } from 'buffer';
 import FileDownload from 'js-file-download'
 import UserCard from '../card/UserCard';
+import SeverityOptions from '../../helper/SeverityOptions';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -50,9 +51,16 @@ const ManageClub = () => {
   const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [search, setSearch] = useState();
   const [clubs, setClubs] = useState([]);
+  const openUserCard = Boolean(anchorUser);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const openUserCard = Boolean(anchorUser);
+  const [options, setOptions] = useState();
+
+  const showSnackbar = (message, options) => {
+    setOptions(options)
+    setAlertMessage(message)
+    setOpenSnackbar(true)
+  }
 
   const handleShowPopover = (event, data, setDate, setAnchorEl) => {
     setAnchorEl(event.currentTarget);
@@ -108,8 +116,7 @@ const ManageClub = () => {
         setClubs(updateClubs)
       }).catch(err => {
         //console.log(err.response.data)
-        setAlertMessage(err.response.data.error)
-        setOpenSnackbar(true);
+        showSnackbar(err.response.data.error, SeverityOptions.error)
       })
 
     const data = res.data;
@@ -172,10 +179,10 @@ const ManageClub = () => {
         )
       }
     },
-    { 
-      field: 'treasurer', 
-      headerName: "Thủ quỹ", 
-      flex: 1, 
+    {
+      field: 'treasurer',
+      headerName: "Thủ quỹ",
+      flex: 1,
       renderCell: (value) => {
         return (
           <a href='#' onClick={(e) =>
@@ -256,9 +263,8 @@ const ManageClub = () => {
         //console.log(response)
         FileDownload(response.data, Date.now() + '-caulacbo.xlsx')
       }).catch(err => {
-        console.log(err)
-        setAlertMessage(err.response)
-        setOpenSnackbar(true);
+        //console.log(err)
+        showSnackbar(err.response.data.error, SeverityOptions.error)
       })
   }
 
@@ -283,12 +289,12 @@ const ManageClub = () => {
   return (
     <div className='container'>
       <Snackbar
-        autoHideDuration={3000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={openSnackbar}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity="error">{alertMessage}</Alert>
+        <Alert severity={options}>{alertMessage}</Alert>
       </Snackbar>
       <Popover
         open={openUserCard}
@@ -313,7 +319,12 @@ const ManageClub = () => {
         }}
       >
         <Box sx={style}>
-          <AddClub setShowFormAdd={setShowFormAdd} clubs={clubs} setClubs={setClubs} />
+          <AddClub
+            setShowFormAdd={setShowFormAdd}
+            clubs={clubs}
+            setClubs={setClubs}
+            showSnackbar={showSnackbar}
+          />
         </Box>
       </Modal>
       <Modal
