@@ -5,8 +5,6 @@ const router = Router();
 
 router.post('/create', activityController.create)
 router.post('/createcard', activityController.createCard)
-router.post('/userjoin', activityController.userJoin)
-router.post('/groupjoin', activityController.groupJoin)
 router.get('/list/:clubId', activityController.getList)
 router.get('/one/:activityId', activityController.getOne)
 router.get('/collaborators/:activityId', activityController.getCollaborators)
@@ -22,9 +20,13 @@ router.patch('/addcollaborators/:activityId', activityController.addCollaborator
 router.patch('/deleteallcards/:activityId', activityController.deleteAllCards)
 router.delete('/delete/:activityId', activityController.delete)
 
+router.post('/userjoin', activityController.userJoin)
+router.post('/groupjoin', activityController.groupJoin)
 router.post('/card/upload', upload.array('file'), activityController.upload)
 router.post('/card/addcomment', activityController.addComment)
 router.get('/card/:cardId', activityController.getCard)
+router.patch('/card/userexit/:cardId', activityController.userExitCard)
+router.patch('/card/groupexit/:cardId', activityController.groupExitCard)
 router.patch('/card/description/:cardId', activityController.updateCardDescription)
 router.patch('/card/deletecomment/:cardId', activityController.deleteComment)
 router.patch('/card/deletefile/:cardId', activityController.deleteFile)

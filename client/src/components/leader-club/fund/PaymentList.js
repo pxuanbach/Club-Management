@@ -1,12 +1,25 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import Chip from '@mui/material/Chip';
+import { Chip, Popover } from '@mui/material';
+import UserCard from '../../card/UserCard';
 
 export default function DataTable({ rows }) {
+  const [anchorUser, setAnchorUser] = useState(null);
+  const [userSelected, setUserSelected] = useState()
+  const openUserCard = Boolean(anchorUser);
   let formatter = new Intl.DateTimeFormat(['ban', 'id'], {
     hour: 'numeric', minute: 'numeric',
-    year: "numeric", month: "numeric", day: "numeric",  
+    year: "numeric", month: "numeric", day: "numeric",
   });
+
+  const handleShowPopover = (event, data, setDate, setAnchorEl) => {
+    setAnchorEl(event.currentTarget);
+    setDate(data)
+  };
+
+  const handleClosePopover = (setAnchorEl) => {
+    setAnchorEl(null);
+  };
 
   const columns = [
     {
@@ -68,7 +81,11 @@ export default function DataTable({ rows }) {
       valueGetter: (value) => value.row.author.name,
       renderCell: (value) => {
         return (
-          <a href='#'>{value.row.author.name}</a>
+          <a href='#' onClick={(e) =>
+            handleShowPopover(e, value.row.author, setUserSelected, setAnchorUser)
+          }>
+            {value.row.author.name}
+          </a>
         )
       }
     }
@@ -76,6 +93,20 @@ export default function DataTable({ rows }) {
 
   return (
     <div style={{ paddingRight: '40px' }}>
+      <Popover
+        open={openUserCard}
+        anchorEl={anchorUser}
+        onClose={() => handleClosePopover(setAnchorUser)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <UserCard
+          user={userSelected}
+          isLeader={false}
+        />
+      </Popover>
       <DataGrid
         getRowId={(r) => r._id}
         rows={rows}

@@ -148,53 +148,6 @@ module.exports.createCard = (req, res) => {
     })
 }
 
-module.exports.userJoin = (req, res) => {
-    const { userId, cardId } = req.body
-
-    ActivityCard.findById(cardId)
-        .populate('groupJoin')
-        .then(card => {
-            //check user joined?
-            if (isUserJoined(userId, card)) {
-                res.status(200).send({ message: "Bạn đã tham gia", success: false })
-            } else {
-                ActivityCard.updateOne(
-                    { _id: cardId },
-                    { $push: { userJoin: userId } }
-                ).then(() => {
-                    res.status(200).send({ message: "Tham gia thành công!", success: true })
-                }).catch(err => {
-                    res.status(500).json({ error: "Update card err - " + err.message })
-                })
-            }
-        }).catch(err => {
-            res.status(500).json({ error: "Query card err - " + err.message })
-        })
-}
-
-module.exports.groupJoin = (req, res) => {
-    const { groupId, cardId } = req.body;
-
-    ActivityCard.findById(cardId)
-        .populate('groupJoin')
-        .then(card => {
-            if (isGroupJoined(groupId, card)) {
-                res.status(200).send({ message: "Nhóm đã tham gia", success: false })
-            } else {
-                ActivityCard.updateOne(
-                    { _id: cardId },
-                    { $push: { groupJoin: groupId } }
-                ).then(() => {
-                    res.status(200).send({ message: "Nhóm tham gia thành công!", success: true })
-                }).catch(err => {
-                    res.status(500).json({ error: "Update card err - " + err.message })
-                })
-            }
-        }).catch(err => {
-            res.status(500).json({ error: "Query card err - " + err.message })
-        })
-}
-
 module.exports.getList = (req, res) => {
     const clubId = req.params.clubId;
 
@@ -565,6 +518,53 @@ module.exports.delete = async (req, res) => {
 }
 
 //card
+module.exports.userJoin = (req, res) => {
+    const { userId, cardId } = req.body
+
+    ActivityCard.findById(cardId)
+        .populate('groupJoin')
+        .then(card => {
+            //check user joined?
+            if (isUserJoined(userId, card)) {
+                res.status(200).send({ message: "Bạn đã tham gia", success: false })
+            } else {
+                ActivityCard.updateOne(
+                    { _id: cardId },
+                    { $push: { userJoin: userId } }
+                ).then(() => {
+                    res.status(200).send({ message: "Tham gia thành công!", success: true })
+                }).catch(err => {
+                    res.status(500).json({ error: "Update card err - " + err.message })
+                })
+            }
+        }).catch(err => {
+            res.status(500).json({ error: "Query card err - " + err.message })
+        })
+}
+
+module.exports.groupJoin = (req, res) => {
+    const { groupId, cardId } = req.body;
+
+    ActivityCard.findById(cardId)
+        .populate('groupJoin')
+        .then(card => {
+            if (isGroupJoined(groupId, card)) {
+                res.status(200).send({ message: "Nhóm đã tham gia", success: false })
+            } else {
+                ActivityCard.updateOne(
+                    { _id: cardId },
+                    { $push: { groupJoin: groupId } }
+                ).then(() => {
+                    res.status(200).send({ message: "Nhóm tham gia thành công!", success: true })
+                }).catch(err => {
+                    res.status(500).json({ error: "Update card err - " + err.message })
+                })
+            }
+        }).catch(err => {
+            res.status(500).json({ error: "Query card err - " + err.message })
+        })
+}
+
 module.exports.upload = async (req, res) => {
     const files = req.files;
     const { cardId } = req.body;
@@ -629,11 +629,61 @@ module.exports.getCard = (req, res) => {
                     res.status(500).send({ error: err.message })
                     return;
                 }
-                res.status(200).send(result)
+                async.forEach(result.groupJoin, function (group, next) {
+                    User.populate(group, {"path": "members"}, function (error, out) {
+                        if (error) {
+                            res.status(500).send({ error: error.message })
+                            return;
+                        }
+                        next();
+                    })
+                }, function (err) {
+                    if (err) {
+                        res.status(500).send({ error: err.message })
+                        return;
+                    }
+                    res.status(200).send(result)
+                })
             })
         }).catch(err => {
             res.status(500).send({ error: err.message })
         })
+}
+
+module.exports.userExitCard = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const { userId } = req.body;
+        let card = await ActivityCard.findById(cardId)
+
+        const newUserJoin = card.userJoin.filter(uid => uid.toString() !== userId)
+
+        card.userJoin = newUserJoin;
+
+        card.save().then(result => {
+            res.status(200).send({ message: "Xóa khỏi thẻ thành công!", success: true })
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports.groupExitCard = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const { groupId } = req.body;
+        let card = await ActivityCard.findById(cardId)
+
+        const newGroupJoin = card.groupJoin.filter(gid => gid.toString() !== groupId)
+
+        card.groupJoin = newGroupJoin;
+
+        card.save().then(result => {
+            res.status(200).send({ message: "Xóa khỏi thẻ thành công!", success: true })
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
 
 module.exports.updateCardDescription = (req, res) => {
