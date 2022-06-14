@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import {
-  Avatar, TextField, Button, Tooltip, Box, Modal, Alert, Snackbar
+  Avatar, TextField, Button, Tooltip, Box, 
+  Modal, Alert, Snackbar, Popover
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,6 +17,7 @@ import { UserContext } from '../../UserContext'
 import { Redirect } from 'react-router-dom'
 import { Buffer } from 'buffer';
 import FileDownload from 'js-file-download'
+import UserCard from '../card/UserCard';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -40,6 +42,8 @@ const style = {
 
 const ManageClub = () => {
   const { user } = useContext(UserContext);
+  const [anchorUser, setAnchorUser] = useState(null);
+  const [userSelected, setUserSelected] = useState()
   const [clubSelected, setClubSelected] = useState()
   const [openDialog, setOpenDialog] = useState(false);
   const [showFormAdd, setShowFormAdd] = useState(false);
@@ -48,6 +52,16 @@ const ManageClub = () => {
   const [clubs, setClubs] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const openUserCard = Boolean(anchorUser);
+
+  const handleShowPopover = (event, data, setDate, setAnchorEl) => {
+    setAnchorEl(event.currentTarget);
+    setDate(data)
+  };
+
+  const handleClosePopover = (setAnchorEl) => {
+    setAnchorEl(null);
+  };
 
   const handleChangeSearchField = (e) => {
     setSearch(e.target.value)
@@ -144,8 +158,34 @@ const ManageClub = () => {
       }
     },
     { field: 'name', headerName: 'Tên câu lạc bộ', flex: 1.3 },
-    { field: 'leader', headerName: "Trưởng câu lạc bộ", flex: 1, valueGetter: (value) => value.row.leader.name },
-    { field: 'treasurer', headerName: "Thủ quỹ", flex: 1, valueGetter: (value) => value.row.treasurer.name },
+    {
+      field: 'leader',
+      headerName: "Trưởng câu lạc bộ",
+      flex: 1,
+      renderCell: (value) => {
+        return (
+          <a href='#' onClick={(e) =>
+            handleShowPopover(e, value.row.leader, setUserSelected, setAnchorUser)
+          }>
+            {value.row.leader.name}
+          </a>
+        )
+      }
+    },
+    { 
+      field: 'treasurer', 
+      headerName: "Thủ quỹ", 
+      flex: 1, 
+      renderCell: (value) => {
+        return (
+          <a href='#' onClick={(e) =>
+            handleShowPopover(e, value.row.treasurer, setUserSelected, setAnchorUser)
+          }>
+            {value.row.treasurer.name}
+          </a>
+        )
+      }
+    },
     { field: 'members_num', headerName: "Thành viên", type: 'number', flex: 0.5 },
     { field: 'fund', headerName: 'Quỹ (VND)', type: 'number', flex: 0.8 },
     {
@@ -209,7 +249,7 @@ const ManageClub = () => {
   const handleExportClubs = (e) => {
     e.preventDefault()
     axiosInstance.get('/export/clubs', {
-      headers: {"Content-Type": "application/vnd.ms-excel"},
+      headers: { "Content-Type": "application/vnd.ms-excel" },
       responseType: 'blob'
     })
       .then(response => {
@@ -250,6 +290,20 @@ const ManageClub = () => {
       >
         <Alert severity="error">{alertMessage}</Alert>
       </Snackbar>
+      <Popover
+        open={openUserCard}
+        anchorEl={anchorUser}
+        onClose={() => handleClosePopover(setAnchorUser)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <UserCard
+          user={userSelected}
+          isLeader={false}
+        />
+      </Popover>
       <Modal
         open={showFormAdd}
         aria-labelledby="modal-add-title"

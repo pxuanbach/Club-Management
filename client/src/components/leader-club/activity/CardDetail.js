@@ -17,6 +17,7 @@ import PreviewFileDialog from '../../dialog/PreviewFileDialog';
 import Comments from './comment/Comments'
 import { UserContext } from '../../../UserContext';
 import SeverityOptions from '../../../helper/SeverityOptions'
+import GroupCard from '../../card/GroupCard';
 
 const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const { activityId } = useParams()
@@ -25,11 +26,13 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const newCardTextareaRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
     const [anchorUser, setAnchorUser] = useState(null);
+    const [anchorGroup, setAnchorGroup] = useState(null);
     const [anchorFindGroup, setAnchorFindGroup] = useState(null);
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
     const [userSelected, setUserSelected] = useState()
+    const [groupSelected, setGroupSelected] = useState()
     const [userJoin, setUserJoin] = useState([]);
     const [groupJoin, setGroupJoin] = useState([]);
     const [file, setFile] = useState();
@@ -41,6 +44,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
     const [alertMessage, setAlertMessage] = useState('');
     const [options, setOptions] = useState();
     const openUserCard = Boolean(anchorUser);
+    const openGroupCard = Boolean(anchorGroup);
     const openFindGroup = Boolean(anchorFindGroup);
 
     const showSnackbar = (message, options) => {
@@ -89,9 +93,9 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
         })
     }
 
-    const handleShowPopover = (event, user, setAnchorEl) => {
+    const handleShowPopover = (event, data, setDate, setAnchorEl) => {
         setAnchorEl(event.currentTarget);
-        setUserSelected(user)
+        setDate(data)
     };
 
     const handleClosePopover = (setAnchorEl) => {
@@ -123,6 +127,47 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
         } else {
             showSnackbar("Đang tải dữ liệu...", false)
         }
+    }
+
+    const handleUserExit = () => {
+        axiosInstance.patch(`/activity/card/userexit/${card._id}`,
+            JSON.stringify({
+                "userId": userSelected._id,
+            }), {
+            headers: { "Content-Type": "application/json" }
+        }).then(response => {
+            //response.data
+            if (response.data.success) {
+                handleClosePopover(setAnchorUser)
+                getCardInfo()
+            } else {
+                showSnackbar(response.data.message, SeverityOptions.warning)
+            }
+        }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        })
+    }
+
+    const handleGroupExit = () => {
+        console.log(groupSelected)
+        axiosInstance.patch(`/activity/card/groupexit/${card._id}`,
+            JSON.stringify({
+                "groupId": groupSelected._id,
+            }), {
+            headers: { "Content-Type": "application/json" }
+        }).then(response => {
+            //response.data
+            if (response.data.success) {
+                handleClosePopover(setAnchorGroup)
+                getCardInfo()
+            } else {
+                showSnackbar(response.data.message, SeverityOptions.warning)
+            }
+        }).catch(err => {
+            //err.response.data.error
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        })
     }
 
     const handleSaveDescription = (e) => {
@@ -203,6 +248,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
         axiosInstance.get(`/activity/card/${card._id}`)
             .then(response => {
                 //response.data
+                console.log(response.data)
                 setUserJoin(response.data.userJoin)
                 setGroupJoin(response.data.groupJoin)
                 setFiles(response.data.files)
@@ -271,7 +317,9 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                             sx={{ cursor: 'pointer', fontSize: '16px' }}
                                             alt={user.name}
                                             src={user.img_url}
-                                            onClick={(e) => handleShowPopover(e, user, setAnchorUser)}
+                                            onClick={(e) =>
+                                                handleShowPopover(e, user, setUserSelected, setAnchorUser)
+                                            }
                                         />
                                     ))}
                                 </AvatarGroup>
@@ -284,7 +332,11 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                         horizontal: 'left',
                                     }}
                                 >
-                                    <UserCard user={userSelected} />
+                                    <UserCard
+                                        handleUserExit={handleUserExit}
+                                        user={userSelected}
+                                        isLeader={isLeader}
+                                    />
                                 </Popover>
                             </div>
                         </div>
@@ -297,12 +349,29 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                             <Avatar
                                                 sx={{ cursor: 'pointer', fontSize: '16px' }}
                                                 alt={group.name}
-                                                src="">
+                                                onClick={(e) =>
+                                                    handleShowPopover(e, group, setGroupSelected, setAnchorGroup)
+                                                }>
                                                 {group.name.charAt(0)}
                                             </Avatar>
                                         </Tooltip>
                                     ))}
                                 </AvatarGroup>
+                                <Popover
+                                    open={openGroupCard}
+                                    anchorEl={anchorGroup}
+                                    onClose={() => handleClosePopover(setAnchorGroup)}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    }}
+                                >
+                                    <GroupCard
+                                        handleGroupExit={handleGroupExit}
+                                        group={groupSelected}
+                                        isLeader={isLeader}
+                                    />
+                                </Popover>
                             </div>
                         </div>
                     </div>
@@ -393,7 +462,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                         <h4 className='title-action'>Tùy chọn thẻ</h4>
                         {isLeader && <>
                             <button className='btn-action'
-                                onClick={(e) => handleShowPopover(e, null, setAnchorFindGroup)}>
+                                onClick={(e) => handleShowPopover(e, null, null, setAnchorFindGroup)}>
                                 <i class="fa-solid fa-user-plus"></i>
                                 Thêm nhóm
                             </button>
@@ -419,7 +488,12 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                 showSnackbar={showSnackbar}
                             />
                         </Popover>
-                        <input style={{ display: 'none' }} type="file" ref={inputFile} onChange={handleFileChange} />
+                        <input
+                            style={{ display: 'none' }}
+                            type="file"
+                            ref={inputFile}
+                            onChange={handleFileChange}
+                        />
                         <button className='btn-action'
                             onClick={(e) => inputFile.current.click()}>
                             <AttachFileIcon fontSize='small' />
