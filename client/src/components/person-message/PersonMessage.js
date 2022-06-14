@@ -12,7 +12,6 @@ import ItemMessage from './ItemMessage'
 import MessagesList from '../leader-club/message/Message-List';
 import Input from '../leader-club/message/Input';
 import { ENDPT } from '../../helper/Helper';
-import { UploadImageMessage } from '../../helper/UploadImage'
 import { UserContext } from '../../UserContext';
 import PreviewFileDialog from '../dialog/PreviewFileDialog'
 import SeverityOptions from '../../helper/SeverityOptions';

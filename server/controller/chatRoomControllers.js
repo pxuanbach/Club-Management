@@ -88,44 +88,48 @@ module.exports = function (socket, io) {
     socket.on('sendMessage', async (
         user_id, type, original_filename, content, room_id, callback
     ) => {
-        const user = getUser({ user_id, room_id });
-        //console.log('send message user', user)
-        let roomId = room_id; //change if room doesn't exist
-        const splitRoomId = room_id.split('_');
-        if (splitRoomId.length > 1) {
-            const roomIdArr = [
-                splitRoomId[0] + "_" + splitRoomId[1],
-                splitRoomId[1] + "_" + splitRoomId[0]
-            ]
-            const rooms = await ChatRoom.find({ room_id: { $in: roomIdArr } })
-            if (rooms.length > 0) {
-                roomId = rooms[0].room_id;
-            } else {
-                console.log("không tìm thấy")
-                const newRoom = await ChatRoom.create({ room_id })
-                roomId = newRoom.room_id;
-                io.emit("chat-room-created", roomId)
+        try {
+            const user = getUser({ user_id, room_id });
+            //console.log('send message user', user)
+            let roomId = room_id; //change if room doesn't exist
+            const splitRoomId = room_id.split('_');
+            if (splitRoomId.length > 1) {
+                const roomIdArr = [
+                    splitRoomId[0] + "_" + splitRoomId[1],
+                    splitRoomId[1] + "_" + splitRoomId[0]
+                ]
+                const rooms = await ChatRoom.find({ room_id: { $in: roomIdArr } })
+                if (rooms.length > 0) {
+                    roomId = rooms[0].room_id;
+                } else {
+                    console.log("không tìm thấy")
+                    const newRoom = await ChatRoom.create({ room_id })
+                    roomId = newRoom.room_id;
+                    io.emit("chat-room-created", roomId)
+                }
             }
+            const msgToStore = {
+                author: user_id,
+                type,
+                original_filename,
+                content,
+                room_id: roomId,
+            }
+            //console.log('message', msgToStore)
+            const msg = new Message(msgToStore);
+            msg.save().then(m =>
+                m.populate('author')
+                    .execPopulate()
+                    .then(async (result) => {
+                        //console.log('send mess', result)
+                        io.to(roomId).emit('message', result);
+                        io.emit('reload-list-room', result)
+                        callback();
+                    })
+            )
+        } catch (err) {
+            console.log(err.message)
         }
-        const msgToStore = {
-            author: user_id,
-            type,
-            original_filename,
-            content,
-            room_id: roomId,
-        }
-        //console.log('message', msgToStore)
-        const msg = new Message(msgToStore);
-        msg.save().then(m =>
-            m.populate('author')
-                .execPopulate()
-                .then(async (result) => {
-                    //console.log('send mess', result)
-                    io.to(roomId).emit('message', result);
-                    io.emit('reload-list-room', result)
-                    callback();
-                })
-        )
     })
 
     socket.on('get-messages-history', room_id => {
