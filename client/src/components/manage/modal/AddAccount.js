@@ -7,8 +7,9 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../Mng.css'
 import axiosInstance from '../../../helper/Axios';
+import SeverityOptions from '../../../helper/SeverityOptions';
 
-const AddAccount = ({ handleClose, users, setUsers }) => {
+const AddAccount = ({ handleClose, users, setUsers, showSnackbar }) => {
     const [avatarHeight, setAvatarHeight] = useState(150);
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
@@ -81,6 +82,7 @@ const AddAccount = ({ handleClose, users, setUsers }) => {
             }).then(response => {
                 //response.data
                 setUsers([...users, response.data])
+                showSnackbar("Thêm tài khoản thành công!", SeverityOptions.success)
                 resetState();
             }).catch(err => {
                 //console.log(err.response.data)
@@ -88,10 +90,11 @@ const AddAccount = ({ handleClose, users, setUsers }) => {
                 setPasswordErr(err.response.data.errors.password);
                 setNameErr(err.response.data.errors.name);
                 setEmailErr(err.response.data.errors.email);
+            }).finally(() => {
+                setIsSuccess(false);
             })
-            setIsSuccess(false);
         } catch (error) {
-            console.log(error)
+            showSnackbar(error, SeverityOptions.error)
         }
     }
 

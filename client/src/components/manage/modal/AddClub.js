@@ -5,8 +5,9 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axiosInstance from '../../../helper/Axios'
 import FindMember from './FindMember'
+import SeverityOptions from '../../../helper/SeverityOptions';
 
-const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
+const AddClub = ({ setShowFormAdd, clubs, setClubs, showSnackbar }) => {
     const avatarRef = useRef();
     const inputAvatarImage = useRef(null);
     const [avatarHeight, setAvatarHeight] = useState(150);
@@ -34,7 +35,7 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
         if (isFileImage(event.target.files[0])) {
             setAvatarImage(event.target.files[0]);
         } else {
-            alert('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...')
+            showSnackbar('Ảnh đại diện nên là tệp có đuôi .jpg, .png, .bmp,...', SeverityOptions.warning)
         }
     };
 
@@ -77,18 +78,18 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
         formData.append('leader', leaderSelected._id)
         formData.append('treasurer', treasurerSelected._id)
 
-        const res = await axiosInstance.post('/club/create', 
+        axiosInstance.post('/club/create', 
         formData, {
             headers: { 'Content-Type': 'application/json' }
-        })
-
-        const data = res.data
-
-        if (data) {
-            setClubs([...clubs, data])
+        }).then(response => {
+            setClubs([...clubs, response.data])
+            showSnackbar("Thêm câu lạc bộ thành công!", SeverityOptions.success)
             resetState();
-        }
-
+        }).catch(err => {
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        }).finally(() => {
+            setIsLoading(false)
+        })
     }
 
     const resetState = () => {
@@ -99,7 +100,6 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs }) => {
         setAvatarImage(null)
         setLeaderSelected(null)
         setTreasurerSelected(null)
-        setIsLoading(false)
     }
 
     const onExitClick = () => {
