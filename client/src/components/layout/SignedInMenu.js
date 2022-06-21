@@ -57,9 +57,9 @@ const SignedInMenu = ({ logout, pathName }) => {
                     </Link>
                 </Tooltip>
                 <Tooltip title="Đăng xuất" placement='right-start'>
-                    <Link onClick={logout} to="/login">
+                    <a onClick={logout} href="/login">
                         <i class="fa-solid fa-right-from-bracket"></i>
-                    </Link>
+                    </a>
                 </Tooltip>
             </div>
         </div>
