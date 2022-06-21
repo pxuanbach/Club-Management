@@ -20,7 +20,7 @@ const Navbar = () => {
             const data = res.data;
             console.log('logout data', data);
             setUser(null);
-            socket.emit('logout')
+            socket.emit('leave-rooms')
         } catch (error) {
             console.log(error)
         }
