@@ -11,7 +11,7 @@ const options = [
 ];
 const ITEM_HEIGHT = 48;
 
-const ItemMessage = ({ room, setCurrentRoom }) => {
+const ItemMessage = ({ room, setCurrentRoom, handleJoinRoom, handleLeaveRoom }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -27,8 +27,10 @@ const ItemMessage = ({ room, setCurrentRoom }) => {
 
     const handleSelectRoom = (e) => {
         e.preventDefault();
+        handleLeaveRoom();
+        handleJoinRoom(room.room_id);
         setCurrentRoom(JSON.parse(JSON.stringify(room)))
-        console.log(room)
+        //console.log(room)
     }
 
     return (

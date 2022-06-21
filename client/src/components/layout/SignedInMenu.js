@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useContext } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { Link } from 'react-router-dom'
 import Avatar from '@mui/material/Avatar';
 import { UserContext } from '../../UserContext'
 
 const SignedInMenu = ({ logout, pathName }) => {
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     return (
         <div className='nav-menu'>

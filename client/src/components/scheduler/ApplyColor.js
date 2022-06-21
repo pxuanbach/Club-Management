@@ -18,6 +18,6 @@ export default function applyColor(datas) {
         item.color = color;
         colorArrClone = colorArrClone.filter(value => value !== color)
     });
-    console.log(colorArr)
+    //console.log(colorArr)
     return datas;
 }

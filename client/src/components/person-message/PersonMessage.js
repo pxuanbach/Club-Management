@@ -5,24 +5,22 @@ import {
     ListItemAvatar, Snackbar, Alert,
     ListItemButton
 } from '@mui/material';
-import io from 'socket.io-client';
 import { Redirect } from 'react-router-dom';
 import './PersonMessage.css'
 import ItemMessage from './ItemMessage'
 import MessagesList from '../leader-club/message/Message-List';
 import Input from '../leader-club/message/Input';
-import { ENDPT } from '../../helper/Helper';
 import { UserContext } from '../../UserContext';
+import { SocketContext } from '../../SocketContext';
 import PreviewFileDialog from '../dialog/PreviewFileDialog'
 import SeverityOptions from '../../helper/SeverityOptions';
 import axiosInstance from '../../helper/Axios'
 
-let socket;
-
 const PersonMessage = () => {
     const inputFile = useRef(null);
-    const [file, setFile] = useState();
+    const socket = useContext(SocketContext);
     const { user } = useContext(UserContext);
+    const [file, setFile] = useState();
     const [search, setSearch] = useState();
     const [message, setMessage] = useState();
     const [roomsFinded, setRoomsFinded] = useState([]);
@@ -82,6 +80,7 @@ const PersonMessage = () => {
 
     const handleSelectChatRoom = (e, roomSelected) => {
         e.preventDefault();
+        handleLeaveRoom();
         let isRoomExist = null;
         const currentRooms = JSON.parse(JSON.stringify(rooms))
         if (roomSelected.email === '') {
@@ -98,9 +97,10 @@ const PersonMessage = () => {
         }
         if (isRoomExist) {
             setCurrentRoom(isRoomExist)
+            handleJoinRoom(isRoomExist.room_id)
         } else {
             const data = {
-                room_id: user._id + "_" + roomSelected._id,
+                room_id: `${user._id}_${roomSelected._id}`,
                 imgUrl: roomSelected.img_url,
                 name: roomSelected.name,
                 lastMessage: "",
@@ -108,6 +108,7 @@ const PersonMessage = () => {
             }
             setRooms([...rooms, data])
             setCurrentRoom(data)
+            handleJoinRoom(data.room_id)
         }
         setSearch('')
         setRoomsFinded([])
@@ -160,15 +161,19 @@ const PersonMessage = () => {
         }
     }
 
+    const handleJoinRoom = (room_id) => {
+        socket.emit('join', { user_id: user?._id, room_id: room_id })
+    }
+
+    const handleLeaveRoom = () => {
+        socket.emit('leave-room', currentRoom?.room_id)
+    }
+
     useEffect(() => {
-        socket = io(ENDPT);
+        socket.emit("leave-rooms")
         socket.on('user-searched', roomList => {
             setRoomsFinded(roomList)
         })
-        return () => {
-            socket.emit('disconnect');
-            socket.off();
-        }
     }, [])
 
     useEffect(() => {
@@ -177,29 +182,23 @@ const PersonMessage = () => {
             setRooms(roomList)
             //console.log("current room 2", currentRoom)
         })
-        socket.on('reload-list-room', (message) => {
-            //console.log(rooms)
-            const currentRooms = JSON.parse(JSON.stringify(rooms))
-            const isRoomExist = currentRooms.find(room => room.room_id === message.room_id)
-            const isRoomClub = user.clubs.find(club => club === message.room_id)
-            //console.log(rooms, message.room_id)
-            if (isRoomExist || isRoomClub) {
-                socket.emit('get-list-room', user._id)
-            }
-        })
     }, [rooms])
 
     useEffect(() => {
-        socket.emit('join', { user_id: user?._id, room_id: currentRoom?.room_id })
+        //console.log(socket)
         socket.emit('get-messages-history', currentRoom?.room_id)
         socket.on('output-messages', messages => {
             //console.log(messages)
             setMessages(messages)
         })
+        //console.log("I'm change", currentRoom)
     }, [currentRoom])
 
     useEffect(() => {
         socket.on('message', message => {
+            // console.log("new message", message.room_id)
+            // console.log("current room", currentRoom)
+            // if (message.room_id === currentRoom.room_id)
             setMessages([...messages, message])
         })
     }, [messages]);
@@ -217,6 +216,20 @@ const PersonMessage = () => {
             })
         }
     }, [user])
+
+    useEffect(() => {
+        socket.on('reload-list-room', async (message) => {
+            const currentRooms = await JSON.parse(JSON.stringify(rooms))
+            const isRoomExist = currentRooms.find(room => room.room_id === message.room_id)
+            const isRoomClub = user.clubs.find(club => club === message.room_id)
+            console.log('rooms', currentRooms)
+            console.log("room", isRoomExist)
+            console.log("isReload", Boolean(isRoomExist || isRoomClub))
+            if (isRoomExist || isRoomClub) {
+                socket.emit('get-list-room', user._id)
+            }
+        })
+    }, [user, rooms])
 
     if (!user) {
         return <Redirect to='/login' />
@@ -304,6 +317,8 @@ const PersonMessage = () => {
                                 key={room.room_id}
                                 room={room}
                                 setCurrentRoom={setCurrentRoom}
+                                handleJoinRoom={handleJoinRoom}
+                                handleLeaveRoom={handleLeaveRoom}
                             />
                         ))
                         : <Box className='loading-temp'>

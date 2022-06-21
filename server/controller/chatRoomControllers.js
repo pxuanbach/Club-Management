@@ -33,6 +33,7 @@ module.exports = function (socket, io) {
             room_id
         })
         socket.join(room_id);
+        console.log("on join", io.sockets.adapter.rooms)
         if (error) {
             console.log('join error', error)
         } else {
@@ -89,7 +90,6 @@ module.exports = function (socket, io) {
         user_id, type, original_filename, content, room_id, callback
     ) => {
         try {
-            const user = getUser({ user_id, room_id });
             //console.log('send message user', user)
             let roomId = room_id; //change if room doesn't exist
             const splitRoomId = room_id.split('_');
@@ -106,6 +106,7 @@ module.exports = function (socket, io) {
                     const newRoom = await ChatRoom.create({ room_id })
                     roomId = newRoom.room_id;
                     io.emit("chat-room-created", roomId)
+                    socket.join(roomId);
                 }
             }
             const msgToStore = {
@@ -143,6 +144,7 @@ module.exports = function (socket, io) {
     })
 
     socket.on('get-list-room', async (user_id) => {
+        // console.log(user_id)
         const roomIdArr = await getListRoomId(user_id)
         //console.log(roomIdArr)
         let arrData = [];
