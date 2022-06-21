@@ -56,9 +56,16 @@ io.on('connection', (socket) => {
     console.log(socket.id)
     require('./controller/chatRoomControllers')(socket, io);
 
-    socket.on('disconnect', () => {
-        const user = removeUser(socket.id);
-        console.log('A user disconnected', user)
+    socket.on('leave-room', (room_id) => {
+        console.log('socket rooms', socket.adapter.rooms)
+        socket.leave(room_id)
+        console.log('socket rooms', socket.adapter.rooms)
+    })
+
+    socket.on('disconnect', (room_id) => {
+        // const user = removeUser(socket.id);
+        // console.log('A user disconnected', user)
+        console.log("on disconnect", io.sockets.adapter.rooms)
     })
 })
 

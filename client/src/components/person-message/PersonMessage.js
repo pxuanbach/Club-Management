@@ -82,6 +82,7 @@ const PersonMessage = () => {
 
     const handleSelectChatRoom = (e, roomSelected) => {
         e.preventDefault();
+        handleLeaveRoom();
         let isRoomExist = null;
         const currentRooms = JSON.parse(JSON.stringify(rooms))
         if (roomSelected.email === '') {
@@ -98,9 +99,10 @@ const PersonMessage = () => {
         }
         if (isRoomExist) {
             setCurrentRoom(isRoomExist)
+            handleJoinRoom(isRoomExist.room_id)
         } else {
             const data = {
-                room_id: user._id + "_" + roomSelected._id,
+                room_id: `${user._id}_${roomSelected._id}`,
                 imgUrl: roomSelected.img_url,
                 name: roomSelected.name,
                 lastMessage: "",
@@ -108,6 +110,7 @@ const PersonMessage = () => {
             }
             setRooms([...rooms, data])
             setCurrentRoom(data)
+            handleJoinRoom(data.room_id)
         }
         setSearch('')
         setRoomsFinded([])
@@ -160,6 +163,14 @@ const PersonMessage = () => {
         }
     }
 
+    const handleJoinRoom = (room_id) => {
+        socket.emit('join', { user_id: user?._id, room_id: room_id })
+    }
+
+    const handleLeaveRoom = () => {
+        socket.emit('leave-room', currentRoom?.room_id)
+    }
+
     useEffect(() => {
         socket = io(ENDPT);
         socket.on('user-searched', roomList => {
@@ -190,17 +201,21 @@ const PersonMessage = () => {
     }, [rooms])
 
     useEffect(() => {
-        socket.emit('join', { user_id: user?._id, room_id: currentRoom?.room_id })
+        //console.log(socket)
         socket.emit('get-messages-history', currentRoom?.room_id)
         socket.on('output-messages', messages => {
             //console.log(messages)
-            setMessages(messages)
+            setMessages(messages)         
         })
+        //console.log("I'm change", currentRoom)
     }, [currentRoom])
 
     useEffect(() => {
         socket.on('message', message => {
-            setMessages([...messages, message])
+            // console.log("new message", message.room_id)
+            // console.log("current room", currentRoom)
+            // if (message.room_id === currentRoom.room_id)
+                setMessages([...messages, message])
         })
     }, [messages]);
 
@@ -304,6 +319,8 @@ const PersonMessage = () => {
                                 key={room.room_id}
                                 room={room}
                                 setCurrentRoom={setCurrentRoom}
+                                handleJoinRoom={handleJoinRoom}
+                                handleLeaveRoom={handleLeaveRoom}
                             />
                         ))
                         : <Box className='loading-temp'>

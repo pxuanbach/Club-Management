@@ -6,8 +6,8 @@ import FilePresentIcon from '@mui/icons-material/FilePresent';
 const styleContainer = {
     display: 'flex',
     justifyContent: 'center',
-    maxWidth: '300px',
-    maxHeight: '300px',
+    maxWidth: '500px',
+    maxHeight: '500px',
     margin: '0px auto 5px',
     overflow: 'hidden',
 }
