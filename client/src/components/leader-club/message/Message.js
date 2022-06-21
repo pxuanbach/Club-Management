@@ -6,16 +6,14 @@ import {
 import MessagesList from './Message-List';
 import Input from './Input';
 import PreviewFileDialog from '../../dialog/PreviewFileDialog';
-import io from 'socket.io-client';
-import { ENDPT } from '../../../helper/Helper'
 import { UserContext } from '../../../UserContext';
+import { SocketContext } from '../../../SocketContext';
 import axiosInstance from '../../../helper/Axios';
 import SeverityOptions from '../../../helper/SeverityOptions'
 
-let socket;
-
 const Message = ({ club_id }) => {
   const inputFile = useRef(null);
+  const socket = useContext(SocketContext);
   const { user } = useContext(UserContext);
   const [file, setFile] = useState();
   const [message, setMessage] = useState();
@@ -79,11 +77,9 @@ const Message = ({ club_id }) => {
   }
 
   useEffect(() => {
-    socket = io(ENDPT);
     socket.emit('join', { user_id: user?._id, room_id: club_id })
     return () => {
-      socket.emit('disconnect');
-      socket.off();
+      socket.emit('leave-room', club_id);
     }
   }, [])
 
@@ -96,7 +92,7 @@ const Message = ({ club_id }) => {
   useEffect(() => {
     socket.emit('get-messages-history', club_id)
     socket.on('output-messages', messages => {
-      console.log(messages)
+      //console.log(messages)
       setMessages(messages)
     })
   }, [])

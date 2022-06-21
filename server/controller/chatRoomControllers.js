@@ -90,7 +90,6 @@ module.exports = function (socket, io) {
         user_id, type, original_filename, content, room_id, callback
     ) => {
         try {
-            const user = getUser({ user_id, room_id });
             //console.log('send message user', user)
             let roomId = room_id; //change if room doesn't exist
             const splitRoomId = room_id.split('_');
@@ -145,6 +144,7 @@ module.exports = function (socket, io) {
     })
 
     socket.on('get-list-room', async (user_id) => {
+        // console.log(user_id)
         const roomIdArr = await getListRoomId(user_id)
         //console.log(roomIdArr)
         let arrData = [];

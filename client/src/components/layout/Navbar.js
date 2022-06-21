@@ -6,13 +6,11 @@ import SignedInMenu from './SignedInMenu'
 import SignedOutMenu from './SignedOutMenu'
 import logo_web from "../../assets/logoweb.png";
 import axiosInstance from '../../helper/Axios'
-import { ENDPT } from '../../helper/Helper'
-import io from 'socket.io-client'
-
-let socket;
+import { SocketContext } from '../../SocketContext'
 
 const Navbar = () => {
     const history = useHistory();
+    const socket = useContext(SocketContext)
     const { user, setUser } = useContext(UserContext);
     const [pathName, setPathName] = useState()
 
@@ -22,6 +20,7 @@ const Navbar = () => {
             const data = res.data;
             console.log('logout data', data);
             setUser(null);
+            socket.emit('logout')
         } catch (error) {
             console.log(error)
         }
