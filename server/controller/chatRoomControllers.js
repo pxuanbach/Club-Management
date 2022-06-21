@@ -33,6 +33,7 @@ module.exports = function (socket, io) {
             room_id
         })
         socket.join(room_id);
+        console.log("on join", io.sockets.adapter.rooms)
         if (error) {
             console.log('join error', error)
         } else {
@@ -106,6 +107,7 @@ module.exports = function (socket, io) {
                     const newRoom = await ChatRoom.create({ room_id })
                     roomId = newRoom.room_id;
                     io.emit("chat-room-created", roomId)
+                    socket.join(roomId);
                 }
             }
             const msgToStore = {
