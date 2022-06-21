@@ -200,6 +200,22 @@ module.exports = function (socket, io) {
             }))
         })
     })
+
+    socket.on('leave-room', (room_id) => {
+        if (room_id) {
+            console.log('leaving socket rooms', socket.adapter.rooms)
+            socket.leave(room_id)
+            console.log('leaved socket rooms', socket.adapter.rooms)
+        }
+    })
+
+    socket.on('leave-rooms', () => {
+        var rooms = io.sockets.adapter.sids[socket.id]; 
+        for(var room in rooms) {       
+            socket.leave(room);     
+        }
+        console.log("on disconnecting io", io.sockets.adapter.rooms)
+    })
 }
 
 async function getListRoomId(userId) {
