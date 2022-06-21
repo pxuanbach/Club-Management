@@ -218,8 +218,8 @@ const PersonMessage = () => {
     }, [user])
 
     useEffect(() => {
-        socket.on('reload-list-room', async (message) => {
-            const currentRooms = await JSON.parse(JSON.stringify(rooms))
+        socket.on('reload-list-room', (message) => {
+            const currentRooms = JSON.parse(JSON.stringify(rooms))
             const isRoomExist = currentRooms.find(room => room.room_id === message.room_id)
             const isRoomClub = user.clubs.find(club => club === message.room_id)
             console.log('rooms', currentRooms)
