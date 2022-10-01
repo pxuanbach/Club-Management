@@ -4,6 +4,7 @@ const activityRequestController = require('../controller/activityRequestControll
 const router = Router();
 
 // club
+router.get('/club', clubRequestController.getList)
 router.post('/club', clubRequestController.create)
 router.patch('/club/:requestId', clubRequestController.update_status)
 

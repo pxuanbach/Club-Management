@@ -22,6 +22,55 @@ async function userAcceptJoinClubRequest(clubId, userId) {
   }
 }
 
+function add_filter(req_query) {
+  const { type, status, club, user } = req_query
+  let query = null;
+  if (type !== undefined) {
+    if (Array.isArray(type)) {
+      query = { ...query, type: { $in: type } }
+    } else {
+      query = { ...query, type: type }
+    }
+  }
+  if (status !== undefined) {
+    if (Array.isArray(status)) {
+      query = {...query, status: { $in: status } }
+    } else {
+      query = { ...query, status: status }
+    }
+  }
+  if (club !== undefined) {
+    if (Array.isArray(club)) {
+      query = {...query, club: { $in: club } }
+    } else {
+      query = { ...query, club: club }
+    }
+  }
+  if (user !== undefined) {
+    if (Array.isArray(user)) {
+      query = {...query, user: { $in: user } }
+    } else {
+      query = { ...query, user: user }
+    }
+  }
+  return query
+}
+
+module.exports.getList = (req, res) => {
+  const query = add_filter(req.query)
+  ClubRequest.find(query)
+  .populate('sender')
+  .populate('club')
+  // .populate('user')
+  .then(result => {
+    res.status(200).send(result)
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).send({ error: err.message });
+  })
+}
+
 module.exports.create = (req, res) => {
   const { sender, club, user, type } = req.body;
   const clubRequest = new ClubRequest({ sender, club, user, type });
