@@ -11,8 +11,9 @@ const groupRoutes = require('./routes/groupRoutes');
 const fundRoutes = require('./routes/fundRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const schedulerRoutes = require('./routes/schedulerRoutes');
-const exportRoutes = require('./routes/exportRoutes')
-const requestRoutes = require('./routes/requestRoutes')
+const exportRoutes = require('./routes/exportRoutes');
+const requestRoutes = require('./routes/requestRoutes');
+const logRoutes = require("./routes/logRoutes");
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -40,6 +41,7 @@ app.use('/activity', activityRoutes);
 app.use('/scheduler', schedulerRoutes);
 app.use('/export', exportRoutes);
 app.use('/request', requestRoutes);
+app.use('/log', logRoutes);
 
 //Connect DB
 mongoose

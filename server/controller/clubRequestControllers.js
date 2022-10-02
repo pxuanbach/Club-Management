@@ -1,6 +1,16 @@
 const ClubRequest = require("../models/ClubRequest");
 const Club = require("../models/Club");
+const ClubLog = require("../models/ClubLog");
 const mongoose = require("mongoose");
+
+async function saveLog(club, type, content) {
+  try {
+    const clubLog = new ClubLog({club, type, content});
+    await clubLog.save()
+  } catch (err) {
+    console.log("saveLog", err);
+  }
+}
 
 async function userAcceptJoinClubRequest(clubId, userId) {
   try {
@@ -110,6 +120,7 @@ module.exports.update_status = async (req, res) => {
     if (status === 1) {
       // Accept
       await userAcceptJoinClubRequest(doc.club, doc.user)
+      await saveLog(doc.club, "member_join", doc.user)
     } else if (status === 2) {
       // Cancel
     }
