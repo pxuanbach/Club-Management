@@ -1,16 +1,7 @@
 const ClubRequest = require("../models/ClubRequest");
 const Club = require("../models/Club");
-const ClubLog = require("../models/ClubLog");
 const mongoose = require("mongoose");
-
-async function saveLog(club, type, content) {
-  try {
-    const clubLog = new ClubLog({club, type, content});
-    await clubLog.save()
-  } catch (err) {
-    console.log("saveLog", err);
-  }
-}
+const { saveLog } = require("../helper/LogHelper");
 
 async function userAcceptJoinClubRequest(clubId, userId) {
   try {

@@ -1,4 +1,5 @@
 const { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers } = require('../helper/ConvertDataHelper')
+const { saveLog } = require('../helper/LogHelper')
 const Club = require('../models/Club')
 const User = require('../models/User')
 const ChatRoom = require('../models/ChatRoom')
@@ -6,6 +7,7 @@ const Message = require('../models/Message')
 const FundHistory = require('../models/FundHistory')
 const Group = require('../models/Group')
 const Activity = require('../models/Activity')
+const ClubLog = require('../models/ClubLog')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const Buffer = require('buffer').Buffer
@@ -278,6 +280,7 @@ module.exports.addMembers = async (req, res) => {
                 userDoc.clubs.push(clubId)
                 userDoc.save()
             })
+            await saveLog(clubId, "member_join", user)
         })
 
         doc.save().then(updatedClub => {
@@ -403,7 +406,7 @@ module.exports.removeMember = async (req, res) => {
     const clubId = req.params.clubId;
     const { userId } = req.body;
 
-    Club.findById(clubId, function (err, doc) {
+    await Club.findById(clubId, async function (err, doc) {
         if (err) {
             res.status(500).send({ error: err.message })
             return;
@@ -414,6 +417,7 @@ module.exports.removeMember = async (req, res) => {
         })
         doc.members = newMembers;
         doc.save();
+        await saveLog(clubId, "member_out", userId)
 
         User.findById(userId, function (err, doc) {
             if (err) {
@@ -432,7 +436,6 @@ module.exports.removeMember = async (req, res) => {
                 res.status(500).send({ error: err.message })
             })
         }).catch(err => {
-            s
             res.status(500).send({ error: err.message })
         })
     }).catch(err => {
@@ -444,24 +447,25 @@ module.exports.removeMember = async (req, res) => {
 module.exports.removeMembers = async (req, res) => {
     const clubId = req.params.clubId;
     const { members } = req.body;
-    //console.log(members)
-    Club.updateOne(
-        { _id: clubId },
-        { $pull: { members: { $in: members } } }
-    ).then(() => {
-        User.updateMany(
+    try {
+        await Club.updateOne(
+            { _id: clubId },
+            { $pull: { members: { $in: members } } }
+        )
+        const users = await User.updateMany(
             { _id: { $in: members } },
             { $pull: { clubs: clubId } }
-        ).then(users => {
-            res.status(200).send(users)
-        }).catch(err => {
-            console.log(err)
-            res.status(500).send({ error: err.message })
-        })
-    }).catch(err => {
+        )
+        const promises = members.map(async (member) => {
+            const log = await saveLog(clubId, "member_out", member)
+            return log
+        });
+        const result = await Promise.all(promises);
+        res.send(users)
+    } catch (err) {
         console.log(err)
         res.status(500).send({ error: err.message })
-    })
+    }
 }
 
 module.exports.delete = async (req, res) => {
