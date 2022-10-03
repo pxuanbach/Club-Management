@@ -23,8 +23,8 @@ async function userAcceptJoinClubRequest(clubId, userId) {
   }
 }
 
-function add_filter(req_query) {
-  const { type, status, club, user } = req_query
+function add_filter(reqQuery) {
+  const { type, status, club, user } = reqQuery
   let query = null;
   if (type !== undefined) {
     if (Array.isArray(type)) {
