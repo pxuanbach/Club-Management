@@ -376,7 +376,7 @@ module.exports.promote = async (req, res) => {
             //console.log('new leader id: ', new_leader_id)
             return value.toString() !== new_member_id;
         })
-        console.log('new member:', newMembers)
+        // console.log('new member:', newMembers)
         club.members = newMembers;
         //console.log('current leader id: ', cur_leader_id)
         club.members.push(cur_member_id);

@@ -19,10 +19,12 @@ const clubRequestSchema = new mongoose.Schema({
     type: {
         type: String,
         lowercase: true,
+        // invite/ask
     },
     status: {
         type: Number,
-        default: 0,
+        default: 0, 
+        // 0: wait, 1: accept, 2: cancel
     }
 }, {timestamps: true})
 
