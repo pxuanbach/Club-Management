@@ -24,5 +24,5 @@ const pointSchema = new mongoose.Schema({
     }
 }, {timestamps: true})
 
-const Activity = mongoose.model('activities', activitySchema)
-module.exports = Activity;
+const Point = mongoose.model('points', pointSchema)
+module.exports = Point;
