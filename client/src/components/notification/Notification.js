@@ -1,7 +1,7 @@
 import React from 'react'
 import './Notification.css'
 import CardNotify from './Card-Notify'
-// import CardInvite from './Card-Invite'
+import CardInvite from './Card-Invite'
 const Notification = () => {
     return(
         <div className='div-notification'>
@@ -12,7 +12,7 @@ const Notification = () => {
                     <CardNotify/>
                     <CardNotify/>
                     <CardNotify/>
-                    {/* <CardInvite/> */}
+                    <CardInvite/>
                 </div>
             </div>
         </div>
