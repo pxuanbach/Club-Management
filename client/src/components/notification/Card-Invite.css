@@ -1,9 +1,10 @@
 .div-action-invite{
     display: flex;
-    margin-top: 5px;
+    margin-top: 6px;
 }
 .div-name-title{
     display: flex;
+    margin-top: -5px;
 }
 .club-name-invite{
     font-weight: bold;
@@ -11,24 +12,26 @@
 }
 .button-accept{
     /* border: 1px solid #2f87f9; */
-    background-color:#2f87f9 ;
+    background-color:#3c72fa ;
     border-radius: 5px;
     color: white;
-    width: 100px;
-    height: 30px;
+    width: 120px;
+    height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-right: 8px;
+    font-size: 14px;
 }
 .button-cancel{
     /* border: 1px solid #2f87f9; */
     background-color:#cfcfd0 ;
     border-radius: 5px;
     color: black;
-    width: 100px;
-    height: 30px;
+    width: 120px;
+    height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 14px;
 }
