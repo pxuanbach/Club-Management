@@ -1,4 +1,5 @@
 const { ConvertClub, ConvertClubs, ConvertUser, ConvertUsers } = require('../helper/ConvertDataHelper')
+const { saveLog, deleteLogOfClub } = require('../helper/LogHelper')
 const Club = require('../models/Club')
 const User = require('../models/User')
 const ChatRoom = require('../models/ChatRoom')
@@ -6,6 +7,7 @@ const Message = require('../models/Message')
 const FundHistory = require('../models/FundHistory')
 const Group = require('../models/Group')
 const Activity = require('../models/Activity')
+const ClubLog = require('../models/ClubLog')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const Buffer = require('buffer').Buffer
@@ -278,6 +280,7 @@ module.exports.addMembers = async (req, res) => {
                 userDoc.clubs.push(clubId)
                 userDoc.save()
             })
+            await saveLog(clubId, "member_join", user)
         })
 
         doc.save().then(updatedClub => {
@@ -358,52 +361,40 @@ module.exports.promote = async (req, res) => {
     const clubId = req.params.clubId;
     const { position, cur_member_id, new_member_id } = req.body
 
-    Club.findById(clubId, function (err, doc) {
-        if (err) {
-            res.status(500).send({ error: err.message })
-            return;
+    try {
+        const club = await Club.findById(clubId)
+        const newPromotedMember = await User.findById(new_member_id)
+
+        if (position === 'leader') {
+            club.leader = newPromotedMember._id;
+        } else if (position === 'treasurer') {
+            club.treasurer = newPromotedMember._id;
         }
 
-        //find new leader info
-        User.findById(new_member_id).then(user => {
-            if (position === 'leader') {
-                doc.leader = user;
-            } else if (position === 'treasurer') {
-                doc.treasurer = user;
-            }
-
-            //exchange new and current leader id
-            var newMembers = doc.members.filter(function (value, index, arr) {
-                //console.log('new leader id: ', new_leader_id)
-                return value.toString() !== new_member_id;
-            })
-            console.log('new member:', newMembers)
-            doc.members = newMembers;
-            //console.log('current leader id: ', cur_leader_id)
-            doc.members.push(cur_member_id);
-            //console.log('add cur leader id:', doc.members)
-
-            doc.save().then(() => {
-                res.status(200).send(user)
-            }).catch(err => {
-                console.log(err)
-                res.status(400).send({ error: err.message })
-            })
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send({ error: err.message })
+        //exchange new and current leader id
+        var newMembers = club.members.filter(function (value, index, arr) {
+            //console.log('new leader id: ', new_leader_id)
+            return value.toString() !== new_member_id;
         })
-    }).catch(err => {
+        // console.log('new member:', newMembers)
+        club.members = newMembers;
+        //console.log('current leader id: ', cur_leader_id)
+        club.members.push(cur_member_id);
+        //console.log('add cur leader id:', doc.members)
+        await club.save()
+        await saveLog(clubId, "promote_" + position, new_member_id)
+        res.status(200).send(newPromotedMember)
+    } catch (err) {
         console.log(err)
-        res.status(400).send({ error: err.message })
-    })
+        res.status(500).send({ error: err.message })
+    }
 }
 
 module.exports.removeMember = async (req, res) => {
     const clubId = req.params.clubId;
     const { userId } = req.body;
 
-    Club.findById(clubId, function (err, doc) {
+    await Club.findById(clubId, async function (err, doc) {
         if (err) {
             res.status(500).send({ error: err.message })
             return;
@@ -414,6 +405,7 @@ module.exports.removeMember = async (req, res) => {
         })
         doc.members = newMembers;
         doc.save();
+        await saveLog(clubId, "member_out", userId)
 
         User.findById(userId, function (err, doc) {
             if (err) {
@@ -432,7 +424,6 @@ module.exports.removeMember = async (req, res) => {
                 res.status(500).send({ error: err.message })
             })
         }).catch(err => {
-            s
             res.status(500).send({ error: err.message })
         })
     }).catch(err => {
@@ -444,24 +435,25 @@ module.exports.removeMember = async (req, res) => {
 module.exports.removeMembers = async (req, res) => {
     const clubId = req.params.clubId;
     const { members } = req.body;
-    //console.log(members)
-    Club.updateOne(
-        { _id: clubId },
-        { $pull: { members: { $in: members } } }
-    ).then(() => {
-        User.updateMany(
+    try {
+        await Club.updateOne(
+            { _id: clubId },
+            { $pull: { members: { $in: members } } }
+        )
+        const users = await User.updateMany(
             { _id: { $in: members } },
             { $pull: { clubs: clubId } }
-        ).then(users => {
-            res.status(200).send(users)
-        }).catch(err => {
-            console.log(err)
-            res.status(500).send({ error: err.message })
-        })
-    }).catch(err => {
+        )
+        const promises = members.map(async (member) => {
+            const log = await saveLog(clubId, "member_out", member)
+            return log
+        });
+        const result = await Promise.all(promises);
+        res.send(users)
+    } catch (err) {
         console.log(err)
         res.status(500).send({ error: err.message })
-    })
+    }
 }
 
 module.exports.delete = async (req, res) => {
@@ -495,7 +487,9 @@ module.exports.delete = async (req, res) => {
                 { clubs: clubId },
                 { $pull: { clubs: clubId } }
             )
-
+            // Log
+            await deleteLogOfClub(clubId);
+            
             res.status(200).send(clubId)
         }
     })
