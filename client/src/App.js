@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { UserContext } from "./UserContext";
 import { socket, SocketContext } from './SocketContext'
 import "./App.css";
-import Home from './components/home/Home'
+import HomeTab from './components/home/HomeTab'
 import ManageAccount from "./components/manage/MngAccount";
 import ManageClub from "./components/manage/MngClub";
 import Info from "./components/info/Info";
@@ -46,7 +46,7 @@ function App() {
               </Route>
               <Route exact path="/scheduler" component={SchedulerActivity} />
               <Route path="/scheduler/activity/:activityId" component={ActivityDetail} />
-              <Route path="/clubs" component={Home} />
+              <Route path="/clubs" component={HomeTab} />
               <Route path="/mng-account" component={ManageAccount} />
               <Route path="/mng-club" component={ManageClub} />
               <Route path="/message" component={PersonMessage}/>
