@@ -1,0 +1,31 @@
+.card-notify-container{
+    width: 100%;
+    height: 85px;
+    border-bottom: 1px solid #d3d9f7;
+    display: flex;
+    border-radius: 10px;
+}
+.card-notify-container:hover{
+    background-color: #d6e9fd;
+    cursor: pointer;
+}
+.notify-avatar{
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.avatar-noti{
+    width: 77%;
+    height: 7%;
+}
+.notify-content{
+    padding: 15px;
+    padding-left: 5px;
+    padding-top: 20px;
+    line-height: 20px;
+}
+.time-noti{
+    color: #5c5a5a;
+    font-size: 14px;
+}

@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { Link } from 'react-router-dom'
 import Avatar from '@mui/material/Avatar';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { UserContext } from '../../UserContext'
 
 const SignedInMenu = ({ logout, pathName }) => {
@@ -50,7 +51,16 @@ const SignedInMenu = ({ logout, pathName }) => {
                         </Tooltip>
                     </> : null}
             </div>
-            <div className='avatar-logout'>
+            <div className='list-btn'>
+                {/* <div className='list-btn'> */}
+                <Tooltip title="Thông báo" placement='right-start'>
+                    <Link
+                        className={pathName === 'notification' ? 'selected' : ''}
+                        to="/notification">
+                        <i class="fa-solid fa-bell"></i>
+                    </Link>
+                </Tooltip>
+                {/* </div> */}
                 <Tooltip title="Thông tin cá nhân" placement="right-start">
                     <Link className={pathName === 'info' ? 'selected' : ''} to="/info">
                         <Avatar src={user.img_url} />

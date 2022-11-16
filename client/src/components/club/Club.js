@@ -5,6 +5,7 @@ import Calendar from "../leader-club/calendar/Calendar"
 import Member from "../leader-club/member/Member"
 import Message from "../leader-club/message/Message"
 import Fund from "../leader-club/fund/Fund"
+import Invite from '../leader-club/invite/Invite';
 import NavbarClub from "../leader-club/Navbar-Club"
 import axiosInstance from '../../helper/Axios';
 import './Club.css'
@@ -48,6 +49,9 @@ const Club = () => {
           </Route>
           <Route path={`/club/${club_id}/${club_name}/fund`}>
             <Fund club_id={club_id}/>
+          </Route>
+          <Route path={`/club/${club_id}/${club_name}/invite`}>
+            <Invite club_id={club_id}/>
           </Route>
         </Switch>
       </div>
