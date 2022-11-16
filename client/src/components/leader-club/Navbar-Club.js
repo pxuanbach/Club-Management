@@ -75,6 +75,14 @@ const NavbarClub = ({ club }) => {
                             Qũy CLB
                         </Link>
                     </Tooltip>
+                    <Tooltip title="Quản lý lời mời" placement="left-start">
+                        <Link
+                            to={`/club/${club_id}/${club_name}/invite`}
+                            className={pathName === 'invite' ? 'navclub-selected' : ''}>
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                            Quản lý lời mời
+                        </Link>
+                    </Tooltip>
                 </div>
             </div>) : (<></>)}
         </nav>
