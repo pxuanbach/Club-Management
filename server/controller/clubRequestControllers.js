@@ -72,7 +72,7 @@ module.exports.getList = (req, res) => {
   })
 }
 
-module.exports.create = (req, res) => {
+module.exports.create = async (req, res) => {
   const { sender, club, user, type } = req.body;
   const clubRequest = new ClubRequest({ sender, club, user, type });
   clubRequest

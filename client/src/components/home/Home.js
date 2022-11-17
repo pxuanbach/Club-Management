@@ -16,8 +16,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import "./Home.css";
 import ClubItem from "./ClubItem";
 import axiosInstance from "../../helper/Axios";
-import { Link, Redirect } from "react-router-dom";
-import { UserContext } from "../../UserContext";
+import { Link } from "react-router-dom";
 import { Buffer } from "buffer";
 import SeverityOptions from "../../helper/SeverityOptions";
 
@@ -42,8 +41,7 @@ const style = {
   p: 4,
 };
 
-const Home = () => {
-  const { user, setUser } = useContext(UserContext);
+const Home = ({user}) => {
   const [showFormAddClub, setShowFormAddClub] = useState(false);
   const [search, setSearch] = useState();
   const [clubs, setClubs] = useState([]);
@@ -80,8 +78,8 @@ const Home = () => {
   };
 
   const getListClub = async () => {
-    let isAdmin = user?.username.includes("admin");
-    let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+    // let isAdmin = user?.username.includes("admin");
+    let res = await axiosInstance.get(`/club/list/${user._id}`, {
       headers: { "Content-Type": "application/json" },
     });
     let data = res.data;
@@ -94,9 +92,6 @@ const Home = () => {
     getListClub();
   }, []);
 
-  if (!user) {
-    return <Redirect to="/login" />;
-  }
   return (
     <div>
       <Modal
@@ -126,7 +121,7 @@ const Home = () => {
       </Snackbar>
       <div className="div-body">
         <div className="header-body">
-          <div className="header-title"> Câu lạc bộ của bạn</div>
+          <div className="header-title"> Câu lạc bộ của tôi</div>
           <Stack
             direction="row"
             spacing={2}

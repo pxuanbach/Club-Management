@@ -6,6 +6,7 @@ const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
+const moment = require('moment')
 const { isElementInArray, isElementInArrayObject } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
@@ -151,9 +152,23 @@ module.exports.createCard = (req, res) => {
 
 module.exports.getList = (req, res) => {
     const clubId = req.params.clubId;
-
-    Activity.find({ club: clubId })
+    const { inMonth } = req.query
+    const currentDate = moment().add(-1, "days")
+    const nextMonthDate = moment().add(30, "days")
+    // const nextMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+    let query = { club: clubId }
+    if (inMonth !== undefined) {
+        query = {
+            ...query, startDate: {
+                $gte: currentDate.toISOString(),
+                $lte: nextMonthDate.toISOString()
+            }
+        }
+    }
+    // console.log(query)
+    Activity.find(query)
         .then(result => {
+            
             res.status(200).send(result)
         }).catch(err => {
             res.status(500).send({ error: err.message })
@@ -639,7 +654,7 @@ module.exports.getCard = (req, res) => {
                     return;
                 }
                 async.forEach(result.groupJoin, function (group, next) {
-                    User.populate(group, {"path": "members"}, function (error, out) {
+                    User.populate(group, { "path": "members" }, function (error, out) {
                         if (error) {
                             res.status(500).send({ error: error.message })
                             return;
@@ -673,7 +688,7 @@ module.exports.updateCardStatus = async (req, res) => {
             res.status(404).json({ error: "Không tìm thấy thẻ hoạt động." })
             return;
         }
-        
+
         if (status === 1 && card.status === 0) {
             card.status = status;
         } else if (status === 2 && card.status === 1) {
@@ -703,7 +718,7 @@ module.exports.updateCardStatus = async (req, res) => {
                     };
                     pointObjectArr.push(pointObject)
                 })
-                Point.insertMany(pointObjectArr, function(err, docs) {})
+                Point.insertMany(pointObjectArr, function (err, docs) { })
             }
         }
 
@@ -791,7 +806,7 @@ module.exports.deleteComment = async (req, res) => {
 module.exports.deleteFile = async (req, res) => {
     try {
         const cardId = req.params.cardId;
-        const {public_id} = req.body;
+        const { public_id } = req.body;
         await cloudinary.uploader.destroy(public_id, function (result) {
             console.log("destroy image", result);
         })
