@@ -1,10 +1,12 @@
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
+const Point = require('../models/Point')
 const User = require('../models/User')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
+const moment = require('moment')
 const { isElementInArray, isElementInArrayObject } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
@@ -150,9 +152,23 @@ module.exports.createCard = (req, res) => {
 
 module.exports.getList = (req, res) => {
     const clubId = req.params.clubId;
-
-    Activity.find({ club: clubId })
+    const { inMonth } = req.query
+    const currentDate = moment().add(-1, "days")
+    const nextMonthDate = moment().add(30, "days")
+    // const nextMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+    let query = { club: clubId }
+    if (inMonth !== undefined) {
+        query = {
+            ...query, startDate: {
+                $gte: currentDate.toISOString(),
+                $lte: nextMonthDate.toISOString()
+            }
+        }
+    }
+    // console.log(query)
+    Activity.find(query)
         .then(result => {
+            
             res.status(200).send(result)
         }).catch(err => {
             res.status(500).send({ error: err.message })
@@ -524,6 +540,10 @@ module.exports.userJoin = (req, res) => {
     ActivityCard.findById(cardId)
         .populate('groupJoin')
         .then(card => {
+            if (card.status === 0 || card.status === 2) {
+                res.status(400).send({ message: "Thẻ này chưa mở check-in.", success: false });
+                return;
+            }
             //check user joined?
             if (isUserJoined(userId, card)) {
                 res.status(200).send({ message: "Bạn đã tham gia", success: false })
@@ -548,6 +568,10 @@ module.exports.groupJoin = (req, res) => {
     ActivityCard.findById(cardId)
         .populate('groupJoin')
         .then(card => {
+            if (card.status === 0 || card.status === 2) {
+                res.status(400).send({ message: "Thẻ này chưa mở check-in.", success: false })
+                return;
+            }
             if (isGroupJoined(groupId, card)) {
                 res.status(200).send({ message: "Nhóm đã tham gia", success: false })
             } else {
@@ -630,7 +654,7 @@ module.exports.getCard = (req, res) => {
                     return;
                 }
                 async.forEach(result.groupJoin, function (group, next) {
-                    User.populate(group, {"path": "members"}, function (error, out) {
+                    User.populate(group, { "path": "members" }, function (error, out) {
                         if (error) {
                             res.status(500).send({ error: error.message })
                             return;
@@ -648,6 +672,62 @@ module.exports.getCard = (req, res) => {
         }).catch(err => {
             res.status(500).send({ error: err.message })
         })
+}
+
+module.exports.updateCardStatus = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const { status, author } = req.body;
+        if (status === undefined) {
+            res.status(400).json({ error: "Yêu cầu chưa xác định." })
+            return;
+        }
+
+        const card = await ActivityCard.findById(cardId).populate("activity")
+        if (card === null) {
+            res.status(404).json({ error: "Không tìm thấy thẻ hoạt động." })
+            return;
+        }
+
+        if (status === 1 && card.status === 0) {
+            card.status = status;
+        } else if (status === 2 && card.status === 1) {
+            card.status = status;
+            // export point 
+            if (card.pointValue > 0) {
+                let pointObjectArr = []
+                card.userJoin.forEach(userId => {
+                    const pointObject = {
+                        title: card.activity.title + card.title,
+                        club: card.activity.club,
+                        value: card.pointValue,
+                        author: author,
+                        type: "member",
+                        content: userId
+                    };
+                    pointObjectArr.push(pointObject)
+                })
+                card.groupJoin.forEach(groupId => {
+                    const pointObject = {
+                        title: card.activity.title + card.title,
+                        club: card.activity.club,
+                        value: card.pointValue,
+                        author: author,
+                        type: "group",
+                        content: groupId
+                    };
+                    pointObjectArr.push(pointObject)
+                })
+                Point.insertMany(pointObjectArr, function (err, docs) { })
+            }
+        }
+
+        card.save().then(result => {
+            res.status(200).send(result)
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
 
 module.exports.userExitCard = async (req, res) => {
@@ -726,7 +806,7 @@ module.exports.deleteComment = async (req, res) => {
 module.exports.deleteFile = async (req, res) => {
     try {
         const cardId = req.params.cardId;
-        const {public_id} = req.body;
+        const { public_id } = req.body;
         await cloudinary.uploader.destroy(public_id, function (result) {
             console.log("destroy image", result);
         })

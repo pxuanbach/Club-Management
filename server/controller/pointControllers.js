@@ -44,7 +44,7 @@ module.exports.reportOfClub = (req, res) => { };
 
 module.exports.createPointOfClub = async (req, res) => {
     const clubId = req.params.clubId;
-    const { value, author, type, content } = req.body;
+    const { title, value, author, type, content } = req.body;
     try {
         const club = await Club.findById(clubId);
         if (club === null) {
@@ -52,6 +52,7 @@ module.exports.createPointOfClub = async (req, res) => {
             return;
         }
         const point = new Point({
+            title,
             club: clubId,
             value,
             author,

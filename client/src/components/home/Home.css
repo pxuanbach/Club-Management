@@ -33,41 +33,14 @@
     cursor: pointer;
 }
 .div-body{
-    padding-top: 55px;
     display: flex;
     flex-direction: column;
 }
 .header-body{
     display: flex;
+    justify-content: space-between;
 }
-.div-btnadd{
-    display: flex;
-    cursor: pointer;
-}
-.btnAdd{
-    position: absolute;
-    margin-top: 20px;
-    width: 180px;
-    height: 45px;
-    right: 40px;
-    border-radius: 5px;
-    border: none;
-    background-color: #1B264D;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-}
-.div-btnadd > i{
-    font-size: 1.3rem;
-    color: #ffffff;
-    position: absolute;
-    right: 190px;
-    margin-top: 32px;
-    
-    
-    
-}
+
 .header-title{
     margin-top: 25px;
     margin-left: 40px;

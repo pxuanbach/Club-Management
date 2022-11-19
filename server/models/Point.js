@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const pointSchema = new mongoose.Schema({
+    title: String,
     club: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'club',

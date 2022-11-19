@@ -269,8 +269,8 @@ const ManageClub = () => {
   }
 
   const getListClub = async () => {
-    let isAdmin = user?.username.includes('admin');
-    let res = await axiosInstance.get(`/club/list/${isAdmin}/${user._id}`, {
+    // let isAdmin = user?.username.includes('admin');
+    let res = await axiosInstance.get(`/club/listnotjoin/${user._id}`, {
       headers: { 'Content-Type': 'application/json' },
     })
     let data = res.data

@@ -5,10 +5,12 @@ const router = Router();
 
 router.post('/create', upload.array('file'), clubController.create)
 router.post('/addmembers', clubController.addMembers)
-router.get('/list/:isAdmin/:userId', clubController.getList)
+router.get('/list/:userId', clubController.getList)
+router.get('/listnotjoin/:userId', clubController.getListNotJoin)
 router.get('/one/:clubId', clubController.getOne)
 router.get('/search/:searchValue', clubController.search)
 router.get('/usersearch/:userId/:searchValue', clubController.userSearch)
+router.get('/usersearchnotjoin/:userId/:searchValue', clubController.userSearchNotJoin)
 router.get('/searchmembers/:clubId/:searchValue', clubController.searchMembers)
 router.get('/members/:clubId', clubController.getMembers)
 router.get('/usersnotmembers/:clubId', clubController.getUsersNotMembers)

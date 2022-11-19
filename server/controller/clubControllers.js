@@ -86,16 +86,37 @@ module.exports.verifyclub = async (req, res, next) => {
 }
 
 module.exports.getList = async (req, res) => {
-    const isAdmin = req.params.isAdmin;
     const userId = req.params.userId;
     //console.log(typeof isAdmin, userId)
-    let query;
-    if (isAdmin === 'true') {
-        query = {}
-    } else {
-        query = { $or: [{ members: userId }, { leader: userId }, { treasurer: userId }] }
-    }
+    let query = { $or: [{ members: userId }, { leader: userId }, { treasurer: userId }] }
+    // if (isAdmin === 'true') {
+    //     query = {}
+    // } else {
+    //     query = { $or: [{ members: userId }, { leader: userId }, { treasurer: userId }] }
+    // }
     //console.log(query)
+
+    var clubs = await Club.find(query).populate('leader').populate('treasurer');
+
+    if (clubs.length) {
+        res.status(200).send(ConvertClubs(clubs))
+    } else {
+        res.status(500).json({ clubs: "none" })
+    }
+}
+
+module.exports.getListNotJoin = async (req, res) => {
+    const userId = req.params.userId;
+    const { isblocked } = req.query
+    //console.log(typeof isAdmin, userId)
+    let query = { $nor: [{ members: userId }, { leader: userId }, { treasurer: userId }] };
+    if (isblocked !== undefined) {
+        if (Array.isArray(isblocked)) {
+            query = { ...query, isblocked: { $in: isblocked } }
+        } else {
+            query = { ...query, isblocked: isblocked }
+        }
+    }
 
     var clubs = await Club.find(query).populate('leader').populate('treasurer');
 
@@ -184,7 +205,7 @@ module.exports.userSearch = (req, res) => {
             Club.find({
                 $and: [
                     { name: { $regex: searchValue } },
-                    user.username.includes('admin') ? {} : { _id: { $in: user.clubs } }
+                    { _id: { $in: user.clubs } }
                 ]
             }).populate('leader')
                 .populate('treasurer')
@@ -194,7 +215,30 @@ module.exports.userSearch = (req, res) => {
                     res.status(500).send({ error: err.message })
                 })
         })
+}
 
+module.exports.userSearchNotJoin = (req, res) => {
+    const userId = req.params.userId;
+    const encodedSearchValue = req.params.searchValue;
+    const buff = Buffer.from(encodedSearchValue, "base64");
+    const searchValue = buff.toString("utf8");
+
+    User.findById(userId)
+        .then(user => {
+            Club.find({
+                $and: [
+                    { name: { $regex: searchValue } },
+                    { _id: { $nin: user.clubs } },
+                    { isblocked: false }
+                ]
+            }).populate('leader')
+                .populate('treasurer')
+                .then(clubs => {
+                    res.status(200).send(ConvertClubs(clubs))
+                }).catch(err => {
+                    res.status(500).send({ error: err.message })
+                })
+        })
 }
 
 module.exports.searchMembers = async (req, res) => {
@@ -489,7 +533,7 @@ module.exports.delete = async (req, res) => {
             )
             // Log
             await deleteLogOfClub(clubId);
-            
+
             res.status(200).send(clubId)
         }
     })

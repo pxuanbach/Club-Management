@@ -79,7 +79,7 @@ const NavbarClub = ({ club }) => {
                         <Link
                             to={`/club/${club_id}/${club_name}/invite`}
                             className={pathName === 'invite' ? 'navclub-selected' : ''}>
-                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                            <i class="fa-solid fa-envelope-open"></i>
                             Quản lý lời mời
                         </Link>
                     </Tooltip>

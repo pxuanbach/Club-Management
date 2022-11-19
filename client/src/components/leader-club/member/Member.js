@@ -34,7 +34,7 @@ TabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
-export default function BasicTabs() {
+export default function Member() {
   const { path } = useRouteMatch();
   const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
