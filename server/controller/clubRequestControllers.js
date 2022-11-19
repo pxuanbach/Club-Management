@@ -78,12 +78,41 @@ module.exports.create = async (req, res) => {
   try {
     const userExist = await User.findById(user)
     if (userExist.username.includes("admin")) {
-      res.status(400).send({ error: "Không thể yêu cầu tham gia." });
+      res.status(400).send({ error: type === "ask" ? "Không thể yêu cầu tham gia." : "Không thể mời người này." });
       return
     }
     const clubRequest = new ClubRequest({ sender, club, user, type });
     let saveClubRequest = await clubRequest.save()
     res.status(200).send(saveClubRequest)
+  } catch (err) {
+    console.log("ActivityRequest Create", err.message)
+    res.status(500).send({ error: err.message });
+  }
+};
+
+module.exports.createMulti = async (req, res) => {
+  const { sender, club, users, type } = req.body;  // user is array
+  try {
+    const userExists = await User.find({ _id: { $in: users } })
+    userExists.map(uExist => {
+      if (uExist.username.includes("admin")) {
+        res.status(400).send({ error: type === "ask" ? "Không thể yêu cầu tham gia." : "Không thể mời người này." });
+        return
+      }
+    })
+
+    const requestExists = await ClubRequest.find({ club: club, type: type, user: { $in: users } })
+    if (requestExists.length > 0) {
+      res.status(400).send({ error: type === "ask" ? "Đã yêu cầu tham gia." : "Đã mời người này." });
+      return
+    }
+
+    let clubRequestArr = []
+    users.map(uid => {
+      clubRequestArr.push({ sender: sender, club: club, user: uid, type: type })
+    })
+    const result = await ClubRequest.insertMany(clubRequestArr)
+    res.status(200).send(result)
   } catch (err) {
     console.log("ActivityRequest Create", err.message)
     res.status(500).send({ error: err.message });

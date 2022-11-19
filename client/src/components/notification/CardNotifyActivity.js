@@ -38,7 +38,7 @@ const CardActivity = ({ data, notificates, setNotificates }) => {
         } else if (data?.status === 1) {
             return (
                 <Stack direction="row" spacing={1}>
-                    <Button variant="text" disableElevation>
+                    <Button variant="text" disableElevation >
                         Đã tham gia
                     </Button>
                 </Stack>
@@ -46,7 +46,7 @@ const CardActivity = ({ data, notificates, setNotificates }) => {
         } else if (data?.status === 2) {
             return (
                 <Stack direction="row" spacing={1}>
-                    <Button variant="text" disableElevation>
+                    <Button variant="text" disableElevation sx={{ color: 'red' }}>
                         Đã hủy
                     </Button>
                 </Stack>
@@ -55,26 +55,24 @@ const CardActivity = ({ data, notificates, setNotificates }) => {
     };
 
     return (
-        <div>
-            <Stack
-                direction="column"
-                spacing={2}
-                alignItems="flex-start"
-                sx={{
-                    backgroundColor: "#E3E3E3",
-                    borderRadius: "10px",
-                    padding: "10px",
-                    marginBottom: "2px",
-                }}
-            >
+        <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+                backgroundColor: "#E3E3E3",
+                borderRadius: "10px",
+                padding: "10px",
+                marginBottom: "2px",
+            }}
+        >
+            <Avatar src={data?.club?.img_url} sx={{ width: 60, height: 60 }} />
+            <Stack direction="column" spacing={2} alignItems="flex-start">
                 {data?.type == "ask" ? (
                     <Stack direction="column" spacing={1.5} alignSelf="flex-start">
-                        <Stack direction="row" spacing={0.6}>
-                            <span>
-                                Bạn yêu cầu tham gia hoạt động <b>{data?.activity?.title}</b>{" "}
-                                của câu lạc bộ <b>{data?.club?.name}</b>
-                            </span>
-                        </Stack>
+                        <span>
+                            Bạn yêu cầu tham gia hoạt động <b>{data?.activity?.title}</b>{" "}
+                            của câu lạc bộ <b>{data?.club?.name}</b>
+                        </span>
                         {renderButtonByStatus()}
                     </Stack>
                 ) : (
@@ -85,7 +83,7 @@ const CardActivity = ({ data, notificates, setNotificates }) => {
                     </Stack>
                 )}
             </Stack>
-        </div>
+        </Stack>
     );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CardActivity from "./CardActivity";
+import CardActivity from "./CardNotifyActivity";
 import axiosInstance from "../../helper/Axios";
 
 const ActivitiesNotification = ({ user }) => {

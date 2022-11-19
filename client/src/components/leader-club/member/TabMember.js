@@ -138,6 +138,7 @@ const TabMember = ({ club }) => {
       >
         <Box sx={style}>
           <AddMembers
+            user={user}
             club_id={club._id}
             setShowFormAdd={setShowFormAdd}
             getMembers={getMembers}

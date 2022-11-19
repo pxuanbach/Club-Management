@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -58,10 +58,10 @@ export default function NotificationTab() {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <ClubNotification user={user}/>
+        <ClubNotification user={user} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <ActivitiesNotification user={user}/>
+        <ActivitiesNotification user={user} />
       </TabPanel>
     </Box>
   );

@@ -1,15 +1,35 @@
-import React from 'react'
-import CardNotify from './Card-Notify'
-import CardInvite from './CardActivity'
-import NavTabs from './Tab-Notification'
+import React, { useState, useEffect } from 'react'
+import CardNotifyClub from './CardNotifyClub';
+import axiosInstance from '../../helper/Axios';
 
+const ClubNotification = ({ user }) => {
+    const [notificates, setNotificates] = useState([]);
 
-const ClubNotification = () => {
-    return(
-        <div className='div-card-noti'>
-            <CardInvite/>
-            <CardInvite/>
-            <CardInvite/>
+    const getAllNotification = async () => {
+        const res = await axiosInstance.get(`/request/club`, {
+            params: {
+                user: user._id,
+            },
+        });
+        const data = res.data;
+        console.log(data);
+        setNotificates(data);
+    };
+
+    useEffect(() => {
+        getAllNotification();
+    }, [user]);
+
+    return (
+        <div>
+            {notificates &&
+                notificates.map((noti) => (
+                    <CardNotifyClub
+                        data={noti}
+                        notificates={notificates}
+                        setNotificates={setNotificates}
+                    />
+                ))}
         </div>
     )
 
