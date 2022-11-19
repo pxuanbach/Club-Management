@@ -126,6 +126,7 @@ const OtherClubs = ({ user }) => {
                     <ClubPreview
                         user={user}
                         club={clubSelected}
+                        showSnackbar={showSnackbar}
                     />
                 </Box>
             </Modal>

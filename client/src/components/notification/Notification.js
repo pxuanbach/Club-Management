@@ -1,25 +1,27 @@
-import React from 'react'
-import './Notification.css'
-import CardNotify from './Card-Notify'
-import CardInvite from './Card-Invite'
-import NavTabs from './Tab-Notification'
+import React from "react";
+import { Box, Stack } from "@mui/material";
+import NavTabs from "./Tab-Notification";
+
 const Notification = () => {
-    return(
-        <div className='div-notification'>
-            <div className='container-noti'>
-                <h1 className='title-noti'>Thông báo</h1>
-                <NavTabs/>
-                {/* <div className='div-card-noti'>
-                    <CardNotify/>
-                    <CardNotify/>
-                    <CardNotify/>
-                    <CardNotify/>
-                    <CardInvite/>
-                </div> */}
-            </div>
-        </div>
-    )
+  return (
+    <Box sx={{ width: "100%", height: '100vh'}}>
+      <Stack direction="column"
+       spacing={1}
+        sx={{
+          width: "50%",
+          minWidth: '600px',
+          height: '100%',
+          justifyContent: "flex-start",
+          margin: "auto",
+          padding: '20px',
+          boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
+        }}
+      >
+        <h1>Thông báo</h1>
+        <NavTabs />
+      </Stack>
+    </Box>
+  );
+};
 
-}
-
-export default Notification
+export default Notification;

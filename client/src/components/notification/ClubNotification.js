@@ -1,9 +1,10 @@
 import React from 'react'
-import './Notification.css'
 import CardNotify from './Card-Notify'
-import CardInvite from './Card-Invite'
+import CardInvite from './CardActivity'
 import NavTabs from './Tab-Notification'
-const AllInvite = () => {
+
+
+const ClubNotification = () => {
     return(
         <div className='div-card-noti'>
             <CardInvite/>
@@ -14,4 +15,4 @@ const AllInvite = () => {
 
 }
 
-export default AllInvite
+export default ClubNotification

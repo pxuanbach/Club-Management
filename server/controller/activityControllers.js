@@ -1,5 +1,6 @@
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
+const ActivityRequest = require('../models/ActivityRequest')
 const Point = require('../models/Point')
 const User = require('../models/User')
 const cloudinary = require('../helper/Cloudinary')
@@ -150,29 +151,52 @@ module.exports.createCard = (req, res) => {
     })
 }
 
-module.exports.getList = (req, res) => {
+module.exports.getList = async (req, res) => {
     const clubId = req.params.clubId;
-    const { inMonth } = req.query
-    const currentDate = moment().add(-1, "days")
+    const { inMonth, userId } = req.query
+    const currentDate = moment().add(-2, "days")
     const nextMonthDate = moment().add(30, "days")
     // const nextMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
     let query = { club: clubId }
     if (inMonth !== undefined) {
         query = {
-            ...query, startDate: {
-                $gte: currentDate.toISOString(),
-                $lte: nextMonthDate.toISOString()
-            }
+            ...query, $or: [
+                {
+                    startDate: {
+                        $gte: currentDate.toISOString(),
+                        $lte: nextMonthDate.toISOString()
+                    },
+                },
+                {
+                    endDate: {
+                        $gte: nextMonthDate.toISOString(),
+                    }
+                }
+            ]
         }
     }
-    // console.log(query)
-    Activity.find(query)
-        .then(result => {
-            
-            res.status(200).send(result)
-        }).catch(err => {
-            res.status(500).send({ error: err.message })
-        })
+    
+    const activities = await Activity.find(query)
+    if (userId !== undefined) {
+        const cloneActivities = JSON.parse(JSON.stringify(activities));
+        const promises = cloneActivities.map(async (activity) => {
+            const request = await ActivityRequest.find({
+                activity: activity._id, sender: userId, type: "ask"
+            })
+            // console.log(request, activity._id)
+            if (!Array.isArray(request) || !request.length) {
+                activity.requested = false
+            } else {
+                activity.requested = true
+            }
+            return activity
+        });
+        const result = await Promise.all(promises);
+        // console.log(userId, result)
+        res.status(200).send(result);
+    } else {
+        res.status(200).send(activities)
+    }
 }
 
 module.exports.getOne = (req, res) => {

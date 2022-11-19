@@ -140,7 +140,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
   }, [])
 
   return (
-    <div>
+    <div style={{width: '100%'}}>
       <Snackbar
         autoHideDuration={3000}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

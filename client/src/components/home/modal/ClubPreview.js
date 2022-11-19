@@ -10,15 +10,24 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import axiosInstance from "../../../helper/Axios";
+import SeverityOptions from "../../../helper/SeverityOptions";
 
-const ClubPreview = ({ user, club }) => {
+const ClubPreview = ({ user, club, showSnackbar }) => {
     const [activities, setActivities] = useState([]);
     const [isAsked, setIsAsked] = useState(false);
 
     const getActivityInMonth = async () => {
-        let res = await axiosInstance.get(`/activity/list/${club._id}?inMonth=1`);
+        let res = await axiosInstance.get(`/activity/list/${club._id}`,
+            {
+                params: {
+                    inMonth: true,
+                    userId: user._id
+                }
+            }
+        );
 
         const data = res.data;
+        // console.log(data)
         setActivities(data);
     };
 
@@ -46,21 +55,51 @@ const ClubPreview = ({ user, club }) => {
                 user: user._id,
                 type: "ask"
             }), {
-                headers: { 
-                    'Content-Type': 'application/json'
-                  },
-            }
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }
         ).then((response) => {
-            console.log(response)
-            if (response.data !== null || response.data !== undefined)
-                setIsAsked(true);
+            // console.log(response)
+            if (response.data != null || response.data != undefined)
+                setIsAsked(false);
+        }).catch((error) => {
+            // console.log(error.response.data.error)
+            showSnackbar(error.response.data.error, SeverityOptions.error)
         })
     }
 
-    const requestJoinActivity = async () => {
-        let res = await axiosInstance.post(`/request/activity`);
-
-        const data = res.data;
+    const requestJoinActivity = async (activity) => {
+        let res = await axiosInstance.post(`/request/activity`,
+            JSON.stringify({
+                sender: user._id,
+                activity: activity._id,
+                user: user._id,
+                type: "ask",
+                club: club._id
+            }), {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }
+        ).then((response) => {
+            // console.log(response)
+            if (response.data != null || response.data != undefined) {
+                const updateActivities = activities.map((elm) => {
+                    if (elm._id === response.data._id) {
+                      return {
+                        ...elm,
+                        requested: response.data.requested
+                      }
+                    }
+                    return elm;
+                  });
+                  setActivities(updateActivities)
+            }
+        }).catch((error) => {
+            // console.log(error.response.data.error)
+            showSnackbar(error.response.data.error, SeverityOptions.error)
+        })
     }
 
     useEffect(() => {
@@ -143,7 +182,7 @@ const ClubPreview = ({ user, club }) => {
                                 spacing={0.5}
                             >
                                 <div>
-                                    <h3>{activity.title}</h3>
+                                    <h2>{activity.title}</h2>
                                     <span>
                                         Thời gian:{" "}
                                         <b>{moment(activity.startDate).format("DD/MM/YYYY HH:mm")}</b> -{" "}
@@ -151,13 +190,21 @@ const ClubPreview = ({ user, club }) => {
                                     </span>
                                 </div>
                                 <div>
-                                    <Button
-                                        sx={{ background: '#1B264D' }}
-                                        variant="contained"
-                                        disableElevation
-                                    >
-                                        Tham gia
-                                    </Button>
+                                    {activity.requested ?
+                                        <Button
+                                            sx={{ color: '#1B264D' }}
+                                            variant="outlined"
+                                            disableElevation
+                                        >
+                                            Chờ xác nhận
+                                        </Button> : <Button
+                                            sx={{ background: '#1B264D' }}
+                                            variant="contained"
+                                            disableElevation
+                                            onClick={() => requestJoinActivity(activity)}
+                                        >
+                                            Tham gia
+                                        </Button>}
                                 </div>
                             </Stack>
                         ))}

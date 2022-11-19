@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 
 const activityRequestSchema = new mongoose.Schema({
+    club: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'club',
+        required: true
+    },
     activity: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'activities',
