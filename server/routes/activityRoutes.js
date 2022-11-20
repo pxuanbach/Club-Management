@@ -31,6 +31,7 @@ router.patch('/card/groupexit/:cardId', activityController.groupExitCard)
 router.patch('/card/description/:cardId', activityController.updateCardDescription)
 router.patch('/card/deletecomment/:cardId', activityController.deleteComment)
 router.patch('/card/deletefile/:cardId', activityController.deleteFile)
+router.patch('/card/point/:cardId', activityController.updatePoint)
 router.delete('/card/:cardId', activityController.deleteCard)
 
 module.exports = router;

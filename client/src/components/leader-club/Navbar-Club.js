@@ -16,7 +16,7 @@ const NavbarClub = ({ club }) => {
             setPathName(location.pathname.split('/')[4])
             console.log(location.pathname.split('/')[4])
         })
-    }, [history])
+    }, [history, user])
 
     return (
         <nav className='div-left-nav'>
@@ -75,14 +75,15 @@ const NavbarClub = ({ club }) => {
                             Qũy CLB
                         </Link>
                     </Tooltip>
-                    <Tooltip title="Quản lý lời mời" placement="left-start">
+                    {club.leader._id === user._id ? <Tooltip title="Quản lý lời mời" placement="left-start">
                         <Link
                             to={`/club/${club_id}/${club_name}/invite`}
                             className={pathName === 'invite' ? 'navclub-selected' : ''}>
                             <i class="fa-solid fa-envelope-open"></i>
-                            Quản lý lời mời
+                            Lời mời
                         </Link>
-                    </Tooltip>
+                    </Tooltip> : <></>}
+
                 </div>
             </div>) : (<></>)}
         </nav>

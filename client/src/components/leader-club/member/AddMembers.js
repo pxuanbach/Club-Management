@@ -6,6 +6,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { styled } from "@mui/material/styles";
 import axiosInstance from "../../../helper/Axios";
 import { Buffer } from "buffer";
+import SeverityOptions from "../../../helper/SeverityOptions";
 
 const CustomTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -16,7 +17,7 @@ const CustomTextField = styled(TextField)({
   },
 });
 
-const AddMembers = ({ user, club_id, setShowFormAdd, getMembers }) => {
+const AddMembers = ({ user, club_id, setShowFormAdd, getMembers, showSnackbar }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState();
   const [users, setUsers] = useState([]);
@@ -70,23 +71,29 @@ const AddMembers = ({ user, club_id, setShowFormAdd, getMembers }) => {
   const handleAddMembers = async (e) => {
     e.preventDefault();
     if (usersSelected.length > 0) {
-      setIsLoading(true);
-      const res = await axiosInstance.post(
-        "/request/club/multi",
-        JSON.stringify({
-          sender: user._id,
-          club: club_id,
-          users: usersSelected,
-          type: "invite",
-        }),
-        {
-          headers: { "Content-Type": "application/json" },
+      try {
+        setIsLoading(true);
+        const res = await axiosInstance.post(
+          "/request/club/multi",
+          JSON.stringify({
+            sender: user._id,
+            club: club_id,
+            users: usersSelected,
+            type: "invite",
+          }),
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data = res.data
+        if (data) {
+          getUsersNotMembers()
+          getMembers()
+          setIsLoading(false)
         }
-      );
-      const data = res.data
-      if (data) {
-        getUsersNotMembers()
-        getMembers()
+      } catch (err) {
+        console.log(err.response.data.error)
+        showSnackbar(err.response.data.error, SeverityOptions.warning)
         setIsLoading(false)
       }
     }
@@ -164,12 +171,12 @@ const AddMembers = ({ user, club_id, setShowFormAdd, getMembers }) => {
       </div>
       <div className="members__body">
         <DataGrid
-          sx={{ height: 52 * 4 + 56 + 55 }}
+          sx={{ height: 52 * 5 + 56 + 55 }}
           checkboxSelection
           getRowId={(r) => r._id}
           rows={users}
           columns={columns}
-          pageSize={4}
+          pageSize={5}
           onSelectionModelChange={setUsersSelected}
           selectionModel={usersSelected}
         />

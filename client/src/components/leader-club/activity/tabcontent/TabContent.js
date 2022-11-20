@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Modal,
-  Snackbar, Alert
+  Box, Button, Modal, FormControl, InputLabel,
+  Snackbar, Alert, Select, MenuItem, Stack
 } from '@mui/material';
 import { useRouteMatch } from 'react-router-dom';
 import FileDownload from 'js-file-download';
@@ -44,6 +44,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
   const [showFormUpdate, setShowFormUpdate] = useState(false);
   const [showCollaborators, setShowCollaborators] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [selectOption, setSelectOption] = useState(1)
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState()
   const [activitySelected, setActivitySelected] = useState()
@@ -125,7 +126,12 @@ const TabContent = ({ match, club_id, isLeader }) => {
   }
 
   const getActivities = () => {
-    axiosInstance.get(`/activity/list/${club_id}`)
+    axiosInstance.get(`/activity/list/${club_id}`,
+      {
+        params: {
+          option: selectOption
+        }
+      })
       .then(response => {
         //response.data
         setActivities(response.data)
@@ -137,10 +143,10 @@ const TabContent = ({ match, club_id, isLeader }) => {
 
   useEffect(() => {
     getActivities()
-  }, [])
+  }, [selectOption])
 
   return (
-    <div style={{width: '100%'}}>
+    <div style={{ width: '100%' }}>
       <Snackbar
         autoHideDuration={3000}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -221,7 +227,27 @@ const TabContent = ({ match, club_id, isLeader }) => {
       </div>
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
-          <h2 className='name-content'>Bảng hoạt động</h2>
+          <Stack direction="row" spacing={3} alignItems="center" justifyContent="center">
+            <h2 className='name-content'>Bảng hoạt động</h2>
+            <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
+              <InputLabel id="filter-select-small">Lựa chọn</InputLabel>
+              <Select
+                labelId="filter-select-small"
+                id="filter-select-small"
+                value={selectOption}
+                onChange={(e) => {
+                  setSelectOption(e.target.value);
+                }}
+                label='Lựa chọn'
+              >
+                <MenuItem value={-1}>Tất cả</MenuItem>
+                <MenuItem value={0}>Sắp diễn ra</MenuItem>
+                <MenuItem value={1}>Đang diễn ra</MenuItem>
+                <MenuItem value={2}>Kết thúc</MenuItem>
+                <MenuItem value={3}>Tổng kết</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
           <div className='div-search-tabmember'>
 
             {isLeader ?

@@ -84,7 +84,7 @@ const Column = (props) => {
                 <div className='column-title'>
                     {column.title}
                 </div>
-                <div className='column-dropdown-actions'>
+                {isLeader && <div className='column-dropdown-actions'>
                     <IconButton
                         aria-label="more"
                         id="long-button"
@@ -120,7 +120,7 @@ const Column = (props) => {
                             Xóa tất cả thẻ
                         </MenuItem>
                     </Menu>
-                </div>
+                </div>}
             </header>
             <div className='card-list'>
                 <Container

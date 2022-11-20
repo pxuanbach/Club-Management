@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
+import { Avatar, Box, Button, Tooltip, TextField, Modal, Snackbar, Alert } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
@@ -24,7 +24,7 @@ const style = {
   top: '45%',
   left: '50%',
   transform: 'translate(-30%, -45%)',
-  width: 750,
+  width: 800,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -39,6 +39,15 @@ const TabMember = ({ club }) => {
   const [members, setMembers] = useState([])
   const [membersSelected, setMembersSelected] = useState([])
   let haveSelected = membersSelected.length <= 0;
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [options, setOptions] = useState();
+
+  const showSnackbar = (message, options) => {
+    setOptions(options);
+    setAlertMessage(message);
+    setOpenSnackbar(true);
+  };
 
   const handleRemoveMembersFromClub = async (event) => {
     event.preventDefault();
@@ -142,9 +151,18 @@ const TabMember = ({ club }) => {
             club_id={club._id}
             setShowFormAdd={setShowFormAdd}
             getMembers={getMembers}
+            showSnackbar={showSnackbar}
           />
         </Box>
       </Modal>
+      <Snackbar
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity={options}>{alertMessage}</Alert>
+      </Snackbar>
       <div className='members__head'>
         <div className='members__card'>
           <h3>Trưởng câu lạc bộ</h3>

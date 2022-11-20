@@ -9,22 +9,21 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import image1 from '../../../assets/anhminhhoa.jpg';
 import { Link } from 'react-router-dom'
+import moment from 'moment';
 import './ActivityItem.css'
+import axiosInstance from '../../../helper/Axios';
 
 const ITEM_HEIGHT = 48;
 
 export default function ActivityItem({
-  activity, link, setShowFormUpdate, setOpenDialog, 
+  activity, link, setShowFormUpdate, setOpenDialog,
   setActivitySelected, setShowCollaborators,
   handleExportActivity, isLeader
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
-  let formatter = new Intl.DateTimeFormat(['ban', 'id'], {
-    year: "numeric", month: "numeric", day: "numeric",
-  });
-
+  const currentDate = moment()
+  
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -33,8 +32,13 @@ export default function ActivityItem({
     setAnchorEl(null);
   };
 
+  const handleSumary = async (e) => {
+    e.preventDefault();
+    let res = await axiosInstance.post(`/activity/${activity._id}/sumary`)
+  }
+
   return (
-    <Card sx={{ width: 250, position: 'relative' }}>
+    <Card sx={{ width: 270, position: 'relative' }}>
       {isLeader && <div className='activity-item-menu'>
         <IconButton
           aria-label="more"
@@ -88,6 +92,12 @@ export default function ActivityItem({
           }}>
             Báo cáo
           </MenuItem>
+          <MenuItem
+            disabled={currentDate < moment(activity.endDate)}
+            onClick={handleSumary}
+          >
+            Tổng kết
+          </MenuItem>
         </Menu>
       </div>}
       <CardMedia
@@ -102,7 +112,7 @@ export default function ActivityItem({
             {activity.title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {formatter.format(Date.parse(activity.startDate))} - {formatter.format(Date.parse(activity.endDate))}
+            {moment(activity.startDate).format("DD/MM/YYYY HH:mm")} - {moment(activity.endDate).format("DD/MM/YYYY HH:mm")}
           </Typography>
         </CardContent>
       </Link>

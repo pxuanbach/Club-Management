@@ -30,9 +30,16 @@ function uniqueIdObjArray(array) {
     return [...new Map(array.map((item) => [item["_id"], item])).values()];
 }
 
+function notContainsNullArray(array) {
+    return array.filter(value => {
+        return value !== null
+    })
+}
+
 module.exports = {
     isElementInArray,
     isElementInArrayObject,
     uniqueArray,
-    uniqueIdObjArray
+    uniqueIdObjArray,
+    notContainsNullArray
 }

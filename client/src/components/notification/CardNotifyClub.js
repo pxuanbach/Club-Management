@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar, Stack, Button } from "@mui/material";
 import axiosInstance from "../../helper/Axios";
+import moment from 'moment'
 
 const CardNotifyClub = ({ data, notificates, setNotificates }) => {
     const cancelNotification = async (e) => {
@@ -21,6 +22,25 @@ const CardNotifyClub = ({ data, notificates, setNotificates }) => {
         });
         setNotificates(updateNotificates);
     };
+
+    const acceptNotification = async (e) => {
+        e.preventDefault();
+        let res = await axiosInstance.patch(
+            `request/club/${data._id}`,
+            JSON.stringify({ status: 1 }),
+            { headers: { "Content-Type": "application/json" } }
+        );
+        const updateNotificates = notificates.map((elm) => {
+            if (elm._id === res.data._id) {
+                return {
+                    ...elm,
+                    status: res.data.status,
+                };
+            }
+            return elm;
+        });
+        setNotificates(updateNotificates);
+    }
 
     const renderTypeAskButtonByStatus = () => {
         if (data?.status === 0) {
@@ -61,7 +81,7 @@ const CardNotifyClub = ({ data, notificates, setNotificates }) => {
                     <Button
                         variant="contained"
                         disableElevation
-                    // onClick={cancelNotification}
+                        onClick={acceptNotification}
                     >
                         Chấp nhận
                     </Button>
@@ -107,17 +127,19 @@ const CardNotifyClub = ({ data, notificates, setNotificates }) => {
             <Avatar src={data?.club?.img_url} sx={{ width: 60, height: 60 }} />
             <Stack direction="column" spacing={2} alignItems="flex-start">
                 {data?.type == "ask" ? (
-                    <Stack direction="column" spacing={1.5}>
+                    <Stack direction="column" spacing={0.6}>
                         <span>
                             Bạn yêu cầu tham gia câu lạc bộ <b>{data?.club?.name}</b>
                         </span>
+                        <p style={{fontSize: '13px', opacity: '80%'}}>{moment(data?.createdAt).fromNow()}</p>
                         {renderTypeAskButtonByStatus()}
                     </Stack>
                 ) : (
-                    <Stack direction="column" spacing={1.5}>
+                    <Stack direction="column" spacing={0.6}>
                         <span>
                             Câu lạc bộ <b>{data?.club?.name}</b> mời bạn tham gia
                         </span>
+                        <p style={{fontSize: '13px', opacity: '80%'}}>{moment(data?.createdAt).fromNow()}</p>
                         {renderTypeInviteButtonByStatus()}
                     </Stack>
                 )}

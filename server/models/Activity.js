@@ -19,7 +19,11 @@ const activitySchema = new mongoose.Schema({
     collaborators: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
-    }]
+    }],
+    sumary: {
+        type: String,
+        default: ""
+    },
 }, {timestamps: true})
 
 const Activity = mongoose.model('activities', activitySchema)

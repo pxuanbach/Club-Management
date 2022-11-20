@@ -12,6 +12,7 @@ router.patch('/club/:requestId', clubRequestController.updateStatus)
 // activity
 router.get('/activity', activityRequestController.getList)
 router.post('/activity', activityRequestController.create)
+router.post('/activity/multi', activityRequestController.createMulti)
 router.patch('/activity/:requestId', activityRequestController.updateStatus)
 
 

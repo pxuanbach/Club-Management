@@ -8,7 +8,7 @@ const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
 const moment = require('moment')
-const { isElementInArray, isElementInArrayObject } = require('../helper/ArrayHelper')
+const { isElementInArray, isElementInArrayObject, notContainsNullArray } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
     if (isElementInArray(userId, card.userJoin)) {
@@ -153,7 +153,7 @@ module.exports.createCard = (req, res) => {
 
 module.exports.getList = async (req, res) => {
     const clubId = req.params.clubId;
-    const { inMonth, userId } = req.query
+    const { inMonth, userId, option } = req.query
     const currentDate = moment().add(-2, "days")
     const nextMonthDate = moment().add(30, "days")
     // const nextMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
@@ -175,24 +175,68 @@ module.exports.getList = async (req, res) => {
             ]
         }
     }
-    
+    if (option !== undefined) {
+        // console.log(typeof(option))
+        if (option === "0") {
+            console.log("future")
+            // future
+            query = {
+                ...query,
+                startDate: { $gte: currentDate.toISOString() }
+            }
+        } else if (option === "1") {
+            // current
+            query = {
+                ...query,
+                startDate: { $lte: currentDate.toISOString() },
+                endDate: { $gte: currentDate.toISOString() }
+            }
+        } else if (option === "2") {
+            // end not sumary
+            query = {
+                ...query,
+                endDate: { $lt: currentDate.toISOString() },
+                sumary: ""
+            }
+        } else if (option === "3") {
+            // end sumary
+            query = {
+                ...query,
+                endDate: { $lt: currentDate.toISOString() },
+                sumary: { $ne: "" }
+            }
+        }
+    }
+
     const activities = await Activity.find(query)
     if (userId !== undefined) {
         const cloneActivities = JSON.parse(JSON.stringify(activities));
         const promises = cloneActivities.map(async (activity) => {
-            const request = await ActivityRequest.find({
-                activity: activity._id, sender: userId, type: "ask"
+            const requests = await ActivityRequest.find({
+                activity: activity._id, user: userId
             })
             // console.log(request, activity._id)
-            if (!Array.isArray(request) || !request.length) {
+            if (!Array.isArray(requests) || !requests.length) {
                 activity.requested = false
             } else {
-                activity.requested = true
+                // status === 0 => requested = true
+                // status === 1 => remove elm
+                // status === 2 => requested = false
+                requests.map(async (rq) => {
+                    if (rq.status === 0) {
+                        activity.requested = true
+                    } else if (rq.status === 1) {
+                        activity = null
+                    } else if (rq.status === 2) {
+                        activity.requested = false
+                    }
+                })
             }
             return activity
         });
-        const result = await Promise.all(promises);
+        const result = notContainsNullArray(await Promise.all(promises));
         // console.log(userId, result)
+
         res.status(200).send(result);
     } else {
         res.status(200).send(activities)
@@ -848,6 +892,20 @@ module.exports.deleteFile = async (req, res) => {
         res.status(500).json({ error: err.message })
     }
 }
+
+module.exports.updatePoint = async (req, res) => {
+    try {
+        const cardId = req.params.cardId;
+        const { point } = req.body;
+        let card = await ActivityCard.findById(cardId)
+        card.pointValue = point
+        const saveCard = await card.save()
+        res.status(200).send(saveCard)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
 
 module.exports.deleteCard = async (req, res) => {
     try {
