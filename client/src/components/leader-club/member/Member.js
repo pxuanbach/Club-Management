@@ -67,6 +67,7 @@ export default function Member() {
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
               <Tab label="Thành viên" />
               <Tab label="Nhóm" />
+              <Tab label="Điểm" />
             </Tabs>
           </Box>
           {isLoading ?
@@ -79,6 +80,9 @@ export default function Member() {
               </TabPanel>
               <TabPanel className='body-member' value={value} index={1}>
                 <TabGroup club={club}></TabGroup>
+              </TabPanel>
+              <TabPanel className='body-member' value={value} index={2}>
+                {/* <TabGroup club={club}></TabGroup> */}
               </TabPanel>
             </div>}
         </Box>

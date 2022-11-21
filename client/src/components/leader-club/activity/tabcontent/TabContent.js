@@ -12,6 +12,7 @@ import UpdateActivity from '../action/UpdateActivity';
 import Collaborators from '../action/Collaborators';
 import { Buffer } from 'buffer';
 import CustomDialog from '../../../dialog/CustomDialog';
+import moment from 'moment';
 import './TabContent.css';
 
 const style = {
@@ -123,6 +124,39 @@ const TabContent = ({ match, club_id, isLeader }) => {
       }).catch(err => {
         showSnackbar(err.response.data.error)
       })
+  }
+
+  const handleSumary = async (activity) => {
+    try {
+      let res = await axiosInstance.patch(`/activity/sumary/${activity._id}`,
+        JSON.stringify({
+          sumary: moment().toString()
+        }), {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      const data = res.data
+      if (selectOption === 2) {
+        const activitiesUpdated = activities.filter((elm) => {
+          return elm._id !== data._id;
+        });
+        setActivities(activitiesUpdated)
+      } else if (selectOption === -1) {
+        const activitiesUpdated = activities.map((elm) => {
+          if (elm._id === data._id) {
+            return {
+              ...elm,
+              sumary: data.sumary
+            }
+          }
+          return elm;
+        });
+        setActivities(activitiesUpdated)
+      }
+    } catch (err) {
+      showSnackbar(err.response.data.error)
+    }
   }
 
   const getActivities = () => {
@@ -275,6 +309,7 @@ const TabContent = ({ match, club_id, isLeader }) => {
                 setShowCollaborators={setShowCollaborators}
                 setActivitySelected={setActivitySelected}
                 handleExportActivity={handleExportActivity}
+                handleSumary={handleSumary}
               />
             </div>
           ))}

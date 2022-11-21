@@ -39,11 +39,6 @@ const activityCardSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    status: {
-        type: Number,
-        default: 0
-        // 0: unopened, 1: open, 2: close
-    }
 }, {timestamps: true})
 
 activityCardSchema.pre('remove', function (next) {

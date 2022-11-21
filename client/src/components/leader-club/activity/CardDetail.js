@@ -27,7 +27,7 @@ import { UserContext } from "../../../UserContext";
 import SeverityOptions from "../../../helper/SeverityOptions";
 import GroupCard from "../../card/GroupCard";
 
-const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
+const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinished }) => {
     const { activityId } = useParams();
     const { user } = useContext(UserContext);
     const inputFile = useRef(null);
@@ -119,7 +119,11 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
         setAnchorEl(null);
     };
 
-    const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
+    const toggleOpenNewCardForm = () => {
+        if (!isFinished) {
+            setOpenNewCardForm(!openNewCardForm);
+        }
+    }
 
     const handleJoinCard = (e) => {
         e.preventDefault();
@@ -330,8 +334,9 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                 }
             })
             const data = res.data
+            showSnackbar("Cập nhật điểm thành công.", SeverityOptions.success);
         } catch (err) {
-            showSnackbar(err.response.data.error, true);
+            showSnackbar(err.response.data.error, SeverityOptions.error);
         }
     };
 
@@ -540,7 +545,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
 
                         <div className="description-activity">
                             <h4>Bình luận</h4>
-                            <div className="comment-area">
+                            {!isFinished && <div className="comment-area">
                                 <TextareaAutosize
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
@@ -554,7 +559,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                         Lưu
                                     </div>
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                     </div>
                     {user && (
@@ -568,7 +573,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                 <div className="div-right-card-detail">
                     <div className="action-1">
                         <h4 className="title-action">Gợi ý</h4>
-                        <button className="btn-action" onClick={handleJoinCard}>
+                        <button className="btn-action" disabled={isFinished} onClick={handleJoinCard}>
                             <i class="fa-solid fa-user"></i>
                             Tham gia
                         </button>
@@ -582,6 +587,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                     onClick={(e) =>
                                         handleShowPopover(e, null, null, setAnchorFindGroup)
                                     }
+                                    disabled={isFinished}
                                 >
                                     <i class="fa-solid fa-user-plus"></i>
                                     Thêm nhóm
@@ -589,6 +595,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                                 <button
                                     className="btn-action"
                                     onClick={(e) => setOpenDialog(true)}
+                                    disabled={isFinished}
                                 >
                                     <i class="fa-solid fa-trash-can"></i>
                                     Xóa thẻ
@@ -619,15 +626,16 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                         />
                         <button
                             className="btn-action"
+                            disabled={isFinished}
                             onClick={(e) => inputFile.current.click()}
                         >
                             <AttachFileIcon fontSize="small" />
                             Đính kèm
                         </button>
                     </div>
-                    <div className="action-2">
+                    {isLeader && <div className="action-2">
                         <h4 className="title-action">Điểm của thẻ</h4>
-                        <Stack direction="row" spacing={1} sx={{ marginTop: "20px" }}>
+                        <Stack direction="row" spacing={1} sx={{ marginTop: "10px" }}>
                             <TextField
                                 value={point}
                                 size="small"
@@ -637,13 +645,21 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity }) => {
                             <Button
                                 variant="contained"
                                 size="small"
-                                sx={{ background: "#1B264D" }}
+                                disableElevation
+                                disabled={isFinished}
+                                sx={{
+                                    background: "#1B264D",
+                                    ml: 1,
+                                    "&.MuiButtonBase-root:hover": {
+                                      bgcolor: "#1B264D"
+                                    }
+                                  }}
                                 onClick={handleUpdateCardPoint}
                             >
                                 Lưu
                             </Button>
                         </Stack>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </BlockUi>

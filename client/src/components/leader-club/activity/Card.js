@@ -18,9 +18,9 @@ const style = {
   height: '100%',
   overflowY: 'scroll'
 };
-const Card = (props) => {
+const Card = ({ card, isLeader, getColumnsActivity, isFinished }) => {
   const [showFormCardDetail, setShowFormCardDetail] = useState(false);
-  const { card, isLeader, getColumnsActivity } = props
+
   return (
     <div>
       <Modal
@@ -36,6 +36,7 @@ const Card = (props) => {
             setShowForm={setShowFormCardDetail}
             card={card}
             isLeader={isLeader}
+            isFinished={isFinished}
             getColumnsActivity={getColumnsActivity}
           />
         </Box>

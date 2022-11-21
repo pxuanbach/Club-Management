@@ -11,17 +11,19 @@ const moment = require('moment')
 const { isElementInArray, isElementInArrayObject, notContainsNullArray } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
+    let isJoined = false
     if (isElementInArray(userId, card.userJoin)) {
-        return true;
+        isJoined = true;
     }
 
     card.groupJoin.forEach(group => {
         if (isElementInArray(userId, group.members)) {
-            return true;
+            // console.log(group)
+            isJoined = true;
         }
     })
 
-    return false;
+    return isJoined;
 }
 
 function isGroupJoined(groupId, card) {
@@ -178,7 +180,6 @@ module.exports.getList = async (req, res) => {
     if (option !== undefined) {
         // console.log(typeof(option))
         if (option === "0") {
-            console.log("future")
             // future
             query = {
                 ...query,
@@ -572,6 +573,19 @@ module.exports.deleteAllCards = async (req, res) => {
     }
 }
 
+module.exports.sumary = async (req, res) => {
+    const activityId = req.params.activityId;
+    const { sumary } = req.body;
+    try {
+        let activity = await Activity.findById(activityId);
+        activity.sumary = sumary
+        const saveActivity = await activity.save()
+        res.status(200).send(saveActivity)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
 module.exports.delete = async (req, res) => {
     try {
         const activityId = req.params.activityId;
@@ -608,10 +622,10 @@ module.exports.userJoin = (req, res) => {
     ActivityCard.findById(cardId)
         .populate('groupJoin')
         .then(card => {
-            if (card.status === 0 || card.status === 2) {
-                res.status(400).send({ message: "Thẻ này chưa mở check-in.", success: false });
-                return;
-            }
+            // if (card.status === 0 || card.status === 2) {
+            //     res.status(400).send({ error: "Thẻ này chưa mở check-in.", success: false });
+            //     return;
+            // }
             //check user joined?
             if (isUserJoined(userId, card)) {
                 res.status(200).send({ message: "Bạn đã tham gia", success: false })

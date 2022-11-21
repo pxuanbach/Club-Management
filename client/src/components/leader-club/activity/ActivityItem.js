@@ -18,12 +18,12 @@ const ITEM_HEIGHT = 48;
 export default function ActivityItem({
   activity, link, setShowFormUpdate, setOpenDialog,
   setActivitySelected, setShowCollaborators,
-  handleExportActivity, isLeader
+  handleExportActivity, isLeader, handleSumary
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const currentDate = moment()
-  
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -31,11 +31,6 @@ export default function ActivityItem({
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const handleSumary = async (e) => {
-    e.preventDefault();
-    let res = await axiosInstance.post(`/activity/${activity._id}/sumary`)
-  }
 
   return (
     <Card sx={{ width: 270, position: 'relative' }}>
@@ -93,8 +88,8 @@ export default function ActivityItem({
             Báo cáo
           </MenuItem>
           <MenuItem
-            disabled={currentDate < moment(activity.endDate)}
-            onClick={handleSumary}
+            disabled={currentDate < moment(activity.endDate) || activity.sumary !== ""}
+            onClick={async () => {await handleSumary(activity)}}
           >
             Tổng kết
           </MenuItem>

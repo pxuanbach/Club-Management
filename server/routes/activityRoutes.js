@@ -18,6 +18,7 @@ router.patch('/updatecolumn/:activityId', activityController.updateColumn)
 router.patch('/updatecollaborators/:activityId', activityController.updateCollaborators)
 router.patch('/addcollaborators/:activityId', activityController.addCollaborators)
 router.patch('/deleteallcards/:activityId', activityController.deleteAllCards)
+router.patch('/sumary/:activityId', activityController.sumary)
 router.delete('/delete/:activityId', activityController.delete)
 
 router.post('/userjoin', activityController.userJoin)
