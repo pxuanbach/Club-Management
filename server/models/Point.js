@@ -15,13 +15,10 @@ const pointSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
     },
-    type: {
-        type: String,
-        lowercase: true,
-        // member/group
-    },
-    content: {
-        type: String,
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
     }
 }, {timestamps: true})
 

@@ -7,6 +7,7 @@ import { UserContext } from '../../../UserContext'
 import { Buffer } from 'buffer';
 import AddMembers from './AddMembers'
 import axiosInstance from '../../../helper/Axios';
+import CustomDialog from '../../dialog/CustomDialog'
 import './TabMember.css'
 
 
@@ -39,6 +40,7 @@ const TabMember = ({ club }) => {
   const [members, setMembers] = useState([])
   const [membersSelected, setMembersSelected] = useState([])
   let haveSelected = membersSelected.length <= 0;
+  const [openDialog, setOpenDialog] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [options, setOptions] = useState();
@@ -49,21 +51,17 @@ const TabMember = ({ club }) => {
     setOpenSnackbar(true);
   };
 
-  const handleRemoveMembersFromClub = async (event) => {
-    event.preventDefault();
-
-    const res = await axiosInstance.patch(`/club/removemembers/${club._id}`,
+  const handleRemoveMembersFromClub = () => {
+    axiosInstance.patch(`/club/removemembers/${club._id}`,
       JSON.stringify({
         'members': membersSelected,
       }), {
       headers: { 'Content-Type': 'application/json' }
-    }
-    )
-
-    const data = res.data
-    if (data) {
-      getMembers();
-    }
+    }).then(res => {
+      if (res.data) {
+        getMembers();
+      }
+    })
   }
 
   const handleChangeSearch = (event) => {
@@ -155,6 +153,13 @@ const TabMember = ({ club }) => {
           />
         </Box>
       </Modal>
+      <CustomDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        title="Đuổi thành viên"
+        contentText={`Bạn có chắc muốn xóa thẻ này?`}
+        handleAgree={handleRemoveMembersFromClub}
+      />
       <Snackbar
         autoHideDuration={5000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -226,7 +231,7 @@ const TabMember = ({ club }) => {
                   Thêm thành viên
                 </Button>
                 <Button disabled={haveSelected}
-                  onClick={handleRemoveMembersFromClub}
+                  onClick={() => setOpenDialog(true)}
                   variant="contained"
                   disableElevation
                   style={{

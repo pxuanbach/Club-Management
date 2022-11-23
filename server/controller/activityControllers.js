@@ -3,12 +3,13 @@ const ActivityCard = require('../models/ActivityCard')
 const ActivityRequest = require('../models/ActivityRequest')
 const Point = require('../models/Point')
 const User = require('../models/User')
+const Group = require('../models/Group')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
 const moment = require('moment')
-const { isElementInArray, isElementInArrayObject, notContainsNullArray } = require('../helper/ArrayHelper')
+const { isElementInArray, isElementInArrayObject, notContainsNullArray, uniqueArray } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
     let isJoined = false
@@ -31,6 +32,15 @@ function isGroupJoined(groupId, card) {
         return true;
     }
     return false;
+}
+
+function getAllUsersInCard(card) {
+    let users = card.userJoin   // array
+    
+    card.groupJoin.forEach((group) => {
+        users.push(...group.members)
+    })
+    return uniqueArray(users)
 }
 
 async function uploadFile(files, public_id) {
@@ -575,14 +585,48 @@ module.exports.deleteAllCards = async (req, res) => {
 
 module.exports.sumary = async (req, res) => {
     const activityId = req.params.activityId;
-    const { sumary } = req.body;
+    const { sumary, author } = req.body;
     try {
-        let activity = await Activity.findById(activityId);
+        let activity = await Activity.findById(activityId)
+            .populate('club');
+        if (activity === undefined) {
+            res.status(404).send({ error: "Không tìm thấy hoạt động này." })
+            return;
+        }
+
         activity.sumary = sumary
+        const members = activity.club.members
+        members.push(activity.club.leader)
+        members.push(activity.club.treasurer)
+        const column = activity.boards.find(col => {
+            return col.title === "Đã xong"
+        })
+        const cardIds = column.cards
+        const cards = await ActivityCard.find({ _id: { $in: cardIds } }).populate('groupJoin')
+
+        const promises = cards.map(async (card) => {
+            let pointArr = []
+            const allUsersOfCard = getAllUsersInCard(card)
+            // console.log("ALL", allUsersOfCard)
+            allUsersOfCard.forEach(async (userId) => {
+                const point = {
+                    title: `${activity.title} - ${card.title}`,
+                    club: activity.club._id,
+                    value: card.pointValue,
+                    author: author,
+                    user: userId
+                }
+                pointArr.push(point)
+            })
+            const points = await Point.insertMany(pointArr)
+            return points
+        })
+        const result = await Promise.all(promises)
+        // console.log("RESULT", result)
         const saveActivity = await activity.save()
         res.status(200).send(saveActivity)
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(500).send({ error: err.message })
     }
 }
 
@@ -754,62 +798,6 @@ module.exports.getCard = (req, res) => {
         }).catch(err => {
             res.status(500).send({ error: err.message })
         })
-}
-
-module.exports.updateCardStatus = async (req, res) => {
-    try {
-        const cardId = req.params.cardId;
-        const { status, author } = req.body;
-        if (status === undefined) {
-            res.status(400).json({ error: "Yêu cầu chưa xác định." })
-            return;
-        }
-
-        const card = await ActivityCard.findById(cardId).populate("activity")
-        if (card === null) {
-            res.status(404).json({ error: "Không tìm thấy thẻ hoạt động." })
-            return;
-        }
-
-        if (status === 1 && card.status === 0) {
-            card.status = status;
-        } else if (status === 2 && card.status === 1) {
-            card.status = status;
-            // export point 
-            if (card.pointValue > 0) {
-                let pointObjectArr = []
-                card.userJoin.forEach(userId => {
-                    const pointObject = {
-                        title: card.activity.title + card.title,
-                        club: card.activity.club,
-                        value: card.pointValue,
-                        author: author,
-                        type: "member",
-                        content: userId
-                    };
-                    pointObjectArr.push(pointObject)
-                })
-                card.groupJoin.forEach(groupId => {
-                    const pointObject = {
-                        title: card.activity.title + card.title,
-                        club: card.activity.club,
-                        value: card.pointValue,
-                        author: author,
-                        type: "group",
-                        content: groupId
-                    };
-                    pointObjectArr.push(pointObject)
-                })
-                Point.insertMany(pointObjectArr, function (err, docs) { })
-            }
-        }
-
-        card.save().then(result => {
-            res.status(200).send(result)
-        })
-    } catch (err) {
-        res.status(500).json({ error: err.message })
-    }
 }
 
 module.exports.userExitCard = async (req, res) => {

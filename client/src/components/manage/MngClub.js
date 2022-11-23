@@ -406,8 +406,9 @@ const ManageClub = () => {
               style={{ background: '#1B264D' }}
               variant="contained"
               disableElevation
-              startIcon={<i class="fa-solid fa-file-export"></i>}>
-              <span>Xuất file</span>
+              startIcon={<i class="fa-solid fa-file-export"></i>}
+            >
+              Xuất file
             </Button>
           </div>
         </div>

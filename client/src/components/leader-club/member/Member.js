@@ -4,6 +4,7 @@ import { Tabs, Tab, Typography, CircularProgress, Box } from '@mui/material';
 import "./Member.css"
 import TabMember from './TabMember';
 import TabGroup from './TabGroup';
+import TabPoint from './TabPoint';
 import axiosInstance from '../../../helper/Axios';
 import { useRouteMatch } from 'react-router-dom';
 import { UserContext } from '../../../UserContext'
@@ -82,7 +83,7 @@ export default function Member() {
                 <TabGroup club={club}></TabGroup>
               </TabPanel>
               <TabPanel className='body-member' value={value} index={2}>
-                {/* <TabGroup club={club}></TabGroup> */}
+                <TabPoint club={club}></TabPoint>
               </TabPanel>
             </div>}
         </Box>

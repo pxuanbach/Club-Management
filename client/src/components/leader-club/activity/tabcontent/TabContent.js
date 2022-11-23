@@ -39,7 +39,7 @@ const collaboratorStyle = {
   p: 3,
 };
 
-const TabContent = ({ match, club_id, isLeader }) => {
+const TabContent = ({ match, club_id, isLeader, user }) => {
   const { path } = useRouteMatch();
   const [showFormAdd, setShowFormAdd] = useState(false);
   const [showFormUpdate, setShowFormUpdate] = useState(false);
@@ -130,7 +130,8 @@ const TabContent = ({ match, club_id, isLeader }) => {
     try {
       let res = await axiosInstance.patch(`/activity/sumary/${activity._id}`,
         JSON.stringify({
-          sumary: moment().toString()
+          sumary: moment().toString(),
+          author: user._id
         }), {
         headers: {
           "Content-Type": "application/json"
