@@ -5,10 +5,10 @@
     margin-top: 10px;
     border-radius: 15px;
     padding: 10px;
-    width: 100%;
     display: flex;
     align-items: center;
     background-color: var(--secondary-color);
+    gap: 5px;
 }
 .member-selected .selected-info{
     margin-left: 6px;

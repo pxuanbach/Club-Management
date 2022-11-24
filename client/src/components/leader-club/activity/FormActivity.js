@@ -11,14 +11,16 @@ import { Link, useParams } from 'react-router-dom'
 import axiosInstance from '../../../helper/Axios'
 import { cloneDeep } from 'lodash';
 import { UserContext } from '../../../UserContext';
+import moment from 'moment';
 
 const FormActivity = ({ match, isLeader }) => {
   const { user } = useContext(UserContext);
   const { activityId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [columns, setColumns] = useState([])
+  const [columns, setColumns] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [isFinished, setIsFinished] = useState(false);
 
   const showSnackbar = (message) => {
     setAlertMessage(message)
@@ -106,6 +108,7 @@ const FormActivity = ({ match, isLeader }) => {
     axiosInstance.get(`/activity/one/${activityId}`)
       .then(response => {
         //response.data
+        setIsFinished(moment() > moment(response.data.endDate))
         setColumns(response.data.boards)
         setIsLoading(false);
       }).catch(err => {
@@ -116,6 +119,7 @@ const FormActivity = ({ match, isLeader }) => {
 
   useEffect(() => {
     getColumnsActivity(activityId)
+    // console.log(isFinished)
   }, [])
 
   const onColumnDrop = (dropResult) => {
@@ -205,6 +209,7 @@ const FormActivity = ({ match, isLeader }) => {
             {columns.map((column, index) => (
               <Draggable key={index}>
                 <Column
+                  isFinished={isFinished}
                   isLeader={isLeader}
                   column={column}
                   getColumnsActivity={getColumnsActivity}

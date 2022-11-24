@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab, Typography, Box } from '@mui/material';
 import AddCollaborators from './AddCollaborators';
 import CollaboratorsList from './CollaboratorsList';
+import { UserContext } from '../../../../UserContext';
+import moment from 'moment'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -31,7 +33,9 @@ TabPanel.propTypes = {
 };
 
 const Collaborators = ({ setShow, activity, showSnackbar }) => {
+    const { user } = useContext(UserContext)
     const [value, setValue] = useState(0);
+    const isFinished = moment() > moment(activity.endDate)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -43,26 +47,28 @@ const Collaborators = ({ setShow, activity, showSnackbar }) => {
                 <Box sx={{ borderBottom: 'none', borderColor: 'divider' }} >
                     <Tabs value={value} onChange={handleChange}>
                         <Tab label="Cộng tác viên" />
-                        <Tab label="Thêm cộng tác viên" />
+                        {!isFinished && <Tab label="Thêm cộng tác viên" />}
                     </Tabs>
                 </Box>
+                {user && (<div>
+                    <TabPanel className='body-member' value={value} index={0}>
+                        <CollaboratorsList
+                            setShow={setShow}
+                            activity={activity}
+                            showSnackbar={showSnackbar}
+                            isFinished={isFinished}
+                        />
+                    </TabPanel>
+                    <TabPanel className='body-member' value={value} index={1}>
+                        <AddCollaborators
+                            setShow={setShow}
+                            activity={activity}
+                            showSnackbar={showSnackbar}
+                            user={user}
+                        />
+                    </TabPanel>
+                </div>)}
             </Box>
-            <div>
-                <TabPanel className='body-member' value={value} index={0}>
-                    <CollaboratorsList
-                        setShow={setShow}
-                        activity={activity}
-                        showSnackbar={showSnackbar}
-                    />
-                </TabPanel>
-                <TabPanel className='body-member' value={value} index={1}>
-                    <AddCollaborators
-                        setShow={setShow}
-                        activity={activity}
-                        showSnackbar={showSnackbar}
-                    />
-                </TabPanel>
-            </div>
         </div>
     )
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Stack } from "@mui/material";
 import NavTabs from "./Tab-Notification";
 
-const Notification = () => {
+const Notification = ({club}) => {
   return (
     <Box sx={{ width: "100%", height: '100vh'}}>
       <Stack direction="column"
@@ -18,7 +18,7 @@ const Notification = () => {
         }}
       >
         <h1>Lời mời</h1>
-        <NavTabs />
+        <NavTabs club={club}/>
       </Stack>
     </Box>
   );

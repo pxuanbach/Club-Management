@@ -1,7 +1,8 @@
 .range-datepicker{
     display: flex;
     width: 100%;
-    gap: 50px;
+    gap: 10px;
+    align-items: center;
 }
 .range-datepicker__start, .range-datepicker__end{
     width: 100%;

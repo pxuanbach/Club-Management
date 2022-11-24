@@ -16,11 +16,11 @@ const CustomTextField = styled(TextField)({
 });
 
 
-const AddCollaborators = ({ setShow, activity, showSnackbar }) => {
+const AddCollaborators = ({ setShow, activity, showSnackbar, user }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState();
     const [users, setUsers] = useState([]);
-    const [usersSelected, setUsersSelected] = useState([])
+    const [usersSelected, setUsersSelected] = useState([]);
 
     const handleChangeSearch = event => {
         setSearch(event.target.value)
@@ -47,24 +47,54 @@ const AddCollaborators = ({ setShow, activity, showSnackbar }) => {
         }
     }
 
+    // const handleAddCollaborators = async (e) => {
+    //     e.preventDefault();
+    //     setIsLoading(true)
+    //     if (usersSelected.length > 0) {
+    //         setIsLoading(true)
+    //         axiosInstance.patch(`/activity/addcollaborators/${activity._id}`,
+    //             JSON.stringify({
+    //                 'users': usersSelected,
+    //             }), {
+    //             headers: { 'Content-Type': 'application/json' }
+    //         }).then(response => {
+    //             //response.data
+    //             getUsersNotCollaborators()
+    //             setIsLoading(false)
+    //         }).catch(err => {
+    //             //err.response.data.error
+    //             showSnackbar(err.response.data.error)
+    //         })
+    //     }
+    // }
+
     const handleAddCollaborators = async (e) => {
         e.preventDefault();
-        setIsLoading(true)
-        if (usersSelected.length > 0) {
-            setIsLoading(true)
-            axiosInstance.patch(`/activity/addcollaborators/${activity._id}`,
-                JSON.stringify({
-                    'users': usersSelected,
-                }), {
-                headers: { 'Content-Type': 'application/json' }
-            }).then(response => {
-                //response.data
-                getUsersNotCollaborators()
-                setIsLoading(false)
-            }).catch(err => {
-                //err.response.data.error
-                showSnackbar(err.response.data.error)
-            })
+        try {
+            if (usersSelected.length > 0) {
+                setIsLoading(true)
+                const res = await axiosInstance.post(
+                    "/request/activity/multi",
+                    JSON.stringify({
+                        activity: activity._id,
+                        sender: user._id,
+                        club: activity.club,
+                        users: usersSelected,
+                        type: "invite",
+                    }),
+                    {
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+                const data = res.data
+                if (data) {
+                    getUsersNotCollaborators()
+                    setIsLoading(false)
+                }
+            }
+        } catch (err) {
+            showSnackbar(err.response.data.error)
+            setIsLoading(false)
         }
     }
 
@@ -160,7 +190,7 @@ const AddCollaborators = ({ setShow, activity, showSnackbar }) => {
                     onClick={handleAddCollaborators}
                     variant="contained"
                     disableElevation>
-                    Thêm
+                    Mời
                 </Button>
                 <Button disabled={isLoading}
                     onClick={handleClose}

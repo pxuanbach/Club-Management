@@ -51,7 +51,7 @@ function App() {
               <Route path="/mng-club" component={ManageClub} />
               <Route path="/message" component={PersonMessage}/>
               <Route path="/info" component={Info} />
-              <Route path="/notification" component={Notification} />
+              <Route path="/my-invites" component={Notification} />
               <Route path="/club/:club_id/:club_name" component={Club} />
               <Route path='/login' component={Login} />
               <Route path='*' component={NotFound} />

@@ -4,7 +4,12 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import './RangeDatePicker.css'
 
-const RangeDatePicker = ({startDate, endDate, setStartDate, setEndDate}) => {
+const RangeDatePicker = ({
+    startDateTitle, endDateTitle, 
+    startDate, endDate, 
+    setStartDate, setEndDate,
+    textCenter
+}) => {
 
     const CustomInput = forwardRef(({ value, onClick }, ref) => (
         <Button
@@ -22,7 +27,7 @@ const RangeDatePicker = ({startDate, endDate, setStartDate, setEndDate}) => {
     return (
         <div className='range-datepicker'>
             <div className='range-datepicker__start'>
-                <h3>Ngày bắt đầu</h3>
+                <h3>{startDateTitle}</h3>
                 <DatePicker
                     dateFormat="dd/MM/yyyy"
                     selectsStart
@@ -33,8 +38,9 @@ const RangeDatePicker = ({startDate, endDate, setStartDate, setEndDate}) => {
                     customInput={<CustomInput />}
                 />
             </div>
+            <h2>{textCenter}</h2>
             <div className='range-datepicker__end'>
-                <h3>Ngày kết thúc</h3>
+                <h3>{endDateTitle}</h3>
                 <DatePicker
                     dateFormat="dd/MM/yyyy"
                     selected={endDate}

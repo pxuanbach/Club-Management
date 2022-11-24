@@ -4,6 +4,7 @@ import { Tabs, Tab, Typography, CircularProgress, Box } from '@mui/material';
 import "./Member.css"
 import TabMember from './TabMember';
 import TabGroup from './TabGroup';
+import TabPoint from './TabPoint';
 import axiosInstance from '../../../helper/Axios';
 import { useRouteMatch } from 'react-router-dom';
 import { UserContext } from '../../../UserContext'
@@ -67,6 +68,7 @@ export default function Member() {
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
               <Tab label="Thành viên" />
               <Tab label="Nhóm" />
+              <Tab label="Điểm" />
             </Tabs>
           </Box>
           {isLoading ?
@@ -79,6 +81,9 @@ export default function Member() {
               </TabPanel>
               <TabPanel className='body-member' value={value} index={1}>
                 <TabGroup club={club}></TabGroup>
+              </TabPanel>
+              <TabPanel className='body-member' value={value} index={2}>
+                <TabPoint club={club}></TabPoint>
               </TabPanel>
             </div>}
         </Box>

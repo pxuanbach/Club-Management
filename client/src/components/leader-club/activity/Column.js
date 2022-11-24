@@ -11,19 +11,19 @@ import { useParams } from 'react-router-dom';
 import CustomDialog from '../../dialog/CustomDialog'
 
 const ITEM_HEIGHT = 48;
-const Column = (props) => {
+const Column = ({
+    isFinished,
+    column,
+    onCardDrop,
+    getColumnsActivity,
+    handleCreateCard,
+    isLeader,
+    handleDeleteAllCards
+}) => {
     const { activityId } = useParams();
     const [anchorEl, setAnchorEl] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
     const open = Boolean(anchorEl);
-    const {
-        column,
-        onCardDrop,
-        getColumnsActivity,
-        handleCreateCard,
-        isLeader,
-        handleDeleteAllCards
-    } = props
     let cards = column.cards
 
     const handleClick = (event) => {
@@ -84,43 +84,45 @@ const Column = (props) => {
                 <div className='column-title'>
                     {column.title}
                 </div>
-                <div className='column-dropdown-actions'>
-                    <IconButton
-                        aria-label="more"
-                        id="long-button"
-                        aria-controls={open ? 'long-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-haspopup="true"
-                        onClick={handleClick}
-                    >
-                        <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                        id="long-menu"
-                        MenuListProps={{
-                            'aria-labelledby': 'long-button',
-                        }}
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        PaperProps={{
-                            style: {
-                                maxHeight: ITEM_HEIGHT * 4.5,
-                                width: 'max-content',
-                            },
-                        }}
-                    >
-                        <MenuItem onClick={() => {
-                            toggleOpenNewCardForm();
-                            handleClose()
-                        }}>
-                            Thêm thẻ
-                        </MenuItem>
-                        <MenuItem onClick={handleDeleteAllCard}>
-                            Xóa tất cả thẻ
-                        </MenuItem>
-                    </Menu>
-                </div>
+                {!isFinished && <>
+                    {isLeader && <div className='column-dropdown-actions'>
+                        <IconButton
+                            aria-label="more"
+                            id="long-button"
+                            aria-controls={open ? 'long-menu' : undefined}
+                            aria-expanded={open ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handleClick}
+                        >
+                            <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                            id="long-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'long-button',
+                            }}
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            PaperProps={{
+                                style: {
+                                    maxHeight: ITEM_HEIGHT * 4.5,
+                                    width: 'max-content',
+                                },
+                            }}
+                        >
+                            <MenuItem onClick={() => {
+                                toggleOpenNewCardForm();
+                                handleClose()
+                            }}>
+                                Thêm thẻ
+                            </MenuItem>
+                            <MenuItem onClick={handleDeleteAllCard}>
+                                Xóa tất cả thẻ
+                            </MenuItem>
+                        </Menu>
+                    </div>}
+                </>}
             </header>
             <div className='card-list'>
                 <Container
@@ -142,6 +144,7 @@ const Column = (props) => {
                             <Card
                                 card={card}
                                 isLeader={isLeader}
+                                isFinished={isFinished}
                                 getColumnsActivity={getColumnsActivity}
                             />
                         </Draggable>
@@ -164,22 +167,25 @@ const Column = (props) => {
                 }
             </div>
             <footer>
-                {isLeader ?
-                    <>
-                        {openNewCardForm &&
-                            <div className='add-new-card-actions'>
-                                <Button variant="contained" onClick={addNewCard}>Thêm thẻ</Button>
-                                <span className='cancel-icon' onClick={toggleOpenNewCardForm}>
-                                    <i className="fa fa-trash icon" />
-                                </span>
-                            </div>
-                        }
-                        {!openNewCardForm &&
-                            <div className='footer-actions' onClick={toggleOpenNewCardForm}>
-                                <i className="fa fa-plus" /> Thêm thẻ khác
-                            </div>
-                        }
-                    </> : <></>}
+                {!isFinished && <>
+                    {isLeader ?
+                        <>
+                            {openNewCardForm &&
+                                <div className='add-new-card-actions'>
+                                    <Button variant="contained" onClick={addNewCard}>Thêm thẻ</Button>
+                                    <span className='cancel-icon' onClick={toggleOpenNewCardForm}>
+                                        <i className="fa fa-trash icon" />
+                                    </span>
+                                </div>
+                            }
+                            {!openNewCardForm &&
+                                <div className='footer-actions' onClick={toggleOpenNewCardForm}>
+                                    <i className="fa fa-plus" /> Thêm thẻ khác
+                                </div>
+                            }
+                        </> : <></>
+                    }
+                </>}
             </footer>
         </div>
     )

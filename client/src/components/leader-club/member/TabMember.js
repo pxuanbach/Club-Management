@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Avatar, Box, Button, Tooltip, TextField, Modal } from '@mui/material';
+import { Avatar, Box, Button, Tooltip, TextField, Modal, Snackbar, Alert } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
@@ -7,6 +7,7 @@ import { UserContext } from '../../../UserContext'
 import { Buffer } from 'buffer';
 import AddMembers from './AddMembers'
 import axiosInstance from '../../../helper/Axios';
+import CustomDialog from '../../dialog/CustomDialog'
 import './TabMember.css'
 
 
@@ -24,7 +25,7 @@ const style = {
   top: '45%',
   left: '50%',
   transform: 'translate(-30%, -45%)',
-  width: 750,
+  width: 800,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -39,22 +40,28 @@ const TabMember = ({ club }) => {
   const [members, setMembers] = useState([])
   const [membersSelected, setMembersSelected] = useState([])
   let haveSelected = membersSelected.length <= 0;
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [options, setOptions] = useState();
 
-  const handleRemoveMembersFromClub = async (event) => {
-    event.preventDefault();
+  const showSnackbar = (message, options) => {
+    setOptions(options);
+    setAlertMessage(message);
+    setOpenSnackbar(true);
+  };
 
-    const res = await axiosInstance.patch(`/club/removemembers/${club._id}`,
+  const handleRemoveMembersFromClub = () => {
+    axiosInstance.patch(`/club/removemembers/${club._id}`,
       JSON.stringify({
         'members': membersSelected,
       }), {
       headers: { 'Content-Type': 'application/json' }
-    }
-    )
-
-    const data = res.data
-    if (data) {
-      getMembers();
-    }
+    }).then(res => {
+      if (res.data) {
+        getMembers();
+      }
+    })
   }
 
   const handleChangeSearch = (event) => {
@@ -138,12 +145,29 @@ const TabMember = ({ club }) => {
       >
         <Box sx={style}>
           <AddMembers
+            user={user}
             club_id={club._id}
             setShowFormAdd={setShowFormAdd}
             getMembers={getMembers}
+            showSnackbar={showSnackbar}
           />
         </Box>
       </Modal>
+      <CustomDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        title="Đuổi thành viên"
+        contentText={`Bạn có chắc muốn xóa thẻ này?`}
+        handleAgree={handleRemoveMembersFromClub}
+      />
+      <Snackbar
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity={options}>{alertMessage}</Alert>
+      </Snackbar>
       <div className='members__head'>
         <div className='members__card'>
           <h3>Trưởng câu lạc bộ</h3>
@@ -207,7 +231,7 @@ const TabMember = ({ club }) => {
                   Thêm thành viên
                 </Button>
                 <Button disabled={haveSelected}
-                  onClick={handleRemoveMembersFromClub}
+                  onClick={() => setOpenDialog(true)}
                   variant="contained"
                   disableElevation
                   style={{

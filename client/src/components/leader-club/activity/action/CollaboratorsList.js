@@ -15,11 +15,11 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const CollaboratorsList = ({ setShow, activity, showSnackbar }) => {
+const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState();
     const [collaborators, setCollaborators] = useState([]);
-    const [collaboratorsSelected, setCollaboratorsSelected] = useState([])
+    const [collaboratorsSelected, setCollaboratorsSelected] = useState([]);
 
     const handleChangeSearch = event => {
         setSearch(event.target.value)
@@ -151,7 +151,7 @@ const CollaboratorsList = ({ setShow, activity, showSnackbar }) => {
                 />
             </div>
             <div className="stack-right">
-                <Button disabled={isLoading}
+                <Button disabled={isLoading || isFinished}
                     onClick={handleRemoveCollaborators}
                     variant="contained"
                     disableElevation>

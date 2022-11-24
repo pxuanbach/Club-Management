@@ -44,6 +44,7 @@ const Activity = ({ match, club_id }) => {
                             match={match}
                             club_id={club_id}
                             isLeader={isLeader}
+                            user={user}
                         />
                         : <Box className='loading-temp'>
                             <CircularProgress />

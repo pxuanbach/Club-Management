@@ -55,8 +55,8 @@ const SignedInMenu = ({ logout, pathName }) => {
                 {/* <div className='list-btn'> */}
                 <Tooltip title="Thông báo" placement='right-start'>
                     <Link
-                        className={pathName === 'notification' ? 'selected' : ''}
-                        to="/notification">
+                        className={pathName === 'my-invites' ? 'selected' : ''}
+                        to="/my-invites">
                         <i class="fa-solid fa-bell"></i>
                     </Link>
                 </Tooltip>

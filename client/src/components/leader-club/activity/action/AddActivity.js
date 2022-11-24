@@ -37,10 +37,10 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                 //response.data
                 acitivityCreated(response.data)
                 handleClose()
-              }).catch(err => {
+            }).catch(err => {
                 //err.response.data.error
                 showSnackbar(err.response.data.error)
-              })
+            })
         } else {
             setTitleErr('Tên hoạt động trống')
         }
@@ -67,6 +67,8 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                         error={titleErr}
                     />
                     <RangeDatePicker
+                        startDateTitle="Ngày bắt đầu"
+                        endDateTitle="Ngày kết thúc"
                         startDate={startDate}
                         setStartDate={setStartDate}
                         endDate={endDate}
