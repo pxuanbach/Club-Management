@@ -7,7 +7,11 @@ module.exports.getListOfClub = async (req, res) => {
         const logs = await ClubLog.find({ club: clubId }).sort({ createdAt: 1 });
         const cloneLogs = JSON.parse(JSON.stringify(logs));
         const promises = cloneLogs.map(async (log) => {
-            if (log.type === "member_join") {
+            if (
+                ["member_join", "promote_leader", "promote_treasurer"].includes(
+                    log.type
+                )
+            ) {
                 user = await User.findById(log.content);
                 log.content = user;
                 return log;

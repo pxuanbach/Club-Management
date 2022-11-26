@@ -1,9 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import PropTypes from "prop-types";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
+import { Tabs, Tab, Snackbar, Alert, Box, Typography } from '@mui/material';
 import ActivitiesNotification from "./ActivitiesNotification";
 import ClubNotification from "./ClubNotification";
 import { UserContext } from "../../../UserContext";
@@ -44,6 +41,16 @@ function a11yProps(index) {
 export default function NotificationTab({ club }) {
   const { user } = useContext(UserContext);
   const [value, setValue] = React.useState(0);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [options, setOptions] = useState();
+
+  const showSnackbar = (message, options) => {
+    setOptions(options);
+    setAlertMessage(message);
+    setOpenSnackbar(true);
+  };
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -59,6 +66,14 @@ export default function NotificationTab({ club }) {
         flexDirection: "column",
       }}
     >
+      <Snackbar
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity={options}>{alertMessage}</Alert>
+      </Snackbar>
       <Box sx={{ borderBottom: 1, borderColor: "divider", height: "auto" }}>
         <Tabs
           value={value}
@@ -71,10 +86,10 @@ export default function NotificationTab({ club }) {
       </Box>
       <Box sx={{ overflowY: "scroll" }}>
         <TabPanel value={value} index={0}>
-          <ClubNotification club={club} />
+          <ClubNotification club={club} showSnackbar={showSnackbar}/>
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <ActivitiesNotification club={club} />
+          <ActivitiesNotification club={club} showSnackbar={showSnackbar} />
         </TabPanel>
       </Box>
     </Box>

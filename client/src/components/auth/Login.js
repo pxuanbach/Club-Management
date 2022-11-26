@@ -29,7 +29,7 @@ const Login = () => {
         setUsernameErr('')
         setPasswordErr('')
         try {
-            axiosInstance.post('/login', JSON.stringify({ username, password }),
+            axiosInstance.post('/login', JSON.stringify({ username: username.trim(), password }),
             {
                 withCredentials: true,
                 headers: {

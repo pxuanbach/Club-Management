@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import CardNotifyClub from './CardNotifyClub';
 import axiosInstance from '../../helper/Axios';
 
-const ClubNotification = ({ user }) => {
+const ClubNotification = ({ user, showSnackbar }) => {
     const [notificates, setNotificates] = useState([]);
 
     const getAllNotification = async () => {
@@ -28,6 +28,7 @@ const ClubNotification = ({ user }) => {
                         data={noti}
                         notificates={notificates}
                         setNotificates={setNotificates}
+                        showSnackbar={showSnackbar}
                     />
                 ))}
         </div>

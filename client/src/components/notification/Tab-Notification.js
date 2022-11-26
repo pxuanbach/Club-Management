@@ -1,9 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { Tabs, Tab, Snackbar, Alert, Box, Typography } from '@mui/material';
 import ActivitiesNotification from './ActivitiesNotification';
 import ClubNotification from './ClubNotification';
 import { UserContext } from '../../UserContext'
@@ -44,6 +41,15 @@ function a11yProps(index) {
 export default function NotificationTab() {
   const { user } = useContext(UserContext);
   const [value, setValue] = React.useState(0);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [options, setOptions] = useState();
+
+  const showSnackbar = (message, options) => {
+    setOptions(options);
+    setAlertMessage(message);
+    setOpenSnackbar(true);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -57,6 +63,14 @@ export default function NotificationTab() {
       display: "flex",
       flexDirection: "column",
     }}>
+      <Snackbar
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert severity={options}>{alertMessage}</Alert>
+      </Snackbar>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           <Tab label="Câu lạc bộ" {...a11yProps(0)} />
@@ -65,10 +79,10 @@ export default function NotificationTab() {
       </Box>
       <Box sx={{ overflowY: "scroll" }}>
         <TabPanel value={value} index={0}>
-          <ClubNotification user={user} />
+          <ClubNotification user={user} showSnackbar={showSnackbar} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <ActivitiesNotification user={user} />
+          <ActivitiesNotification user={user} showSnackbar={showSnackbar} />
         </TabPanel>
       </Box>
 

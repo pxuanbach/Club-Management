@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CardActivity from "./CardNotifyActivity";
 import axiosInstance from "../../helper/Axios";
 
-const ActivitiesNotification = ({ user }) => {
+const ActivitiesNotification = ({ user, showSnackbar }) => {
   const [notificates, setNotificates] = useState([]);
 
   const getAllNotification = async () => {
@@ -28,6 +28,7 @@ const ActivitiesNotification = ({ user }) => {
             data={noti}
             notificates={notificates}
             setNotificates={setNotificates}
+            showSnackbar={showSnackbar}
           />
         ))}
     </div>

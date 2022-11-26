@@ -5,14 +5,13 @@ const User = require("../models/User");
 
 module.exports.getPointsOfClub = async (req, res) => {
     const clubId = req.params.clubId;
-    const { startDate, endDate, justCurrentMember } = req.query
+    const { startDate, endDate, justCurrentMember, search } = req.query
     try {
         const club = await Club.findById(clubId);
         if (club === null) {
             res.status(404).send({ error: "Không tìm thấy câu lạc bộ này." });
             return;
         }
-
         let members = club.members
         members.push(club.leader)
         members.push(club.treasurer)
@@ -22,7 +21,7 @@ module.exports.getPointsOfClub = async (req, res) => {
                     from: "users", // name of the foreign collection
                     localField: "user",
                     foreignField: "_id",
-                    as: "user-data"
+                    as: "user-data",
                 }
             },
             {
@@ -32,7 +31,7 @@ module.exports.getPointsOfClub = async (req, res) => {
                         $gte: new Date(startDate),
                         $lte: new Date(endDate)
                     },
-                    user: justCurrentMember === "true" ? { $in: members } : { $ne: ''}
+                    user: justCurrentMember === "true" ? { $in: members } : { $ne: '' },
                 },
             },
             {
@@ -75,6 +74,13 @@ module.exports.getPointsOfClub = async (req, res) => {
                 })
             })
         }
+        // search
+        const searchValue = search !== undefined ? search : '';
+        clonePoints = clonePoints.filter((point) => {
+            return point.data.username.includes(searchValue)
+                || point.data.name.includes(searchValue)
+                || point.data.email.includes(searchValue)
+        })
         res.send(clonePoints)
     } catch (err) {
         res.status(500).send({ error: err.message });
@@ -114,7 +120,7 @@ module.exports.getPointsOfMember = async (req, res) => {
     }
 }
 
-module.exports.reportOfClub = (req, res) => { 
+module.exports.reportOfClub = (req, res) => {
     const clubId = req.params.clubId;
     const { startDate, endDate } = req.query
 };
@@ -137,6 +143,33 @@ module.exports.createPointOfClub = async (req, res) => {
         });
         await point.save();
         res.send(point);
+    } catch (err) {
+        res.status(400).send({ error: err.message });
+    }
+};
+
+module.exports.createMultiPointsOfClub = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { title, value, author, users } = req.body;
+    try {
+        const club = await Club.findById(clubId);
+        if (club === null) {
+            res.status(404).send({ error: "Không tìm thấy câu lạc bộ này." });
+            return;
+        }
+
+        let pointArr = [];
+        users.map((uid) => {
+            pointArr.push({
+                club: clubId,
+                title,
+                value,
+                author,
+                user: uid,
+            });
+        });
+        const result = await Point.insertMany(pointArr);
+        res.status(200).send(result);
     } catch (err) {
         res.status(400).send({ error: err.message });
     }

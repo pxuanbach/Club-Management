@@ -161,6 +161,10 @@ module.exports.updateStatus = async (req, res) => {
       res.status(400).send({ error: err.message });
       return;
     }
+    if (doc.status === 2) {
+      res.status(400).send({ error: "Lời mời này đã bị hủy!" });
+      return;
+    }
     doc.status = status;
     if (status === 1) {
       // Accept

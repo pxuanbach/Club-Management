@@ -159,6 +159,11 @@ module.exports.updateStatus = async (req, res) => {
   // console.log("updateStatus", status)
   try {
     let activityRequest = await ActivityRequest.findById(requestId);
+
+    if (activityRequest.status === 2) {
+      res.status(400).send({ error: "Lời mời này đã bị hủy!" });
+      return;
+    }
     activityRequest.status = status;
     if (status === 1) {
       // Accept

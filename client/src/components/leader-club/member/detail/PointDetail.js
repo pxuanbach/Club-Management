@@ -33,7 +33,7 @@ const PointDetail = ({
     const columns = [
         {
             field: "title",
-            headerName: "Tiêu đề",
+            headerName: "Nội dung",
             flex: 1.2,
         },
         {
