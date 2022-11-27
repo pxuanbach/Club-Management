@@ -190,7 +190,7 @@ module.exports.getMembersJoinLogs = async (req, res) => {
         type: { $in: logType },
         content: member._id,
         club: clubId,
-      }).sort({createdAt: 1});
+      }).sort({createdAt: -1});
       if (log.length > 0) {
         member.dateJoin = log[0].createdAt
       }

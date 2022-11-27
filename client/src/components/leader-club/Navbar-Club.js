@@ -83,6 +83,14 @@ const NavbarClub = ({ club }) => {
                             Lời mời
                         </Link>
                     </Tooltip> : <></>}
+                    <Tooltip title="Nhật ký câu lạc bộ" placement="left-start">
+                        <Link
+                            to={`/club/${club_id}/${club_name}/log`}
+                            className={pathName === 'log' ? 'navclub-selected' : ''}>
+                            <i class="fa-solid fa-book"></i>
+                            Nhật ký
+                        </Link>
+                    </Tooltip>
 
                 </div>
             </div>) : (<></>)}

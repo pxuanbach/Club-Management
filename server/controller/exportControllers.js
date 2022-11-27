@@ -4,6 +4,7 @@ const Club = require('../models/Club')
 const User = require('../models/User')
 const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
+const ClubLog = require('../models/ClubLog')
 
 const convertClubsToExport = (clubs) => {
     let dataArr = []
@@ -60,6 +61,21 @@ const converActivityToExport = (activity) => {
     ]
 }
 
+const converLogToExport = (logs) => {
+    let dataArr = []
+    logs.forEach(log => {
+        const data = {
+            "Thời gian": log.createdAt,
+            "Nội dung": log.content._id !== undefined ?
+                log.content.username + " - " + log.content.name + " " + log.mean.toLowerCase()
+                : log.mean,
+        }
+        //console.log(data)
+        dataArr.push(data)
+    })
+
+    return dataArr;
+}
 
 module.exports.exportClubs = async (req, res) => {
     const excelOutput = Date.now() + "clubs.xlsx";
@@ -131,7 +147,7 @@ module.exports.exportActivity = async (req, res) => {
     xlsx.utils.book_append_sheet(wb, activityWS, "Hoạt động");
     xlsx.utils.book_append_sheet(wb, membersWS, "Thành viên");
     xlsx.utils.book_append_sheet(wb, collaboratorsWS, "Cộng tác viên");
-    
+
     var excelBinary = xlsx.write(wb, { bookType: 'xlsx', type: 'binary' })
 
     fs.writeFileSync(excelOutput, excelBinary, 'binary')
@@ -143,4 +159,51 @@ module.exports.exportActivity = async (req, res) => {
         }
         fs.unlinkSync(excelOutput);
     })
+}
+
+module.exports.exportClubLogs = async (req, res) => {
+    const clubId = req.params.clubId
+    try {
+        const excelOutput = Date.now().toString() + "clublogs.xlsx";
+        const club = await Club.findById(clubId)
+        if (club === undefined || club === null) {
+            res.status(404).send({ error: "Không tìm thấy câu lạc bộ này." })
+            return
+        }
+        const logs = await ClubLog.find({ club: clubId })
+            .sort({ createdAt: 1 });
+        const cloneLogs = JSON.parse(JSON.stringify(logs));
+        const promises = cloneLogs.map(async (log) => {
+            if (
+                ["member_join", "promote_leader", "promote_treasurer", "member_out"].includes(
+                    log.type
+                )
+            ) {
+                const user = await User.findById(log.content);
+                log.content = user;
+                return log;
+            }
+            return log;
+        });
+        const result = await Promise.all(promises);
+        console.log(result)
+        var logWS = xlsx.utils.json_to_sheet(converLogToExport(result));
+        var wb = xlsx.utils.book_new();
+
+        xlsx.utils.book_append_sheet(wb, logWS, "Nhật ký");
+
+        var excelBinary = xlsx.write(wb, { bookType: 'xlsx', type: 'binary' })
+
+        fs.writeFileSync(excelOutput, excelBinary, 'binary')
+
+        res.download(excelOutput, (err) => {
+            if (err) {
+                fs.unlinkSync(excelOutput);
+                res.status(400).send({ error: "Không thể tải tệp excel" })
+            }
+            fs.unlinkSync(excelOutput);
+        })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }

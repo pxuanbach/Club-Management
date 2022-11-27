@@ -7,6 +7,7 @@ import Member from "../leader-club/member/Member";
 import Message from "../leader-club/message/Message";
 import Fund from "../leader-club/fund/Fund";
 import Notification from "../leader-club/invite/Notification";
+import ClubLog from '../log/ClubLog'
 import NavbarClub from "../leader-club/Navbar-Club";
 import axiosInstance from "../../helper/Axios";
 import "./Club.css";
@@ -60,6 +61,9 @@ const Club = () => {
               </Route>
               <Route path={`/club/${club_id}/${club_name}/invite`}>
                 <Notification club={club} />
+              </Route>
+              <Route path={`/club/${club_id}/${club_name}/log`}>
+                <ClubLog club={club} />
               </Route>
             </Switch>
           </div>
