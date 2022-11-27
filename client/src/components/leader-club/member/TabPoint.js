@@ -21,6 +21,7 @@ import PointDetail from "./detail/PointDetail";
 import AddPoints from "./AddPoints";
 import "./TabMember.css";
 import SeverityOptions from '../../../helper/SeverityOptions'
+import FileDownload from 'js-file-download';
 import moment from "moment";
 
 const CustomTextField = styled(TextField)({
@@ -72,6 +73,27 @@ const TabPoint = ({ club }) => {
   const handleChangeSearch = (event) => {
     setSearch(event.target.value);
   };
+
+  const exportMemberPointsFile = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axiosInstance.get(`/export/memberpoints/${club._id}/${user._id}`, {
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          justCurrentMember: justCurrentMember ? "true" : "false",
+        },
+        headers: { "Content-Type": "application/vnd.ms-excel" },
+        responseType: 'blob'
+      });
+      const data = res.data;
+      if (data) {
+        FileDownload(data, Date.now() + `-diem_thanhvien_${club.name}.xlsx`)
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const handleSearchMembers = async (event) => {
     event.preventDefault();
@@ -210,8 +232,9 @@ const TabPoint = ({ club }) => {
       >
         <Box sx={style}>
           <PointDetail
+            user={user}
             club={club}
-            membersSelected={memberSelected}
+            memberSelected={memberSelected}
             startDate={startDate}
             endDate={endDate}
             setShowFormDetail={setShowFormDetail}
@@ -327,7 +350,7 @@ const TabPoint = ({ club }) => {
                   console.log(membersSelected)
                   setShowFormAdd(true)
                 }}
-                variant={haveSelected ? "outlined" : "contained" }
+                variant={haveSelected ? "outlined" : "contained"}
                 disableElevation
                 startIcon={<i class="fa-solid fa-plus"></i>}
                 style={{
@@ -337,7 +360,7 @@ const TabPoint = ({ club }) => {
                 Phiếu điểm
               </Button>
               <Button
-                onClick={() => { }}
+                onClick={exportMemberPointsFile}
                 style={{ background: "#1B264D" }}
                 variant="contained"
                 disableElevation

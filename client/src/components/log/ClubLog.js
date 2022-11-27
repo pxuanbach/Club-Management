@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Stack, Button } from "@mui/material";
 import axiosInstance from "../../helper/Axios";
 import STB from "react-scroll-to-bottom";
 import moment from "moment";
 import FileDownload from 'js-file-download';
+import { UserContext } from "../../UserContext";
 
 const ClubLog = ({ club }) => {
+    const { user } = useContext(UserContext)
     const [logs, setLogs] = useState([]);
     const space = 1.5
 
     const exportLogsFile = async (e) => {
         e.preventDefault()
         try {
-            const res = await axiosInstance.get(`/export/log/${club._id}`, {
+            const res = await axiosInstance.get(`/export/log/${club._id}/${user._id}`, {
                 headers: { "Content-Type": "application/vnd.ms-excel" },
                 responseType: 'blob'
             });

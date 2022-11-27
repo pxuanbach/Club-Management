@@ -18,6 +18,7 @@ import AddMembers from "./AddMembers";
 import axiosInstance from "../../../helper/Axios";
 import CustomDialog from "../../dialog/CustomDialog";
 import moment from 'moment'
+import FileDownload from 'js-file-download';
 import "./TabMember.css";
 
 const CustomTextField = styled(TextField)({
@@ -81,6 +82,22 @@ const TabMember = ({ club }) => {
   const handleChangeSearch = (event) => {
     setSearch(event.target.value);
   };
+
+  const exportMembersFile = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axiosInstance.get(`/export/members/${club._id}/${user._id}`, {
+        headers: { "Content-Type": "application/vnd.ms-excel" },
+        responseType: 'blob'
+      });
+      const data = res.data;
+      if (data) {
+        FileDownload(data, Date.now() + `-thanhvien_${club.name}.xlsx`)
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const handleSearchMembers = async (event) => {
     event.preventDefault();
@@ -257,13 +274,22 @@ const TabMember = ({ club }) => {
                 <Button
                   disabled={haveSelected}
                   onClick={() => setOpenDialog(true)}
-                  variant={haveSelected ? "outlined" : "contained" }
+                  variant={haveSelected ? "outlined" : "contained"}
                   disableElevation
                   style={{
                     background: haveSelected ? "transparent" : "#1B264D",
                   }}
                 >
                   Đuổi thành viên
+                </Button>
+                <Button
+                  onClick={exportMembersFile}
+                  style={{ background: "#1B264D" }}
+                  variant="contained"
+                  disableElevation
+                  startIcon={<i class="fa-solid fa-file-export"></i>}
+                >
+                  Xuất file
                 </Button>
               </div>
             ) : (
