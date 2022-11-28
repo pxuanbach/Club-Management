@@ -69,17 +69,15 @@ const convertUsersToExport = (users) => {
 };
 
 const converActivityToExport = (activity) => {
-    return [
-        {
-            Mã: activity._id.toString(),
-            "Tên hoạt động": activity.title,
-            "Tạo ngày": moment(activity.createdAt).format("DD/MM/YYYY HH:mm:ss"),
-            "Ngày bắt đầu": moment(activity.startDate).format("DD/MM/YYYY HH:mm:ss"),
-            "Ngày kết thúc": moment(activity.endDate).format("DD/MM/YYYY HH:mm:ss"),
-            "Mã câu lạc bộ": activity.club._id.toString(),
-            "Câu lạc bộ": activity.club.name,
-        },
-    ];
+    let obj = {
+        "Mã hoạt động": activity._id.toString(),
+        "Tên hoạt động": activity.title,
+        "Tạo ngày": moment(activity.createdAt).format("DD/MM/YYYY HH:mm:ss"),
+        "Ngày bắt đầu": moment(activity.startDate).format("DD/MM/YYYY HH:mm:ss"),
+        "Ngày kết thúc": moment(activity.endDate).format("DD/MM/YYYY HH:mm:ss"),
+    }
+
+    return Object.entries(obj).map(([key, value]) => ({ key, value }));
 };
 
 const converLogsToExport = (logs) => {
@@ -129,9 +127,12 @@ const converPointsToExport = (points) => {
         const data = {
             "Mã thành viên": point._id.toString(),
             "Mã sinh viên": point.data.username,
-            Tên: point.data.name,
-            Email: point.data.email,
-            Điểm: point.point,
+            "Tên": point.data.name,
+            "Giới tính": point.data.gender,
+            "Email": point.data.email,
+            "Số điện thoại": point.data.phone,
+            "Facebook": point.data.facebook,
+            "Điểm": point.point,
         };
         //console.log(data)
         dataArr.push(data);

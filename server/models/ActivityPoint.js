@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-const pointSchema = new mongoose.Schema({
+const activityPointSchema = new mongoose.Schema({
     title: String,
-    club: {
+    activity: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'club',
+        ref: 'activities',
         required: true
     },
     value: {
@@ -22,5 +22,5 @@ const pointSchema = new mongoose.Schema({
     },
 }, {timestamps: true})
 
-const Point = mongoose.model('points', pointSchema)
-module.exports = Point;
+const ActivityPoint = mongoose.model('activityPoints', activityPointSchema)
+module.exports = ActivityPoint;
