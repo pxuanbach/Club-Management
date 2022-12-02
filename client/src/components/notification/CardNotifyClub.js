@@ -1,45 +1,54 @@
 import React from "react";
 import { Avatar, Stack, Button } from "@mui/material";
 import axiosInstance from "../../helper/Axios";
+import SeverityOptions from '../../helper/SeverityOptions'
 import moment from 'moment'
 
-const CardNotifyClub = ({ data, notificates, setNotificates }) => {
+const CardNotifyClub = ({ data, notificates, setNotificates, showSnackbar }) => {
     const cancelNotification = async (e) => {
         e.preventDefault();
-        let res = await axiosInstance.patch(
-            `request/club/${data._id}`,
-            JSON.stringify({ status: 2 }),
-            { headers: { "Content-Type": "application/json" } }
-        );
-        const updateNotificates = notificates.map((elm) => {
-            if (elm._id === res.data._id) {
-                return {
-                    ...elm,
-                    status: res.data.status,
-                };
-            }
-            return elm;
-        });
-        setNotificates(updateNotificates);
+        try {
+            let res = await axiosInstance.patch(
+                `request/club/${data._id}`,
+                JSON.stringify({ status: 2 }),
+                { headers: { "Content-Type": "application/json" } }
+            );
+            const updateNotificates = notificates.map((elm) => {
+                if (elm._id === res.data._id) {
+                    return {
+                        ...elm,
+                        status: res.data.status,
+                    };
+                }
+                return elm;
+            });
+            setNotificates(updateNotificates);
+        } catch (err) {
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        }
     };
 
     const acceptNotification = async (e) => {
         e.preventDefault();
-        let res = await axiosInstance.patch(
-            `request/club/${data._id}`,
-            JSON.stringify({ status: 1 }),
-            { headers: { "Content-Type": "application/json" } }
-        );
-        const updateNotificates = notificates.map((elm) => {
-            if (elm._id === res.data._id) {
-                return {
-                    ...elm,
-                    status: res.data.status,
-                };
-            }
-            return elm;
-        });
-        setNotificates(updateNotificates);
+        try {
+            const res = await axiosInstance.patch(
+                `request/club/${data._id}`,
+                JSON.stringify({ status: 1 }),
+                { headers: { "Content-Type": "application/json" } }
+            );
+            const updateNotificates = notificates.map((elm) => {
+                if (elm._id === res.data._id) {
+                    return {
+                        ...elm,
+                        status: res.data.status,
+                    };
+                }
+                return elm;
+            });
+            setNotificates(updateNotificates);
+        } catch (err) {
+            showSnackbar(err.response.data.error, SeverityOptions.error)
+        }
     }
 
     const renderTypeAskButtonByStatus = () => {
@@ -131,7 +140,7 @@ const CardNotifyClub = ({ data, notificates, setNotificates }) => {
                         <span>
                             Bạn yêu cầu tham gia câu lạc bộ <b>{data?.club?.name}</b>
                         </span>
-                        <p style={{fontSize: '13px', opacity: '80%'}}>{moment(data?.createdAt).fromNow()}</p>
+                        <p style={{ fontSize: '13px', opacity: '80%' }}>{moment(data?.createdAt).fromNow()}</p>
                         {renderTypeAskButtonByStatus()}
                     </Stack>
                 ) : (
@@ -139,7 +148,7 @@ const CardNotifyClub = ({ data, notificates, setNotificates }) => {
                         <span>
                             Câu lạc bộ <b>{data?.club?.name}</b> mời bạn tham gia
                         </span>
-                        <p style={{fontSize: '13px', opacity: '80%'}}>{moment(data?.createdAt).fromNow()}</p>
+                        <p style={{ fontSize: '13px', opacity: '80%' }}>{moment(data?.createdAt).fromNow()}</p>
                         {renderTypeInviteButtonByStatus()}
                     </Stack>
                 )}

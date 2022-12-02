@@ -4,11 +4,13 @@ import { DataGrid } from "@mui/x-data-grid";
 import axiosInstance from "../../../../helper/Axios";
 import RangeDatePicker from "../../activity/utilities/RangeDatePicker";
 import UserCard from '../../../card/UserCard';
-import moment from 'moment'
+import moment from 'moment';
+import FileDownload from 'js-file-download';
 
 const PointDetail = ({
+    user,
     club,
-    membersSelected,
+    memberSelected,
     startDate,
     endDate,
     setShowFormDetail,
@@ -33,7 +35,7 @@ const PointDetail = ({
     const columns = [
         {
             field: "title",
-            headerName: "Tiêu đề",
+            headerName: "Nội dung",
             flex: 1.2,
         },
         {
@@ -73,9 +75,31 @@ const PointDetail = ({
         setShowFormDetail(false);
     };
 
+    const exportPointDetailFile = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axiosInstance.get(
+                `/export/points/${club._id}/${user._id}/user/${memberSelected._id}`,
+                {
+                    params: {
+                        startDate: sDate,
+                        endDate: eDate
+                    },
+                    headers: { "Content-Type": "application/vnd.ms-excel" },
+                    responseType: 'blob'
+                });
+            const data = res.data;
+            if (data) {
+                FileDownload(data, Date.now() + `-diem_${memberSelected.data.name}.xlsx`)
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     const getPoints = async () => {
         const res = await axiosInstance.get(
-            `/point/club/${club._id}/user/${membersSelected._id}`,
+            `/point/club/${club._id}/user/${memberSelected._id}`,
             {
                 params: {
                     startDate: sDate,
@@ -113,31 +137,42 @@ const PointDetail = ({
             <Stack direction="column" spacing={2}>
                 <Stack direction="row" spacing={1} justifyContent='space-between' alignItems='center'>
                     <h2>Bảng điểm chi tiết</h2>
-                    <div>
+                    <Stack direction="row" spacing={1} alignItems='center'>
                         <RangeDatePicker
                             startDate={sDate}
                             setStartDate={setSDate}
                             endDate={eDate}
                             setEndDate={setEDate}
                         />
-                    </div>
+                        <div>
+                            <Button
+                                onClick={exportPointDetailFile}
+                                sx={{ background: "#1B264D", minWidth: '140px', marginTop: 0.5 }}
+                                variant="contained"
+                                disableElevation
+                                startIcon={<i class="fa-solid fa-file-export"></i>}
+                            >
+                                Xuất file
+                            </Button>
+                        </div>
+                    </Stack>
                 </Stack>
                 <div
                     className="member-selected"
                     style={{ display: "flex", justifyContent: "space-between" }}
                 >
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Avatar src={membersSelected.data.img_url} />
+                        <Avatar src={memberSelected.data.img_url} />
                         <Stack direction="column" spacing={0.6}>
                             <h3>
-                                {membersSelected.data.name} - {membersSelected.data.username}
+                                {memberSelected.data.name} - {memberSelected.data.username}
                             </h3>
-                            <span>{membersSelected.data.email}</span>
+                            <span>{memberSelected.data.email}</span>
                         </Stack>
                     </Stack>
 
                     <div style={{ display: "flex", justifySelf: "flex-end" }}>
-                        <h3>Tổng điểm: {totalPoint ? totalPoint : membersSelected.point}</h3>
+                        <h3>Tổng điểm: {totalPoint ? totalPoint : memberSelected.point}</h3>
                     </div>
                 </div>
                 <div

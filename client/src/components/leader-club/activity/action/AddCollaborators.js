@@ -175,12 +175,12 @@ const AddCollaborators = ({ setShow, activity, showSnackbar, user }) => {
                 </Tooltip>
             </div>
             <div className='members__body'>
-                <DataGrid sx={{ height: 52 * 4 + 56 + 55 }}
+                <DataGrid sx={{ height: 52 * 5 + 56 + 55 }}
                     checkboxSelection
                     getRowId={(r) => r._id}
                     rows={users}
                     columns={columns}
-                    pageSize={4}
+                    pageSize={5}
                     onSelectionModelChange={setUsersSelected}
                     selectionModel={usersSelected}
                 />

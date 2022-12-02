@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Stack } from "@mui/material";
 import NavTabs from "./Tab-Notification";
 
 const Notification = () => {
   return (
-    <Box sx={{ width: "100%", height: '100vh'}}>
+    <Box sx={{ width: "100%", height: '100vh' }}>
       <Stack direction="column"
-       spacing={1}
+        spacing={1}
         sx={{
           width: "50%",
           minWidth: '600px',
@@ -18,7 +18,7 @@ const Notification = () => {
         }}
       >
         <h1>Lời mời</h1>
-        <NavTabs />
+        <NavTabs/>
       </Stack>
     </Box>
   );

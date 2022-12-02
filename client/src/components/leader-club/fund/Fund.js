@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react'
 import {
   Modal, Button, Tooltip, Box, TextField, styled,
-  Alert, Snackbar, CircularProgress
+  Alert, Snackbar, CircularProgress, Stack, FormControlLabel,
+  Checkbox
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { UserContext } from '../../../UserContext';
 import AddFund from './AddFund';
 import PaymentList from "./PaymentList"
 import NumberFormat from 'react-number-format';
-import { Buffer } from 'buffer';
 import axiosInstance from '../../../helper/Axios';
+import FileDownload from 'js-file-download';
+import RangeDatePicker from "../activity/utilities/RangeDatePicker";
+import moment from "moment";
 import "./Fund.css"
 import "../../../assets/css/grid.css"
 import '../../manage/Mng.css'
@@ -40,39 +43,48 @@ const Fund = ({ club_id }) => {
   let isTreasurer = false;
   const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState('');
   const [club, setClub] = useState();
   const [fundHistorys, setFundHistorys] = useState([])
   const [showFormAddFund, setShowFormAddFund] = useState(false);
-  const [collectInMonth, setCollectInMonth] = useState(0);
-  const [payInMonth, setPayInMonth] = useState(0);
+  const [collect, setCollect] = useState(0);
+  const [pay, setPay] = useState(0);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [applyFilter, setApplyFilter] = useState(true);
+  const [startDate, setStartDate] = useState(
+    new Date(moment().startOf("month"))
+  );
+  const [endDate, setEndDate] = useState(new Date(moment().endOf("month")));
 
   const handleChangeSearch = (event) => {
     setSearch(event.target.value)
   }
 
-  const handleSearchFund = (e) => {
-    e.preventDefault();
-    if (search) {
-      const encodedSearch = new Buffer(search).toString('base64');
-      axiosInstance.get(`/fund/search/${club_id}/${encodedSearch}`)
-        .then(response => {
-          //response.data
-          setFundHistorys(response.data)
-        }).catch(err => {
-          //err.response.data.error
-          showSnackbar(err.response.data.error)
-        })
-    } else {
-      getFundHistories()
-    }
-  }
-
   const showSnackbar = (message) => {
     setAlertMessage(message)
     setOpenSnackbar(true);
+  }
+
+  const exportFundFile = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axiosInstance.get(`/export/fund/${club._id}/${user._id}`, {
+        params: {
+          applyFilter: applyFilter,
+          startDate: startDate,
+          endDate: endDate,
+        },
+        headers: { "Content-Type": "application/vnd.ms-excel" },
+        responseType: 'blob'
+      });
+      const data = res.data;
+      if (data) {
+        FileDownload(data, Date.now() + `-quy_${club.name}.xlsx`)
+      }
+    } catch (err) {
+      showSnackbar(err.response.data.error)
+    }
   }
 
   const fundHistoryCreated = (data) => {
@@ -81,24 +93,11 @@ const Fund = ({ club_id }) => {
       fund: data.fund
     }))
     if (data.fundHistory.type === 'Thu') {
-      setCollectInMonth(collectInMonth + data.fundHistory.total)
+      setCollect(collect + data.fundHistory.total)
     } else {
-      setPayInMonth(payInMonth + data.fundHistory.total)
+      setPay(pay + data.fundHistory.total)
     }
     setFundHistorys([...fundHistorys, data.fundHistory])
-  }
-
-  const getColPayInMonth = (club_id) => {
-    axiosInstance.get(`/fund/colpayinmonth/${club_id}`)
-      .then(response => {
-        //response.data
-        console.log(response.data)
-        setCollectInMonth(response.data.collect)
-        setPayInMonth(response.data.pay)
-      }).catch(err => {
-        //err.response.data.error
-        showSnackbar(err.response.data.error)
-      })
   }
 
   const getClub = (club_id) => {
@@ -113,11 +112,22 @@ const Fund = ({ club_id }) => {
       })
   }
 
-  const getFundHistories = () => {
-    axiosInstance.get(`/fund/list/${club_id}`)
+  const getFundHistories = async () => {
+    axiosInstance.get(`/fund/list/${club_id}`, {
+      params: {
+        applyFilter: applyFilter,
+        startDate: startDate,
+        endDate: endDate,
+        search: search
+      },
+      headers: { "Content-Type": "application/json" }
+    })
       .then(response => {
         //response.data
-        setFundHistorys(response.data)
+        console.log(response.data)
+        setFundHistorys(response.data.funds)
+        setCollect(response.data.collect)
+        setPay(response.data.pay)
       }).catch(err => {
         //err.response.data.error
         showSnackbar(err.response.data.error)
@@ -125,11 +135,14 @@ const Fund = ({ club_id }) => {
   }
 
   useEffect(() => {
-    console.log(club_id)
+    // console.log(club_id)
     getClub(club_id)
-    getColPayInMonth(club_id)
     getFundHistories()
   }, [])
+
+  useEffect(() => {
+    getFundHistories()
+  }, [applyFilter, startDate, endDate])
 
   if (user) {
     isTreasurer = user._id === club?.treasurer._id
@@ -173,17 +186,43 @@ const Fund = ({ club_id }) => {
                 <h2 className='title-header'>Tổng quan</h2>
                 <div className="dashboard-overview">
                   <div className="dashboard-overview-row">
+                    <div>
+                      <Stack direction="column" spacing={1}>
+                        <FormControlLabel
+                          sx={{ minWidth: 'max-content' }}
+                          control={
+                            <Checkbox
+                              checked={applyFilter}
+                              onChange={(e) => setApplyFilter(e.target.checked)}
+                            />
+                          }
+                          label="Áp dụng bộ lọc"
+                        />
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          spacing={1}
+                          sx={{ width: 'max-content' }}
+                        >
+                          <h3>Lọc</h3>
+                          <RangeDatePicker
+                            textCenter="-"
+                            startDate={startDate}
+                            setStartDate={setStartDate}
+                            endDate={endDate}
+                            setEndDate={setEndDate}
+                          />
+                        </Stack>
+                      </Stack>
+                    </div>
                     <div className="dashboard-overview-row-cell">
                       <div className='status-card'>
-                        <div className='status-card_icon'>
-                          {/* <PaidIcon /> */}
-                        </div>
                         <div className='status-card_info'>
                           <h4>Tổng quỹ</h4>
                           <h3>
                             <NumberFormat
                               displayType='text'
-                              value={club.fund}
+                              value={collect - pay}
                               thousandSeparator="."
                               decimalSeparator=","
                             />
@@ -193,15 +232,12 @@ const Fund = ({ club_id }) => {
                     </div>
                     <div className="dashboard-overview-row-cell">
                       <div className='status-card'>
-                        <div className='status-card_icon'>
-
-                        </div>
                         <div className='status-card_info'>
-                          <h4>{"Tiền thu tháng " + (date.getMonth() + 1)}</h4>
+                          <h4>{"Tiền thu"}</h4>
                           <h3>
                             <NumberFormat
                               displayType='text'
-                              value={collectInMonth}
+                              value={collect}
                               thousandSeparator="."
                               decimalSeparator=","
                             />
@@ -211,15 +247,12 @@ const Fund = ({ club_id }) => {
                     </div>
                     <div className="dashboard-overview-row-cell">
                       <div className='status-card'>
-                        <div className='status-card_icon'>
-
-                        </div>
                         <div className='status-card_info'>
-                          <h4>{"Tiền chi tháng " + (date.getMonth() + 1)}</h4>
+                          <h4>{"Tiền chi"}</h4>
                           <h3>
                             <NumberFormat
                               displayType='text'
-                              value={payInMonth}
+                              value={pay}
                               thousandSeparator="."
                               decimalSeparator=","
                             />
@@ -246,7 +279,7 @@ const Fund = ({ club_id }) => {
                         id="search-field-tabmember"
                         label="Tìm kiếm phiếu thu/chi"
                         variant="standard"
-                        onKeyPress={event => event.key === 'Enter' ? handleSearchFund(event) : null}
+                        onKeyPress={event => event.key === 'Enter' ? getFundHistories() : null}
                       />
                     </Box>
                     <Tooltip title='Tìm kiếm' placement='right-start'>
@@ -254,22 +287,32 @@ const Fund = ({ club_id }) => {
                         className='btn-search3'
                         variant="text"
                         disableElevation
-                        onClick={handleSearchFund}
+                        onClick={getFundHistories}
                       >
                         <SearchIcon sx={{ color: '#1B264D' }} />
                       </Button>
                     </Tooltip>
                     {isTreasurer ?
-                      (<Button
-                        onClick={() => {
-                          setShowFormAddFund(true)
-                        }}
-                        className='btn-add-tabmember'
-                        variant="contained"
-                        disableElevation
-                        style={{ background: '#1B264D' }}>
-                        Thêm phiếu
-                      </Button>) : <></>}
+                      <Stack direction="row" spacing={0.6}>
+                        <Button
+                          onClick={() => {
+                            setShowFormAddFund(true)
+                          }}
+                          variant="contained"
+                          disableElevation
+                          style={{ background: '#1B264D' }}>
+                          Thêm phiếu
+                        </Button>
+                        <Button
+                          onClick={exportFundFile}
+                          style={{ background: "#1B264D", minWidth: '140px' }}
+                          variant="contained"
+                          disableElevation
+                          startIcon={<i class="fa-solid fa-file-export"></i>}
+                        >
+                          Xuất file
+                        </Button>
+                      </Stack> : <></>}
                   </div>
                 </div>
                 <div className='table-paymentlist'>

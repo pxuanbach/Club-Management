@@ -2,6 +2,7 @@ const Activity = require('../models/Activity')
 const ActivityCard = require('../models/ActivityCard')
 const ActivityRequest = require('../models/ActivityRequest')
 const Point = require('../models/Point')
+const ActivityPoint = require('../models/ActivityPoint')
 const User = require('../models/User')
 const Group = require('../models/Group')
 const cloudinary = require('../helper/Cloudinary')
@@ -9,6 +10,7 @@ const fs = require('fs');
 const async = require('async')
 const Buffer = require('buffer').Buffer
 const moment = require('moment')
+const mongoose = require('mongoose')
 const { isElementInArray, isElementInArrayObject, notContainsNullArray, uniqueArray } = require('../helper/ArrayHelper')
 
 function isUserJoined(userId, card) {
@@ -34,13 +36,28 @@ function isGroupJoined(groupId, card) {
     return false;
 }
 
-function getAllUsersInCard(card) {
-    let users = card.userJoin   // array
-    
-    card.groupJoin.forEach((group) => {
-        users.push(...group.members)
+function getAllMembersInCard(card, members) {
+    let membersInCard = []
+    card.userJoin.forEach((user) => {
+        if (isElementInArray(user, members)) {
+            membersInCard.push(user)
+        }
     })
-    return uniqueArray(users)
+
+    card.groupJoin.forEach((group) => {
+        membersInCard.push(...group.members)
+    })
+    return uniqueArray(membersInCard)
+}
+
+function getAllCollaboratorsInCard(card, collaborators) {
+    let collaboratorsInCard = []
+    card.userJoin.forEach((user) => {
+        if (isElementInArray(user, collaborators)) {
+            collaboratorsInCard.push(user)
+        }
+    })
+    return uniqueArray(collaboratorsInCard)
 }
 
 async function uploadFile(files, public_id) {
@@ -606,9 +623,11 @@ module.exports.sumary = async (req, res) => {
 
         const promises = cards.map(async (card) => {
             let pointArr = []
-            const allUsersOfCard = getAllUsersInCard(card)
+            let activityPointArr = []
+            const allMembersInCard = getAllMembersInCard(card, members)
+            const allCollaboratorsInCard = getAllCollaboratorsInCard(card, activity.collaborators)
             // console.log("ALL", allUsersOfCard)
-            allUsersOfCard.forEach(async (userId) => {
+            allMembersInCard.forEach(async (userId) => {
                 const point = {
                     title: `${activity.title} - ${card.title}`,
                     club: activity.club._id,
@@ -616,9 +635,28 @@ module.exports.sumary = async (req, res) => {
                     author: author,
                     user: userId
                 }
+                const activityPoint = {
+                    title: `${activity.title} - ${card.title}`,
+                    activity: activity._id,
+                    value: card.pointValue,
+                    author: author,
+                    user: userId
+                }
                 pointArr.push(point)
+                activityPointArr.push(point)
+            })
+            allCollaboratorsInCard.forEach(async (userId) => {
+                const point = {
+                    title: `${activity.title} - ${card.title}`,
+                    activity: activity._id,
+                    value: card.pointValue,
+                    author: author,
+                    user: userId
+                }
+                activityPointArr.push(point)
             })
             const points = await Point.insertMany(pointArr)
+            const activityPoints = await ActivityPoint.insertMany(activityPointArr)
             return points
         })
         const result = await Promise.all(promises)

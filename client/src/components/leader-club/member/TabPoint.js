@@ -15,11 +15,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { styled } from "@mui/material/styles";
 import { UserContext } from "../../../UserContext";
-import { Buffer } from "buffer";
 import RangeDatePicker from "../activity/utilities/RangeDatePicker";
 import axiosInstance from "../../../helper/Axios";
 import PointDetail from "./detail/PointDetail";
+import AddPoints from "./AddPoints";
 import "./TabMember.css";
+import SeverityOptions from '../../../helper/SeverityOptions'
+import FileDownload from 'js-file-download';
 import moment from "moment";
 
 const CustomTextField = styled(TextField)({
@@ -47,7 +49,8 @@ const TabPoint = ({ club }) => {
   let isLeader = false;
   const { user, setUser } = useContext(UserContext);
   const [showFormDetail, setShowFormDetail] = useState(false);
-  const [search, setSearch] = useState();
+  const [showFormAdd, setShowFormAdd] = useState(false);
+  const [search, setSearch] = useState('');
   const [members, setMembers] = useState([]);
   const [memberSelected, setMemberSelected] = useState();
   const [membersSelected, setMembersSelected] = useState([]);
@@ -59,6 +62,7 @@ const TabPoint = ({ club }) => {
   );
   const [endDate, setEndDate] = useState(new Date(moment().endOf("month")));
   const [justCurrentMember, setJustCurrentMember] = useState(true);
+  let haveSelected = membersSelected.length <= 0;
 
   const showSnackbar = (message, options) => {
     setOptions(options);
@@ -70,13 +74,41 @@ const TabPoint = ({ club }) => {
     setSearch(event.target.value);
   };
 
+  const exportMemberPointsFile = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axiosInstance.get(`/export/memberpoints/${club._id}/${user._id}`, {
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          justCurrentMember: justCurrentMember ? "true" : "false",
+        },
+        headers: { "Content-Type": "application/vnd.ms-excel" },
+        responseType: 'blob'
+      });
+      const data = res.data;
+      if (data) {
+        FileDownload(data, Date.now() + `-diem_thanhvien_${club.name}.xlsx`)
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const handleSearchMembers = async (event) => {
     event.preventDefault();
     setMembersSelected([]);
     if (search) {
-      const encodedSearch = new Buffer(search).toString("base64");
       const res = await axiosInstance.get(
-        `/club/searchmembers/${club._id}/${encodedSearch}`
+        `/point/club/${club._id}`,
+        {
+          params: {
+            startDate: startDate,
+            endDate: endDate,
+            justCurrentMember: justCurrentMember ? "true" : "false",
+            search: search
+          }
+        }
       );
 
       const data = res.data;
@@ -84,7 +116,7 @@ const TabPoint = ({ club }) => {
         setMembers(data);
       }
     } else {
-      getMembers();
+      getMemberPoints();
     }
   };
 
@@ -94,26 +126,30 @@ const TabPoint = ({ club }) => {
     setShowFormDetail(true);
   };
 
-  const getMembers = async () => {
-    const res = await axiosInstance.get(`/point/club/${club._id}`, {
-      params: {
-        startDate: startDate,
-        endDate: endDate,
-        justCurrentMember: justCurrentMember ? "true" : "false"
-      },
-    });
-    const data = res.data;
-    if (data) {
-      setMembers(data);
+  const getMemberPoints = async () => {
+    try {
+      const res = await axiosInstance.get(`/point/club/${club._id}`, {
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          justCurrentMember: justCurrentMember ? "true" : "false"
+        },
+      });
+      const data = res.data;
+      if (data) {
+        setMembers(data);
+      }
+    } catch (err) {
+      showSnackbar(err.response.data.error, SeverityOptions.error)
     }
   };
 
   useEffect(() => {
-    getMembers();
+    getMemberPoints();
   }, []);
 
   useEffect(() => {
-    getMembers();
+    getMemberPoints();
   }, [startDate, endDate, justCurrentMember]);
 
   const columns = [
@@ -196,11 +232,31 @@ const TabPoint = ({ club }) => {
       >
         <Box sx={style}>
           <PointDetail
+            user={user}
             club={club}
-            membersSelected={memberSelected}
+            memberSelected={memberSelected}
             startDate={startDate}
             endDate={endDate}
             setShowFormDetail={setShowFormDetail}
+          />
+        </Box>
+      </Modal>
+      <Modal
+        open={showFormAdd}
+        aria-labelledby="modal-add-title"
+        aria-describedby="modal-add-description"
+        onClose={() => {
+          setShowFormAdd(false);
+        }}
+      >
+        <Box sx={style}>
+          <AddPoints
+            user={user}
+            club={club}
+            membersSelected={membersSelected}
+            setShowFormAdd={setShowFormAdd}
+            showSnackbar={showSnackbar}
+            getMemberPoints={getMemberPoints}
           />
         </Box>
       </Modal>
@@ -212,7 +268,9 @@ const TabPoint = ({ club }) => {
       >
         <Alert severity={options}>{alertMessage}</Alert>
       </Snackbar>
+
       <div className="div-table-tabmember">
+        <h2 style={{ marginLeft: '20px', marginBottom: '20px' }}>Bảng điểm</h2>
         <div className="header-table-tabmember">
           <Stack
             direction="row"
@@ -220,11 +278,9 @@ const TabPoint = ({ club }) => {
             spacing={1}
             sx={{ marginLeft: "20px", width: 'max-content' }}
           >
-            <div style={{ minWidth: "160px" }}>
-              <h2>Bảng điểm từ</h2>
-            </div>
+            <span>Lọc</span>
             <RangeDatePicker
-              textCenter="đến"
+              textCenter="-"
               startDate={startDate}
               setStartDate={setStartDate}
               endDate={endDate}
@@ -282,20 +338,37 @@ const TabPoint = ({ club }) => {
                 className="btn-refresh"
                 variant="outlined"
                 disableElevation
-                onClick={getMembers}
+                onClick={getMemberPoints}
               >
                 <RefreshIcon sx={{ color: "#1B264D" }} />
               </Button>
             </Tooltip>
-            <Button
-              onClick={() => { }}
-              style={{ background: "#1B264D" }}
-              variant="contained"
-              disableElevation
-              startIcon={<i class="fa-solid fa-file-export"></i>}
-            >
-              Xuất file
-            </Button>
+            {isLeader && <>
+              <Button
+                disabled={haveSelected}
+                onClick={() => {
+                  console.log(membersSelected)
+                  setShowFormAdd(true)
+                }}
+                variant={haveSelected ? "outlined" : "contained"}
+                disableElevation
+                startIcon={<i class="fa-solid fa-plus"></i>}
+                style={{
+                  background: haveSelected ? "transparent" : "#1B264D",
+                }}
+              >
+                Phiếu điểm
+              </Button>
+              <Button
+                onClick={exportMemberPointsFile}
+                style={{ background: "#1B264D" }}
+                variant="contained"
+                disableElevation
+                startIcon={<i class="fa-solid fa-file-export"></i>}
+              >
+                Xuất file
+              </Button>
+            </>}
           </Stack>
         </div>
         <div
@@ -308,13 +381,19 @@ const TabPoint = ({ club }) => {
           }}
         >
           <DataGrid
+            checkboxSelection={isLeader}
             getRowId={(r) => r._id}
             rows={members}
             columns={columns}
             pageSize={9}
             rowsPerPageOptions={[9]}
-            onSelectionModelChange={setMembersSelected}
-            selectionModel={membersSelected}
+            onSelectionModelChange={(ids) => {
+              const selected = members.filter((member) => {
+                return ids.includes(member._id)
+              })
+              // console.log(membersSelected)
+              setMembersSelected(selected)
+            }}
           />
         </div>
       </div>

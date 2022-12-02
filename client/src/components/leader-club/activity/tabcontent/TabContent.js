@@ -32,7 +32,7 @@ const collaboratorStyle = {
   top: '45%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 750,
+  width: 900,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -113,7 +113,7 @@ const TabContent = ({ match, club_id, isLeader, user }) => {
   }
 
   const handleExportActivity = (activity) => {
-    axiosInstance.get(`/export/activity/${activity._id}`,
+    axiosInstance.get(`/export/activity/${activity._id}/${user._id}`,
       {
         headers: { "Content-Type": "application/vnd.ms-excel" },
         responseType: 'blob'
