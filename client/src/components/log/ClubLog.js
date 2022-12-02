@@ -107,7 +107,7 @@ const ClubLog = ({ club }) => {
                 sx={{ padding: '6px 12px 6px 12px' }}
             >
                 <h2>Nhật ký câu lạc bộ</h2>
-                <Button
+                {user._id === club.leader && <Button
                     onClick={exportLogsFile}
                     style={{ background: "#1B264D" }}
                     variant="contained"
@@ -115,7 +115,7 @@ const ClubLog = ({ club }) => {
                     startIcon={<i class="fa-solid fa-file-export"></i>}
                 >
                     Xuất file
-                </Button>
+                </Button>}
             </Stack>
             <Box
                 sx={{

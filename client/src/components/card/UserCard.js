@@ -4,6 +4,7 @@ import {
     Box, Avatar, IconButton, Divider, Tooltip
 } from '@mui/material'
 import FacebookIcon from '@mui/icons-material/Facebook';
+import MailIcon from '@mui/icons-material/Mail';
 import SendIcon from '@mui/icons-material/Send';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -12,6 +13,10 @@ import './UserCard.css'
 const UserCard = ({ user, isLeader, handleUserExit }) => {
     const handleOpenFacebook = () => {
         window.open(user.facebook, "_blank")
+    }
+
+    const handleOpenEmail = () => {
+        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${user.email}`)
     }
 
     return (
@@ -35,6 +40,11 @@ const UserCard = ({ user, isLeader, handleUserExit }) => {
                     <Tooltip title="Facebook">
                         <IconButton onClick={handleOpenFacebook}>
                             <FacebookIcon sx={{ color: '#1B264D' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Email">
+                        <IconButton onClick={handleOpenEmail}>
+                            <MailIcon sx={{ color: '#1B264D' }} />
                         </IconButton>
                     </Tooltip>
                     {/* <Tooltip title="Trò chuyện">

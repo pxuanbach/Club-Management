@@ -3,6 +3,63 @@ const Club = require('../models/Club')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const Buffer = require('buffer').Buffer
+const moment = require('moment')
+
+module.exports.getFundHistories = async (
+    clubId, startDate, endDate, applyFilter, search = ''
+) => {
+    let startDateValue = startDate
+    let endDateValue = endDate
+    if (applyFilter === "false") {
+        const funds = await FundHistory.find({
+            club: clubId,
+            content: { $regex: search ? search : '' },
+        }).populate('author').sort({ createdAt: -1 })
+        let collect = 0;
+        let pay = 0;
+        funds.forEach((fh) => {
+            if (fh.type === "Thu") {
+                collect += fh.total
+            } else {
+                pay += fh.total
+            }
+        })
+        // console.log(funds)
+        return {
+            collect,
+            pay,
+            funds
+        };
+    }
+    if (startDate === undefined) {
+        startDateValue = moment().startOf('month')
+    }
+    if (endDate === undefined) {
+        endDateValue = moment().endOf('month')
+    }
+    const funds = await FundHistory.find({
+        club: clubId,
+        content: { $regex: search ? search : '' },
+        createdAt: {
+            $gte: new Date(startDateValue),
+            $lte: new Date(endDateValue)
+        },
+    }).populate('author').sort({ createdAt: -1 })
+    let collect = 0;
+    let pay = 0;
+    funds.forEach((fh) => {
+        if (fh.type === "Thu") {
+            collect += fh.total
+        } else {
+            pay += fh.total
+        }
+    })
+    return {
+        collect,
+        pay,
+        funds
+    };
+}
 
 module.exports.create = async (req, res) => {
     const files = req.files;
@@ -58,16 +115,17 @@ module.exports.create = async (req, res) => {
     })
 }
 
-module.exports.getList = (req, res) => {
+module.exports.getList = async (req, res) => {
     const clubId = req.params.clubId;
-
-    FundHistory.find({ club: clubId })
-        .populate('author')
-        .then(result => {
-            res.status(200).send(result)
-        }).catch(err => {
-            res.status(500).json({ error: err.message })
-        })
+    const { startDate, endDate, applyFilter, search } = req.query
+    try {
+        result = await this.getFundHistories(
+            clubId, startDate, endDate, applyFilter, search
+        )
+        res.send(result)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
 
 module.exports.getColPayInMonth = (req, res) => {

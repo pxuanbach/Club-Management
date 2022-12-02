@@ -7,15 +7,17 @@ const Point = require("../models/Point");
 const ClubLog = require("../models/ClubLog");
 const moment = require("moment");
 const { pointsOfClub, activityPointsOfActivity } = require("./pointControllers");
+const { getFundHistories } = require('./fundControllers')
 const {
     convertClubsToExport,
-    converActivityToExport,
-    converLogsToExport,
-    converMembersToExport,
-    converPointsToExport,
+    convertActivityToExport,
+    convertLogsToExport,
+    convertMembersToExport,
+    convertPointsToExport,
     convertUsersToExport,
     convertGeneralInfoToExport,
-    convertPointDetailsToExport
+    convertPointDetailsToExport,
+    convertFundHistoriesToExport
 } = require("../helper/ReportDataHelper")
 
 
@@ -90,13 +92,13 @@ module.exports.exportActivity = async (req, res) => {
         const memberPoints = await activityPointsOfActivity(activity, "", club.members)
         const collaboratorPoints = await activityPointsOfActivity(activity, "", activity.collaborators)
 
-        var activityWS = xlsx.utils.json_to_sheet(converActivityToExport(activity), { skipHeader: 1 });
-        var membersWS = xlsx.utils.json_to_sheet(converPointsToExport(memberPoints));
+        var activityWS = xlsx.utils.json_to_sheet(convertActivityToExport(activity), { skipHeader: 1 });
+        var membersWS = xlsx.utils.json_to_sheet(convertPointsToExport(memberPoints));
         var collaboratorsWS = xlsx.utils.json_to_sheet(
-            converPointsToExport(collaboratorPoints)
+            convertPointsToExport(collaboratorPoints)
         );
         var wb = xlsx.utils.book_new();
-        
+
         var generalWS = xlsx.utils.json_to_sheet(
             convertGeneralInfoToExport(
                 {
@@ -110,7 +112,7 @@ module.exports.exportActivity = async (req, res) => {
         xlsx.utils.book_append_sheet(wb, activityWS, "Hoạt động");
         xlsx.utils.book_append_sheet(wb, membersWS, "Thành viên");
         xlsx.utils.book_append_sheet(wb, collaboratorsWS, "Cộng tác viên");
-        
+
         // column width
         var generalWscols = [
             { wch: 22 },
@@ -190,7 +192,7 @@ module.exports.exportClubLogs = async (req, res) => {
             }),
             { skipHeader: 1 }
         );
-        var logWS = xlsx.utils.json_to_sheet(converLogsToExport(result));
+        var logWS = xlsx.utils.json_to_sheet(convertLogsToExport(result));
         var wb = xlsx.utils.book_new();
 
         // column width
@@ -223,6 +225,120 @@ module.exports.exportClubLogs = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+module.exports.exportClubFunds = async (req, res) => {
+    const clubId = req.params.clubId;
+    const createdBy = req.params.createdBy;
+    const { startDate, endDate, applyFilter } = req.query
+    try {
+        const excelOutput = Date.now().toString() + "clubfunds.xlsx";
+        const club = await Club.findById(clubId)
+            .populate("leader")
+            .populate("treasurer");
+        if (club === undefined || club === null) {
+            res.status(404).send({ error: "Không tìm thấy câu lạc bộ này." });
+            return;
+        }
+        const createdByUser = await User.findById(createdBy)
+        if (createdByUser === undefined || createdByUser === null) {
+            res.status(404).send({ error: "Không xác định được người tạo báo cáo." });
+            return;
+        }
+        const fundData = await getFundHistories(clubId, startDate, endDate, applyFilter)
+        console.log(fundData)
+
+        var generalWS = xlsx.utils.json_to_sheet(
+            convertGeneralInfoToExport({
+                ...club._doc,
+                createdBy: createdByUser,
+            }),
+            { skipHeader: 1 }
+        );
+        let jsonObjArr = null
+        if (applyFilter === "false") {
+            jsonObjArr = [
+                {
+                    key: "Tổng quỹ",
+                    value: fundData.collect - fundData.pay,
+                },
+                {
+                    key: "Tiền thu",
+                    value: fundData.collect,
+                },
+                {
+                    key: "Tiền chi",
+                    value: fundData.pay,
+                },
+            ]
+        } else {
+            jsonObjArr = [
+                {
+                    key: "Từ ngày",
+                    value: moment(startDate).format("DD/MM/YYYY HH:mm:ss"),
+                },
+                {
+                    key: "Đến ngày",
+                    value: moment(endDate).format("DD/MM/YYYY HH:mm:ss"),
+                },
+                {
+                    key: "Tổng quỹ",
+                    value: fundData.collect - fundData.pay,
+                },
+                {
+                    key: "Tiền thu",
+                    value: fundData.collect,
+                },
+                {
+                    key: "Tiền chi",
+                    value: fundData.pay,
+                },
+            ]
+        }
+
+        var fundWS = xlsx.utils.json_to_sheet(jsonObjArr, { skipHeader: 1 });
+        xlsx.utils.sheet_add_json(
+            fundWS, 
+            convertFundHistoriesToExport(fundData.funds), 
+            { origin: `A${jsonObjArr.length + 2}` }
+        )
+        var wb = xlsx.utils.book_new();
+
+        // column width
+        var generalWscols = [
+            { wch: 22 },
+            { wch: 30 },
+        ];
+        generalWS['!cols'] = generalWscols
+        var fundWscols = [
+            { wch: 25 },    // id
+            { wch: 40 },    // content
+            { wch: 8 },     // type
+            { wch: 12 },    // value
+            { wch: 18 },    // name
+            { wch: 18 },    // mssv
+            { wch: 24 },    // email
+        ]
+        fundWS['!cols'] = fundWscols
+
+        xlsx.utils.book_append_sheet(wb, generalWS, "Thông tin chung");
+        xlsx.utils.book_append_sheet(wb, fundWS, "Quỹ");
+
+        var excelBinary = xlsx.write(wb, { bookType: "xlsx", type: "binary" });
+
+        fs.writeFileSync(excelOutput, excelBinary, "binary");
+
+        res.download(excelOutput, (err) => {
+            if (err) {
+                fs.unlinkSync(excelOutput);
+                res.status(400).send({ error: "Không thể tải tệp excel" });
+            }
+            fs.unlinkSync(excelOutput);
+        });
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: err.message });
+    }
+}
 
 module.exports.exportMembers = async (req, res) => {
     const clubId = req.params.clubId;
@@ -266,7 +382,7 @@ module.exports.exportMembers = async (req, res) => {
             }),
             { skipHeader: 1 }
         );
-        var membersWS = xlsx.utils.json_to_sheet(converMembersToExport(result));
+        var membersWS = xlsx.utils.json_to_sheet(convertMembersToExport(result));
         var wb = xlsx.utils.book_new();
 
         // column width
@@ -358,7 +474,7 @@ module.exports.exportMemberPoints = async (req, res) => {
             }
         ]
         var pointsWS = xlsx.utils.json_to_sheet(jsonObjArr, { skipHeader: 1 });
-        xlsx.utils.sheet_add_json(pointsWS, converPointsToExport(points), { origin: "A5" })
+        xlsx.utils.sheet_add_json(pointsWS, convertPointsToExport(points), { origin: "A5" })
         var wb = xlsx.utils.book_new();
 
         // column width

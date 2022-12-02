@@ -68,7 +68,7 @@ const convertUsersToExport = (users) => {
     return dataArr;
 };
 
-const converActivityToExport = (activity) => {
+const convertActivityToExport = (activity) => {
     let obj = {
         "Mã hoạt động": activity._id.toString(),
         "Tên hoạt động": activity.title,
@@ -80,7 +80,7 @@ const converActivityToExport = (activity) => {
     return Object.entries(obj).map(([key, value]) => ({ key, value }));
 };
 
-const converLogsToExport = (logs) => {
+const convertLogsToExport = (logs) => {
     let dataArr = [];
     logs.forEach((log) => {
         const data = {
@@ -101,7 +101,7 @@ const converLogsToExport = (logs) => {
     return dataArr;
 };
 
-const converMembersToExport = (members) => {
+const convertMembersToExport = (members) => {
     let dataArr = [];
     members.forEach((member) => {
         const data = {
@@ -121,7 +121,7 @@ const converMembersToExport = (members) => {
     return dataArr;
 };
 
-const converPointsToExport = (points) => {
+const convertPointsToExport = (points) => {
     let dataArr = [];
     points.forEach((point) => {
         const data = {
@@ -160,13 +160,33 @@ const convertPointDetailsToExport = (points) => {
     return dataArr;
 }
 
+const convertFundHistoriesToExport = (fundhistories) => {
+    let dataArr = [];
+    fundhistories.forEach((fh) => {
+        const data = {
+            "Mã phiếu": fh._id.toString(),
+            "Nội dung": fh.content,
+            "Loại": fh.type,
+            "Số tiền": fh.total,
+            "Người xác nhận": fh.author.name,
+            "MSSV người xác nhận": fh.author.username,
+            "Email người xác nhận": fh.author.email,
+        };
+        //console.log(data)
+        dataArr.push(data);
+    });
+
+    return dataArr;
+}
+
 module.exports = {
     convertClubsToExport,
-    converActivityToExport,
-    converLogsToExport,
-    converMembersToExport,
-    converPointsToExport,
+    convertActivityToExport,
+    convertLogsToExport,
+    convertMembersToExport,
+    convertPointsToExport,
     convertUsersToExport,
     convertGeneralInfoToExport,
-    convertPointDetailsToExport
+    convertPointDetailsToExport,
+    convertFundHistoriesToExport
 }
