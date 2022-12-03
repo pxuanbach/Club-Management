@@ -117,7 +117,7 @@ const renderButtonJoinClub = () => {
                     disableElevation
                     onClick={requestJoinClub}
                 >
-                    THAM GIA CÂU LẠC BỘ
+                    THAM GIA NGAY
                 </Button>
             )
         } else {
