@@ -183,13 +183,14 @@ module.exports.createCard = (req, res) => {
 module.exports.getList = async (req, res) => {
     const clubId = req.params.clubId;
     const { inMonth, userId, option } = req.query
-    const currentDate = moment().add(-2, "days")
+    const currentDate = moment()
     const nextMonthDate = moment().add(30, "days")
     // const nextMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
     let query = { club: clubId }
     if (inMonth !== undefined) {
         query = {
-            ...query, $or: [
+            ...query,
+            $or: [
                 {
                     startDate: {
                         $gte: currentDate.toISOString(),
