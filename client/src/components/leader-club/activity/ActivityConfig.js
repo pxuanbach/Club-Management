@@ -10,48 +10,117 @@ import {
   Tooltip,
   styled,
   tooltipClasses,
-  Button,
+  Button, Box
 } from "@mui/material";
 import HelpIcon from "@mui/icons-material/Help";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import axiosInstance from "../../../helper/Axios";
 import { UserContext } from "../../../UserContext";
 import SeverityOptions from "../../../helper/SeverityOptions";
 
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "#f5f5f9",
-    color: "rgba(0, 0, 0, 0.87)",
-    maxWidth: 220,
-    fontSize: theme.typography.pxToRem(12),
-    border: "1px solid #dadde9",
-  },
-}));
+export const DynamicInputField = ({
+  inputFields, selectCriteriaOption,
+  handlePercentOrQuantityChange, sortInputFields,
+  handleFormChange, removeFields
+}) => {
 
-const ActivityConfig = ({ show, setShow, activityId }) => {
+  return (
+    <Stack
+      fullWidth
+      spacing={2}
+    >
+      {inputFields.map((input, index) => {
+        return (
+          <Stack
+            key={index}
+            direction="row"
+            spacing={1}
+            alignItems="center"
+          >
+            <Typography sx={{ minWidth: "70px" }}>
+              Mốc {index + 1}
+            </Typography>
+            <TextField
+              name="percentOrQuantity"
+              label={selectCriteriaOption === "percent" ? "Tỉ lệ (%)" : "Số lượng"}
+              value={input.percentOrQuantity}
+              size="small"
+              type="number"
+              onChange={event => handlePercentOrQuantityChange(index, event)}
+              // onMouseLeave={sortInputFields}
+              // onPointerLeave={sortInputFields}
+              // onMouseOut={sortInputFields}
+              onBlur={sortInputFields}
+            />
+            <TextField
+              name="point"
+              label="Điểm đạt được"
+              value={input.point}
+              size="small"
+              type="number"
+              onChange={event => handleFormChange(index, event)}
+            />
+            <Button onClick={() => removeFields(index)}>
+              <RemoveCircleIcon />
+            </Button>
+          </Stack>
+        )
+      })}
+    </Stack>
+  )
+}
+
+const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
   const [selectCriteriaOption, setSelectCriteriaOption] = useState("percent");
-  const [selectWayCalOption, setSelectWayCalOption] = useState(0);
-  const [criteriaValue, setCriteriaValue] = useState(0);
-  const [wayCalTip, setWayCalTip] = useState("");
+  const [inputFields, setInputFields] = useState([
+    { percentOrQuantity: '', point: '' }
+  ])
 
-  const handleChangeCriteriaValue = (e) => {
-    e.preventDefault();
+  const handlePercentOrQuantityChange = (index, event) => {
+    let data = [...inputFields];
     if (selectCriteriaOption === "percent") {
-      if (e.target.value >= 0 && e.target.value <= 100) {
-        setCriteriaValue(e.target.value);
+      if (event.target.value >= 0 && event.target.value <= 100) {
+        data[index]["percentOrQuantity"] = event.target.value;
+        setInputFields(data);
       }
     } else {
-      setCriteriaValue(e.target.value);
+      data[index]["percentOrQuantity"] = event.target.value;
+      setInputFields(data);
     }
-  };
+  }
+
+  const handleFormChange = (index, event) => {
+    let data = [...inputFields];
+    data[index][event.target.name] = event.target.value;
+    setInputFields(data);
+  }
+
+  const addFields = () => {
+    if (inputFields.length < 5) {
+      let newfield = { percentOrQuantity: '', point: '' }
+      setInputFields([...inputFields, newfield])
+    } else {
+      showSnackbar("Chỉ có thể thêm tối đa 5 mốc điểm.", SeverityOptions.warning)
+    }
+  }
+
+  const removeFields = (index) => {
+    if (inputFields.length > 1) {
+      let data = [...inputFields];
+      data.splice(index, 1)
+      setInputFields(data)
+    } else {
+      showSnackbar("Phải có ít nhất 1 mốc điểm.", SeverityOptions.warning)
+    }
+  }
 
   const handleSaveConfig = async (e) => {
     e.preventDefault();
     try {
 
     } catch (err) {
-        console.log(err.response.data.error)
+      console.log(err.response.data.error)
     }
   }
 
@@ -59,7 +128,7 @@ const ActivityConfig = ({ show, setShow, activityId }) => {
     try {
 
     } catch (err) {
-        console.log(err.response.data.error)
+      console.log(err.response.data.error)
     }
   }
 
@@ -67,17 +136,17 @@ const ActivityConfig = ({ show, setShow, activityId }) => {
     getCurrentConfig()
   }, [])
 
-  useEffect(() => {
-    if (selectWayCalOption === 0) {
-      setWayCalTip(
-        "Chỉ những người tham gia hoàn thành được tiêu chí hoàn thành mới được tính điểm những thẻ hoạt động đã tham gia."
-      );
-    } else if (selectWayCalOption === 1) {
-      setWayCalTip(
-        "Những người tham gia được tính điểm từ thẻ hoạt động đã tham gia (bất kể tiêu chí hoàn thành)."
-      );
-    }
-  }, [selectWayCalOption]);
+  const sortInputFields = () => {
+    setInputFields((current) => {
+      const newArr = [...current];
+      newArr.sort((a, b) => {
+        if (a["percentOrQuantity"] !== "" || b["percentOrQuantity"] !== "") {
+          return a["percentOrQuantity"] - b["percentOrQuantity"]
+        }
+      });
+      return newArr;
+    });
+  }
 
   return (
     <div>
@@ -93,32 +162,49 @@ const ActivityConfig = ({ show, setShow, activityId }) => {
             <Typography sx={{ minWidth: "150px" }}>
               Tiêu chí hoàn thành
             </Typography>
-            <FormControl sx={{ m: 1, minWidth: 160 }} size="small">
+            <FormControl sx={{ m: 1, minWidth: 160 }} fullWidth size="small">
               <InputLabel id="filter-select-small">Loại tiêu chí</InputLabel>
               <Select
                 labelId="filter-select-small"
                 id="filter-select-small"
                 value={selectCriteriaOption}
                 onChange={(e) => {
-                  setCriteriaValue(0);
+                  setInputFields([
+                    { percentOrQuantity: '', point: '' }
+                  ])
                   setSelectCriteriaOption(e.target.value);
                 }}
                 label="Loại tiêu chí"
               >
-                <MenuItem value="percent">Phần trăm</MenuItem>
-                <MenuItem value="quantity">Số lượng</MenuItem>
+                <MenuItem value="percent">Tỉ lệ thẻ tham gia</MenuItem>
+                <MenuItem value="quantity">Số lượng thẻ tham gia</MenuItem>
               </Select>
             </FormControl>
-            <TextField
+            {/* <TextField
               fullWidth
               label="thẻ tham gia"
               value={criteriaValue}
               size="small"
               type="number"
               onChange={handleChangeCriteriaValue}
-            />
+            /> */}
           </Stack>
           <Stack
+            fullWidth
+            sx={{ borderLeft: '5px solid #1976d2', paddingLeft: '20px' }}
+            spacing={2}
+          >
+            <DynamicInputField
+              inputFields={inputFields}
+              selectCriteriaOption={selectCriteriaOption}
+              handlePercentOrQuantityChange={handlePercentOrQuantityChange}
+              sortInputFields={sortInputFields}
+              handleFormChange={handleFormChange}
+              removeFields={removeFields}
+            />
+            <Button onClick={addFields} startIcon={<AddCircleIcon />}>Thêm mốc...</Button>
+          </Stack>
+          {/* <Stack
             direction="row"
             spacing={1}
             alignItems="center"
@@ -149,25 +235,26 @@ const ActivityConfig = ({ show, setShow, activityId }) => {
             >
               <HelpIcon sx={{ cursor: "pointer" }} />
             </HtmlTooltip>
+          </Stack> */}
+          <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <Button
+              onClick={handleSaveConfig}
+              variant="contained"
+              disableElevation
+            >
+              Lưu
+            </Button>
+            <Button
+              onClick={() => setShow(false)}
+              variant="outlined"
+              disableElevation
+            >
+              Hủy
+            </Button>
           </Stack>
         </Stack>
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Button
-            onClick={handleSaveConfig}
-            variant="contained"
-            disableElevation
-          >
-            Lưu
-          </Button>
-          <Button
-            onClick={() => setShow(false)}
-            variant="outlined"
-            disableElevation
-          >
-            Hủy
-          </Button>
-        </Stack>
       </Stack>
+
     </div>
   );
 };

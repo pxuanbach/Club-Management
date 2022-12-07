@@ -98,7 +98,9 @@ async function uploadFile(files, public_id) {
 }
 
 module.exports.create = (req, res) => {
-    const { club, title, startDate, endDate } = req.body
+    const { 
+        club, title, startDate, endDate, configType, configMilestone 
+    } = req.body
 
     let boards = [
         {
@@ -124,7 +126,9 @@ module.exports.create = (req, res) => {
         title,
         startDate,
         endDate,
-        boards
+        boards,
+        configType,
+        configMilestone
     });
 
     activity.save().then(result => {
@@ -607,7 +611,7 @@ module.exports.sumary = async (req, res) => {
     try {
         let activity = await Activity.findById(activityId)
             .populate('club');
-        if (activity === undefined) {
+        if (activity === undefined || activity === null) {
             res.status(404).send({ error: "Không tìm thấy hoạt động này." })
             return;
         }
@@ -662,6 +666,25 @@ module.exports.sumary = async (req, res) => {
         })
         const result = await Promise.all(promises)
         // console.log("RESULT", result)
+        const saveActivity = await activity.save()
+        res.status(200).send(saveActivity)
+    } catch (err) {
+        res.status(500).send({ error: err.message })
+    }
+}
+
+module.exports.config = async (req, res) => {
+    const activityId = req.params.activityId;
+    const { configType, configMilestone } = req.body
+    try {
+        let activity = await Activity.findById(activityId)
+            .populate('club');
+        if (activity === undefined || activity === null) {
+            res.status(404).send({ error: "Không tìm thấy hoạt động này." })
+            return;
+        }
+        activity.configType = configType
+        activity.configMilestone = configMilestone
         const saveActivity = await activity.save()
         res.status(200).send(saveActivity)
     } catch (err) {

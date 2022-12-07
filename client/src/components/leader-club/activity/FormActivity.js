@@ -13,7 +13,7 @@ import { cloneDeep } from 'lodash';
 import { UserContext } from '../../../UserContext';
 import moment from 'moment';
 import ActivityConfig from './ActivityConfig';
-import GroupIcon from '@mui/icons-material/Group';
+import SeverityOptions from '../../../helper/SeverityOptions';
 
 const style = {
   position: 'absolute',
@@ -36,9 +36,11 @@ const FormActivity = ({ match, isLeader }) => {
   const [alertMessage, setAlertMessage] = useState('');
   const [isFinished, setIsFinished] = useState(false);
   const [showFormConfig, setShowFormConfig] = useState(false);
+  const [options, setOptions] = useState(SeverityOptions.error)
 
-  const showSnackbar = (message) => {
-    setAlertMessage(message)
+  const showSnackbar = (message, options) => {
+    setAlertMessage(message);
+    setOptions(options);
     setOpenSnackbar(true);
   }
 
@@ -197,7 +199,7 @@ const FormActivity = ({ match, isLeader }) => {
         open={openSnackbar}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity="error">{alertMessage}</Alert>
+        <Alert severity={options}>{alertMessage}</Alert>
       </Snackbar>
       <Modal
         open={showFormConfig}
@@ -212,6 +214,7 @@ const FormActivity = ({ match, isLeader }) => {
             show={showFormConfig}
             setShow={setShowFormConfig}
             activityId={activityId}
+            showSnackbar={showSnackbar}
           />
         </Box>
       </Modal>
