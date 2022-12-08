@@ -73,6 +73,7 @@ export const DynamicInputField = ({
 
 const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
   const [selectCriteriaOption, setSelectCriteriaOption] = useState("percent");
+  const [joinPoint, setJoinPoint] = useState(0)
   const [inputFields, setInputFields] = useState([
     { percentOrQuantity: '', point: '' }
   ])
@@ -115,20 +116,59 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
     }
   }
 
+  const validateInputFields = () => {
+    let isOk = true
+    inputFields.forEach((input, index) => {
+      if (input.percentOrQuantity === null || input.percentOrQuantity === "") {
+        isOk = false
+        showSnackbar(`Giá trị ở mốc ${index + 1} trống`, SeverityOptions.warning)
+      }
+      if (input.point === "" || input.point === null) {
+        isOk = false
+        showSnackbar(`Giá trị ở mốc ${index + 1} trống`, SeverityOptions.warning)
+      }
+    })
+    return isOk
+  }
+
   const handleSaveConfig = async (e) => {
     e.preventDefault();
     try {
-
+      if (validateInputFields()) {
+        const res = await axiosInstance.patch(
+          `/activity/config/${activityId}`,
+          JSON.stringify({
+            "joinPoint": joinPoint,
+            "configType": selectCriteriaOption,
+            "configMilestone": inputFields
+          }),
+          {
+            headers: { "Content-Type": "application/json" }
+          }
+        )
+        const data = res.data
+        setJoinPoint(data.joinPoint)
+        setSelectCriteriaOption(data.configType)
+        setInputFields(data.configMilestone)
+        showSnackbar("Cập nhật cài đặt hoạt động thành công!", SeverityOptions.success)
+      }
     } catch (err) {
-      console.log(err.response.data.error)
+      console.log(err)
+      showSnackbar(err.response.data.error, SeverityOptions.error)
     }
   }
 
   const getCurrentConfig = async () => {
     try {
-
+      const res = await axiosInstance.get(`/activity/one/${activityId}`)
+      const data = res.data
+      // console.log(data)
+      setJoinPoint(data.joinPoint)
+      setSelectCriteriaOption(data.configType)
+      setInputFields(data.configMilestone)
     } catch (err) {
       console.log(err.response.data.error)
+      showSnackbar(err.response.data.error, SeverityOptions.error)
     }
   }
 
@@ -152,7 +192,24 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
     <div>
       <Stack direction="column" spacing={4}>
         <h2>Cài đặt hoạt động</h2>
-        <Stack direction="column" spacing={3}>
+        <Stack direction="column" spacing={2}>
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography fullWidth sx={{ minWidth: "200px" }}>
+              Chỉ cần tham gia là được cộng (+)
+            </Typography>
+            <TextField
+              value={joinPoint}
+              label="Điểm"
+              size="small"
+              type="number"
+              onChange={e => setJoinPoint(e.target.value)}
+            />
+          </Stack>
           <Stack
             direction="row"
             spacing={1}
@@ -180,15 +237,8 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
                 <MenuItem value="quantity">Số lượng thẻ tham gia</MenuItem>
               </Select>
             </FormControl>
-            {/* <TextField
-              fullWidth
-              label="thẻ tham gia"
-              value={criteriaValue}
-              size="small"
-              type="number"
-              onChange={handleChangeCriteriaValue}
-            /> */}
           </Stack>
+          <span><i>Hoàn thành được tính từ mốc 1 và chỉ tính các thẻ ở cột đã xong.</i></span>
           <Stack
             fullWidth
             sx={{ borderLeft: '5px solid #1976d2', paddingLeft: '20px' }}

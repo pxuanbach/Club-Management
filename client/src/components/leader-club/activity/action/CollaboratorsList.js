@@ -15,7 +15,7 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
+const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState();
     const [collaborators, setCollaborators] = useState([]);
@@ -34,7 +34,7 @@ const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
         setIsLoading(true);
         axiosInstance
             .patch(
-                `/activity/updatecollaborators/${activity._id}`,
+                `/activity/updatecollaborators/${activityId}`,
                 JSON.stringify({
                     collaborators: collaboratorsSelected,
                 }),
@@ -55,7 +55,7 @@ const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
 
     const getCollaborators = () => {
         axiosInstance
-            .get(`/point/activity/${activity._id}`, {
+            .get(`/point/activity/${activityId}`, {
                 params: {
                     search: search,
                 },

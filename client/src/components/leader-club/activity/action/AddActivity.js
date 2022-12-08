@@ -25,6 +25,7 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
     const [startDate, setStartDate] = useState(date.setDate(date.getDate()));
     const [endDate, setEndDate] = useState(date.setDate(date.getDate() + 14));
     const [selectCriteriaOption, setSelectCriteriaOption] = useState("percent");
+    const [joinPoint, setJoinPoint] = useState(0)
     const [inputFields, setInputFields] = useState([
         { percentOrQuantity: '', point: '' }
     ])
@@ -91,27 +92,45 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
         });
     }
 
+    const validateInputFields = () => {
+        let isOk = true
+        inputFields.forEach((input, index) => {
+            if (input.percentOrQuantity === null || input.percentOrQuantity === "") {
+                isOk = false
+                showSnackbar(`Giá trị ở mốc ${index + 1} trống`, SeverityOptions.warning)
+            }
+            if (input.point === "" || input.point === null) {
+                isOk = false
+                showSnackbar(`Giá trị ở mốc ${index + 1} trống`, SeverityOptions.warning)
+            }
+        })
+        return isOk
+    }
+
     const handleSave = (event) => {
         event.preventDefault();
         if (title) {
-            axiosInstance.post(`/activity/create`,
-                JSON.stringify({
-                    "club": club_id,
-                    "title": title,
-                    "startDate": validateDate(startDate),
-                    "endDate": validateDate(endDate),
-                    "configType": selectCriteriaOption,
-                    "configMilestone": inputFields
-                }), {
-                headers: { 'Content-Type': 'application/json' }
-            }).then(response => {
-                //response.data
-                acitivityCreated(response.data)
-                handleClose()
-            }).catch(err => {
-                //err.response.data.error
-                showSnackbar(err.response.data.error)
-            })
+            if (validateInputFields()) {
+                axiosInstance.post(`/activity/create`,
+                    JSON.stringify({
+                        "club": club_id,
+                        "title": title,
+                        "startDate": validateDate(startDate),
+                        "endDate": validateDate(endDate),
+                        "joinPoint": joinPoint,
+                        "configType": selectCriteriaOption,
+                        "configMilestone": inputFields
+                    }), {
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(response => {
+                    //response.data
+                    acitivityCreated(response.data)
+                    handleClose()
+                }).catch(err => {
+                    //err.response.data.error
+                    showSnackbar(err.response.data.error)
+                })
+            }
         } else {
             setTitleErr('Tên hoạt động trống')
         }
@@ -147,24 +166,51 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                     />
                     <Stack spacing={2}>
                         <h3>Cài đặt hoạt động</h3>
-                        <FormControl sx={{ minWidth: 160 }} fullWidth size="small">
-                            <InputLabel id="filter-select-small">Loại tiêu chí</InputLabel>
-                            <Select
-                                labelId="filter-select-small"
-                                id="filter-select-small"
-                                value={selectCriteriaOption}
-                                onChange={(e) => {
-                                    setInputFields([
-                                        { percentOrQuantity: '', point: '' }
-                                    ])
-                                    setSelectCriteriaOption(e.target.value);
-                                }}
-                                label="Loại tiêu chí"
-                            >
-                                <MenuItem value="percent">Tỉ lệ thẻ tham gia</MenuItem>
-                                <MenuItem value="quantity">Số lượng thẻ tham gia</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Typography fullWidth sx={{ minWidth: "200px" }}>
+                                Chỉ cần tham gia là được cộng (+)
+                            </Typography>
+                            <TextField
+                                value={joinPoint}
+                                label="Điểm"
+                                size="small"
+                                type="number"
+                                onChange={e => setJoinPoint(e.target.value)}
+                            />
+                        </Stack>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Typography sx={{ minWidth: "200px" }}>
+                                Tiêu chí hoàn thành
+                            </Typography>
+                            <FormControl sx={{ m: 1, minWidth: 160 }} fullWidth size="small">
+                                <InputLabel id="filter-select-small">Loại tiêu chí</InputLabel>
+                                <Select
+                                    labelId="filter-select-small"
+                                    id="filter-select-small"
+                                    value={selectCriteriaOption}
+                                    onChange={(e) => {
+                                        setInputFields([
+                                            { percentOrQuantity: '', point: '' }
+                                        ])
+                                        setSelectCriteriaOption(e.target.value);
+                                    }}
+                                    label="Loại tiêu chí"
+                                >
+                                    <MenuItem value="percent">Tỉ lệ thẻ tham gia</MenuItem>
+                                    <MenuItem value="quantity">Số lượng thẻ tham gia</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Stack>
                         <Stack
                             fullWidth
                             sx={{ borderLeft: '5px solid #1976d2', paddingLeft: '20px' }}

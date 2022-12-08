@@ -14,6 +14,7 @@ import { UserContext } from '../../../UserContext';
 import moment from 'moment';
 import ActivityConfig from './ActivityConfig';
 import SeverityOptions from '../../../helper/SeverityOptions';
+import CollaboratorsList from './action/CollaboratorsList';
 
 const style = {
   position: 'absolute',
@@ -21,6 +22,18 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 600,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+};
+
+const styleCollaborator = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 800,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
@@ -36,6 +49,7 @@ const FormActivity = ({ match, isLeader }) => {
   const [alertMessage, setAlertMessage] = useState('');
   const [isFinished, setIsFinished] = useState(false);
   const [showFormConfig, setShowFormConfig] = useState(false);
+  const [showFormCollaborator, setShowFormCollaborator] = useState(false);
   const [options, setOptions] = useState(SeverityOptions.error)
 
   const showSnackbar = (message, options) => {
@@ -218,6 +232,23 @@ const FormActivity = ({ match, isLeader }) => {
           />
         </Box>
       </Modal>
+      <Modal
+        open={showFormCollaborator}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        onClose={() => {
+          setShowFormCollaborator(false);
+        }}
+      >
+        <Box sx={styleCollaborator}>
+          <CollaboratorsList
+            setShow={setShowFormCollaborator}
+            activityId={activityId}
+            showSnackbar={showSnackbar}
+            isFinished={false}
+          />
+        </Box>
+      </Modal>
       {user && <>
         <Stack className='div-back' direction="row" justifyContent="space-between">
           <Link className="btn-back"
@@ -229,7 +260,7 @@ const FormActivity = ({ match, isLeader }) => {
           </Link>
           <Stack direction="row" spacing={1}>
             <div
-              onClick={() => setShowFormConfig(true)}
+              onClick={() => setShowFormCollaborator(true)}
               className="btn-back"
               style={{ color: 'white', marginRight: '15px' }}>
               <i class="fas fa-user-friends"></i>

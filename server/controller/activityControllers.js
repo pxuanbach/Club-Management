@@ -99,9 +99,9 @@ async function uploadFile(files, public_id) {
 
 module.exports.create = (req, res) => {
     const { 
-        club, title, startDate, endDate, configType, configMilestone 
+        club, title, startDate, endDate, 
+        joinPoint, configType, configMilestone 
     } = req.body
-
     let boards = [
         {
             title: "Cần làm",
@@ -120,17 +120,16 @@ module.exports.create = (req, res) => {
             cards: []
         }
     ]
-
     const activity = new Activity({
         club,
         title,
         startDate,
         endDate,
         boards,
+        joinPoint,
         configType,
         configMilestone
     });
-
     activity.save().then(result => {
         res.status(201).send(result)
     }).catch(err => {
@@ -675,7 +674,7 @@ module.exports.sumary = async (req, res) => {
 
 module.exports.config = async (req, res) => {
     const activityId = req.params.activityId;
-    const { configType, configMilestone } = req.body
+    const { joinPoint, configType, configMilestone } = req.body
     try {
         let activity = await Activity.findById(activityId)
             .populate('club');
@@ -683,6 +682,7 @@ module.exports.config = async (req, res) => {
             res.status(404).send({ error: "Không tìm thấy hoạt động này." })
             return;
         }
+        activity.joinPoint = joinPoint
         activity.configType = configType
         activity.configMilestone = configMilestone
         const saveActivity = await activity.save()
