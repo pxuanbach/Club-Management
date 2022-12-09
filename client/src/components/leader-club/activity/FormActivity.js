@@ -14,7 +14,7 @@ import { UserContext } from '../../../UserContext';
 import moment from 'moment';
 import ActivityConfig from './ActivityConfig';
 import SeverityOptions from '../../../helper/SeverityOptions';
-import CollaboratorsList from './action/CollaboratorsList';
+import CollaboratorsList from './action/CollaboratorsInActivity';
 
 const style = {
   position: 'absolute',

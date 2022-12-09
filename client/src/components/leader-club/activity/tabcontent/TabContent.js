@@ -32,13 +32,11 @@ const collaboratorStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 950,
-  height: '100%',
+  width: 900,
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
   p: 3,
-  overflowY: 'scroll'
 };
 
 const TabContent = ({ match, club_id, isLeader, user }) => {
@@ -60,7 +58,7 @@ const TabContent = ({ match, club_id, isLeader, user }) => {
   }
 
   const acitivityCreated = (data) => {
-    setActivities([...activities, data]);
+    getActivities()
   }
 
   const activityUpdated = (data) => {
