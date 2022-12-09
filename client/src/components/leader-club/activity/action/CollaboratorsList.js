@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Avatar, TextField, styled, Button, Tooltip } from "@mui/material";
+import React, { useState, useEffect, FC, useMemo } from "react";
+import { Avatar, TextField, styled, Button, Tooltip, Stack, Box, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from '@mui/icons-material/Close';
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { DataGrid } from "@mui/x-data-grid";
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import axiosInstance from "../../../../helper/Axios";
-import { Buffer } from "buffer";
+import './OverrideExpandableTable.css'
+import MaterialReactTable from 'material-react-table';
 
 const CustomTextField = styled(TextField)({
     "& label.Mui-focused": {
@@ -29,14 +33,13 @@ const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) =>
         setShow(false);
     };
 
-    const handleRemoveCollaborators = (event) => {
-        event.preventDefault();
+    const handleRemoveCollaborators = (data) => {
         setIsLoading(true);
         axiosInstance
             .patch(
-                `/activity/updatecollaborators/${activityId}`,
+                `/activity/card/userexit/${data.cardId}`,
                 JSON.stringify({
-                    collaborators: collaboratorsSelected,
+                    userId: data.collabId,
                 }),
                 {
                     headers: { "Content-Type": "application/json" },
@@ -62,10 +65,12 @@ const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) =>
             })
             .then((response) => {
                 //response.data
-                setCollaborators(response.data);
+                const data = response.data
+                setCollaborators(data);
             })
             .catch((err) => {
                 //err.response.data.error
+                console.log(err)
                 showSnackbar(err.response.data.error);
             });
     };
@@ -74,87 +79,123 @@ const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) =>
         getCollaborators();
     }, []);
 
-    const columns = [
-        {
-            field: "img_url",
-            headerName: "",
-            disableColumnMenu: true,
-            sortable: false,
-            align: "center",
-            flex: 0.5,
-            renderCell: (value) => {
-                return <Avatar src={value.row.data.img_url} />;
+    const columns = useMemo(
+        //column definitions...
+        () => [
+            {
+                accessorKey: 'username',
+                header: 'Tài khoản',
+                // columnDefType: 'display',
+                size: 30
             },
-        },
-        {
-            field: "username",
-            headerName: "Tài khoản",
-            flex: 1,
-            valueGetter: (value) => value.row.data.username,
-        },
-        {
-            field: "name",
-            headerName: "Tên",
-            flex: 1.5,
-            valueGetter: (value) => value.row.data.name,
-        },
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1.5,
-            valueGetter: (value) => value.row.data.email,
-        },
-        {
-            field: "point",
-            headerName: "Điểm",
-            flex: 0.5,
-        },
-    ];
+            {
+                accessorKey: 'name',
+                header: 'Tên',
+                size: 150
+            },
+
+            {
+                accessorKey: 'email',
+                header: 'Email',
+                size: 1
+            },
+            {
+                accessorKey: 'point',
+                header: 'Điểm',
+                size: 0.3
+            },
+            {
+                accessorKey: 'quantityCard',
+                // enableColumnOrdering: false,
+                header: 'Số thẻ tham gia',
+                size: 0.3
+            },
+        ],
+        [],
+        //end
+    );
 
     return (
         <div className="addmember-modal">
-            <div className="stack-left">
-                <CustomTextField
-                    id="search-field"
-                    label="Tìm kiếm cộng tác viên"
-                    variant="standard"
-                    value={search}
-                    onChange={handleChangeSearch}
-                    size="small"
-                    onKeyPress={(event) =>
-                        event.key === "Enter" ? getCollaborators() : null
-                    }
-                />
-                <Tooltip title="Tìm kiếm" placement="right-start">
-                    <Button variant="text" disableElevation onClick={getCollaborators}>
-                        <SearchIcon sx={{ color: "#1B264D" }} />
-                    </Button>
-                </Tooltip>
-                <Tooltip title="Làm mới" placement="right-start">
-                    <Button
-                        sx={{ borderColor: "#1B264D" }}
-                        className="btn-refresh"
-                        variant="outlined"
-                        disableElevation
-                        onClick={getCollaborators}
-                    >
-                        <RefreshIcon sx={{ color: "#1B264D" }} />
-                    </Button>
-                </Tooltip>
-            </div>
+            <Stack direction="row"
+                justifyContent="space-between"
+                alignItems="center">
+                <div className="stack-left">
+                    <CustomTextField
+                        id="search-field"
+                        label="Tìm kiếm cộng tác viên"
+                        variant="standard"
+                        value={search}
+                        onChange={handleChangeSearch}
+                        size="small"
+                        onKeyPress={(event) =>
+                            event.key === "Enter" ? getCollaborators() : null
+                        }
+                    />
+                    <Tooltip title="Tìm kiếm" placement="right-start">
+                        <Button variant="text" disableElevation onClick={getCollaborators}>
+                            <SearchIcon sx={{ color: "#1B264D" }} />
+                        </Button>
+                    </Tooltip>
+                    <Tooltip title="Làm mới" placement="right-start">
+                        <Button
+                            sx={{ borderColor: "#1B264D" }}
+                            className="btn-refresh"
+                            variant="outlined"
+                            disableElevation
+                            onClick={getCollaborators}
+                        >
+                            <RefreshIcon sx={{ color: "#1B264D" }} />
+                        </Button>
+                    </Tooltip>
+                </div>
+                <Button
+                    disabled={isLoading}
+                    onClick={handleClose}
+                    variant="text"
+                    disableElevation
+                >
+                    <CloseIcon sx={{ color: "#1B264D" }} />
+                </Button>
+            </Stack>
             <div className="members__body">
-                <DataGrid
-                    sx={{ height: 52 * 5 + 56 + 55 }}
-                    checkboxSelection
-                    getRowId={(r) => r._id}
-                    rows={collaborators}
+                <MaterialReactTable
                     columns={columns}
-                    pageSize={5}
-                    onSelectionModelChange={setCollaboratorsSelected}
-                    selectionModel={collaboratorsSelected}
+                    data={collaborators}
+                    enableExpanding
+                    enableExpandAll //default
+                    enableRowActions
+                    initialState={{ density: 'compact' }}
+                    // enableDensityToggle={false}
+                    enableFullScreenToggle={false}
+                    paginateExpandedRows={false}
+                    displayColumnDefOptions={{
+                        'mrt-row-actions': {
+                            header: '',
+                        },
+                    }}
+                    renderRowActions={({row}) => {
+                        return (
+                            <>
+                                {
+                                    (row.original.subRows === undefined
+                                        && row.original.username !== "Tên thẻ tham gia") ? <Tooltip title="Đuổi khỏi thẻ">
+                                        <IconButton onClick={() => handleRemoveCollaborators(row.original)}>
+                                            <HighlightOffIcon sx={{ color: '#1B264D' }} />
+                                        </IconButton>
+                                    </Tooltip> : <></>
+                                }
+                            </>
+                        )
+                    }}
+                    positionActionsColumn="last"
+                    muiTablePaginationProps={{
+                        rowsPerPageOptions: [10, 20],
+                        showFirstLastPageButtons: false,
+                    }}
                 />
             </div>
-            <div className="stack-right">
+            {/* <div className="stack-right">
                 <Button
                     disabled={isLoading || isFinished}
                     onClick={handleRemoveCollaborators}
@@ -171,7 +212,7 @@ const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) =>
                 >
                     Hủy
                 </Button>
-            </div>
+            </div> */}
         </div>
     );
 };

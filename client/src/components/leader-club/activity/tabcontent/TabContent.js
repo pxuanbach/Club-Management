@@ -29,14 +29,16 @@ const style = {
 
 const collaboratorStyle = {
   position: 'absolute',
-  top: '45%',
+  top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 900,
+  width: 950,
+  height: '100%',
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
   p: 3,
+  overflowY: 'scroll'
 };
 
 const TabContent = ({ match, club_id, isLeader, user }) => {
