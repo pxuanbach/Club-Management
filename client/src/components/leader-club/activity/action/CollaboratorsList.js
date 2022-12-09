@@ -83,26 +83,26 @@ const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) =>
             align: "center",
             flex: 0.5,
             renderCell: (value) => {
-                return <Avatar src={value.row.data.img_url} />;
+                return <Avatar src={value.row.img_url} />;
             },
         },
         {
             field: "username",
             headerName: "Tài khoản",
             flex: 1,
-            valueGetter: (value) => value.row.data.username,
+            valueGetter: (value) => value.row.username,
         },
         {
             field: "name",
             headerName: "Tên",
             flex: 1.5,
-            valueGetter: (value) => value.row.data.name,
+            valueGetter: (value) => value.row.name,
         },
         {
             field: "email",
             headerName: "Email",
             flex: 1.5,
-            valueGetter: (value) => value.row.data.email,
+            valueGetter: (value) => value.row.email,
         },
         {
             field: "point",

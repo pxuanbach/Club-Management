@@ -309,7 +309,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
             .get(`/activity/card/${card._id}`)
             .then((response) => {
                 //response.data
-                console.log(response.data);
+                // console.log(response.data);
                 setUserJoin(response.data.userJoin);
                 setGroupJoin(response.data.groupJoin);
                 setPoint(response.data.pointValue);

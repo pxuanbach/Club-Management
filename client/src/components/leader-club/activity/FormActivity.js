@@ -14,7 +14,7 @@ import { UserContext } from '../../../UserContext';
 import moment from 'moment';
 import ActivityConfig from './ActivityConfig';
 import SeverityOptions from '../../../helper/SeverityOptions';
-import CollaboratorsList from './action/CollaboratorsList';
+import CollaboratorsList from './action/CollaboratorsInActivity';
 
 const style = {
   position: 'absolute',
@@ -33,11 +33,13 @@ const styleCollaborator = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 800,
+  width: 950,
+  height: '100%',
   bgcolor: 'background.paper',
   border: 'none',
   boxShadow: 24,
   p: 4,
+  overflowY: 'scroll'
 };
 
 const FormActivity = ({ match, isLeader }) => {

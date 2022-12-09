@@ -4,6 +4,8 @@ const Point = require("../models/Point");
 const ActivityPoint = require("../models/ActivityPoint");
 const mongoose = require('mongoose');
 const User = require("../models/User");
+const ActivityCard = require("../models/ActivityCard");
+const { isElementInArray } = require("../helper/ArrayHelper")
 
 const pointsOfClub = async (club, startDate, endDate, justCurrentMember, search = "") => {
     let members = club.members
@@ -269,12 +271,51 @@ module.exports.getPointsOfActivity = async (req, res) => {
     const { search } = req.query
     try {
         const activity = await Activity.findById(activityId)
+            .populate("boards.cards")
         if (activity === undefined || activity === null) {
             res.status(404).send({ error: "Không tìm thấy hoạt động này." });
             return;
         }
-        const points = await activityPointsOfActivity(activity, search, activity.collaborators)
-        res.send(points)
+        const points = await activityPointsOfActivity(
+            activity, search, activity.collaborators
+        )
+        const promises = points.map(async (obj) => {
+            // const cards = await ActivityCard.find({userJoin: obj._id, activity: activityId})
+            let childArr = [{
+                username: "Tên thẻ tham gia",
+                name: "Mô tả",
+                email: "Trạng thái"
+            }]
+            activity.boards.map(column => {
+                column.cards.map(card => {
+                    if (isElementInArray(obj._id, card.userJoin)) {
+                        childArr.push({
+                            cardId: card._id,
+                            username: card.title,
+                            name: card.description,
+                            email: column.title,
+                            collabId: obj._id
+                        })
+                    }
+                })
+            })
+            const convertObj = {
+                img_url: obj.data.img_url,
+                email: obj.data.email,
+                facebook: obj.data.facebook,
+                name: obj.data.name,
+                phone: obj.data.phone,
+                username: obj.data.username,
+                gender: obj.data.gender,
+                point: obj.point,
+                _id: obj._id,
+                quantityCard: childArr.length > 1 ? childArr.length-1 : 0,
+                subRows: childArr.length > 1 ? childArr : []
+            }
+            return convertObj
+        })
+        const result = await Promise.all(promises)
+        res.send(result)
     } catch (err) {
         res.status(500).send({ error: err.message })
     }
