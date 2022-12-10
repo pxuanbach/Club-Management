@@ -235,13 +235,14 @@ const ClubPreview = ({ user, club, showSnackbar }) => {
                           <React.Fragment>
                             <Typography>
                               {activity.configType === "percent"
-                                ? "Hoàn thành dựa vào tỉ lệ thẻ tham gia. (%)"
-                                : "Hoàn thành dựa vào số lượng thẻ tham gia."}
+                                ? "Dựa vào tỉ lệ thẻ hoàn thành mà bạn tham gia."
+                                : "Dựa vào số lượng thẻ hoàn thành mà bạn tham gia."}
                             </Typography>
                             {activity.configMilestone.map(
                               (milestone, index) => (
                                 <Typography>
-                                  Mốc {index + 1}: {milestone.percentOrQuantity}{" "}
+                                  Mốc {index + 1}: {milestone.percentOrQuantity}
+                                  {activity.configType === "percent" ? "%" : " "}
                                   - {milestone.point} điểm.
                                 </Typography>
                               )

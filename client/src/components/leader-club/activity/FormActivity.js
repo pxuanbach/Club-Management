@@ -33,7 +33,7 @@ const styleCollaborator = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 950,
+  width: 1000,
   height: '100%',
   bgcolor: 'background.paper',
   border: 'none',

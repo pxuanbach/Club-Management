@@ -294,7 +294,9 @@ module.exports.getPointsOfActivity = async (req, res) => {
                             username: card.title,
                             name: card.description,
                             email: column.title,
-                            collabId: obj._id
+                            collabId: obj._id,
+                            collabUsername: obj.data.username,
+                            collabName: obj.data.name
                         })
                     }
                 })

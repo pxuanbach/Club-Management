@@ -238,7 +238,7 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
               </Select>
             </FormControl>
           </Stack>
-          <span><i>Hoàn thành được tính từ mốc 1 và chỉ tính các thẻ ở cột đã xong.</i></span>
+          <span><i>Hoàn thành được tính từ <b>mốc 1</b> và chỉ tính các thẻ ở cột <b>đã xong</b>.</i></span>
           <Stack
             fullWidth
             sx={{ borderLeft: '5px solid #1976d2', paddingLeft: '20px' }}

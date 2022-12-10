@@ -18,6 +18,7 @@ const style = {
   height: '100%',
   overflowY: 'scroll'
 };
+
 const Card = ({ card, isLeader, getColumnsActivity, isFinished }) => {
   const [showFormCardDetail, setShowFormCardDetail] = useState(false);
 

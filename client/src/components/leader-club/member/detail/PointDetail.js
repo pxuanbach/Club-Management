@@ -36,12 +36,12 @@ const PointDetail = ({
         {
             field: "title",
             headerName: "Nội dung",
-            flex: 1.2,
+            flex: 2,
         },
         {
             field: "createdAt",
             headerName: "Ngày tạo",
-            flex: 0.8,
+            flex: 0.6,
             headerAlign: 'center',
             align: "center",
             valueGetter: (value) => moment(value.row.createdAt).format("DD/MM/YYYY HH:mm"),
@@ -49,7 +49,7 @@ const PointDetail = ({
         {
             field: "author",
             headerName: "Người xác nhận",
-            flex: 0.8,
+            flex: 0.7,
             renderCell: (value) => {
                 return (
                     <a href='#' onClick={(e) =>
@@ -63,7 +63,7 @@ const PointDetail = ({
         {
             field: "value",
             headerName: "Điểm",
-            flex: 0.5,
+            flex: 0.4,
             headerAlign: 'center',
             align: "center",
         },
