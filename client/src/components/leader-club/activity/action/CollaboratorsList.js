@@ -15,7 +15,7 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
+const CollaboratorsList = ({ setShow, activityId, showSnackbar, isFinished }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState();
     const [collaborators, setCollaborators] = useState([]);
@@ -34,7 +34,7 @@ const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
         setIsLoading(true);
         axiosInstance
             .patch(
-                `/activity/updatecollaborators/${activity._id}`,
+                `/activity/updatecollaborators/${activityId}`,
                 JSON.stringify({
                     collaborators: collaboratorsSelected,
                 }),
@@ -55,7 +55,7 @@ const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
 
     const getCollaborators = () => {
         axiosInstance
-            .get(`/point/activity/${activity._id}`, {
+            .get(`/point/activity/${activityId}`, {
                 params: {
                     search: search,
                 },
@@ -83,26 +83,26 @@ const CollaboratorsList = ({ setShow, activity, showSnackbar, isFinished }) => {
             align: "center",
             flex: 0.5,
             renderCell: (value) => {
-                return <Avatar src={value.row.data.img_url} />;
+                return <Avatar src={value.row.img_url} />;
             },
         },
         {
             field: "username",
             headerName: "Tài khoản",
             flex: 1,
-            valueGetter: (value) => value.row.data.username,
+            valueGetter: (value) => value.row.username,
         },
         {
             field: "name",
             headerName: "Tên",
             flex: 1.5,
-            valueGetter: (value) => value.row.data.name,
+            valueGetter: (value) => value.row.name,
         },
         {
             field: "email",
             headerName: "Email",
             flex: 1.5,
-            valueGetter: (value) => value.row.data.email,
+            valueGetter: (value) => value.row.email,
         },
         {
             field: "point",

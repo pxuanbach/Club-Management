@@ -309,7 +309,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
             .get(`/activity/card/${card._id}`)
             .then((response) => {
                 //response.data
-                console.log(response.data);
+                // console.log(response.data);
                 setUserJoin(response.data.userJoin);
                 setGroupJoin(response.data.groupJoin);
                 setPoint(response.data.pointValue);
@@ -323,22 +323,22 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
             });
     };
 
-    const handleUpdateCardPoint = async () => {
-        try {
-            const res = await axiosInstance.patch(`/activity/card/point/${card._id}`,
-                JSON.stringify({
-                    point: point
-                }), {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            const data = res.data
-            showSnackbar("Cập nhật điểm thành công.", SeverityOptions.success);
-        } catch (err) {
-            showSnackbar(err.response.data.error, SeverityOptions.error);
-        }
-    };
+    // const handleUpdateCardPoint = async () => {
+    //     try {
+    //         const res = await axiosInstance.patch(`/activity/card/point/${card._id}`,
+    //             JSON.stringify({
+    //                 point: point
+    //             }), {
+    //             headers: {
+    //                 "Content-Type": "application/json"
+    //             }
+    //         })
+    //         const data = res.data
+    //         showSnackbar("Cập nhật điểm thành công.", SeverityOptions.success);
+    //     } catch (err) {
+    //         showSnackbar(err.response.data.error, SeverityOptions.error);
+    //     }
+    // };
 
     useEffect(() => {
         if (newCardTextareaRef && newCardTextareaRef.current) {
@@ -426,6 +426,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
                                         handleUserExit={handleUserExit}
                                         user={userSelected}
                                         isLeader={isLeader}
+
                                     />
                                 </Popover>
                             </div>
@@ -633,7 +634,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
                             Đính kèm
                         </button>
                     </div>
-                    {isLeader && <div className="action-2">
+                    {/* {isLeader && <div className="action-2">
                         <h4 className="title-action">Điểm của thẻ</h4>
                         <Stack direction="row" spacing={1} sx={{ marginTop: "10px" }}>
                             <TextField
@@ -659,7 +660,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
                                 Lưu
                             </Button>
                         </Stack>
-                    </div>}
+                    </div>} */}
                 </div>
             </div>
         </BlockUi>

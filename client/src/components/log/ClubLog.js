@@ -107,7 +107,7 @@ const ClubLog = ({ club }) => {
                 sx={{ padding: '6px 12px 6px 12px' }}
             >
                 <h2>Nhật ký câu lạc bộ</h2>
-                {user._id === club.leader && <Button
+                {user._id === club.leader._id && <Button
                     onClick={exportLogsFile}
                     style={{ background: "#1B264D" }}
                     variant="contained"

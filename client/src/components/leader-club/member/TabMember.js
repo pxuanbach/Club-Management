@@ -196,7 +196,7 @@ const TabMember = ({ club }) => {
         open={openDialog}
         setOpen={setOpenDialog}
         title="Đuổi thành viên"
-        contentText={`Bạn có chắc muốn xóa thẻ này?`}
+        contentText={`Bạn có chắc muốn đuổi người này?`}
         handleAgree={handleRemoveMembersFromClub}
       />
       <Snackbar

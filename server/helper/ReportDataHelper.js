@@ -75,10 +75,36 @@ const convertActivityToExport = (activity) => {
         "Tạo ngày": moment(activity.createdAt).format("DD/MM/YYYY HH:mm:ss"),
         "Ngày bắt đầu": moment(activity.startDate).format("DD/MM/YYYY HH:mm:ss"),
         "Ngày kết thúc": moment(activity.endDate).format("DD/MM/YYYY HH:mm:ss"),
+        "Chỉ cần tham gia là được điểm": activity.joinPoint,
+        "Cách hoàn thành": activity.configType === "percent" ? "Tỉ lệ thẻ tham gia" : "Số lượng thẻ tham gia"
     }
 
     return Object.entries(obj).map(([key, value]) => ({ key, value }));
 };
+
+const convertActivityConfigToExport = (activity) => {
+    let dataArr = []
+    if (activity.configType === "percent") {
+        activity.configMilestone.map((milestone, index) => {
+            const data = {
+                "Mốc": index+1,
+                "Tỉ lệ": milestone.percentOrQuantity,
+                "Điểm đạt được": milestone.point
+            }
+            dataArr.push(data)
+        })
+    } else if (activity.configType === "quantity") {
+        activity.configMilestone.map((milestone, index) => {
+            const data = {
+                "Mốc": index+1,
+                "Số lượng": milestone.percentOrQuantity,
+                "Điểm đạt được": milestone.point
+            }
+            dataArr.push(data)
+        })
+    }
+    return dataArr
+}
 
 const convertLogsToExport = (logs) => {
     let dataArr = [];
@@ -121,23 +147,40 @@ const convertMembersToExport = (members) => {
     return dataArr;
 };
 
-const convertPointsToExport = (points) => {
+const convertPointsToExport = (points, joinPoint) => {
     let dataArr = [];
-    points.forEach((point) => {
-        const data = {
-            "Mã thành viên": point._id.toString(),
-            "Mã sinh viên": point.data.username,
-            "Tên": point.data.name,
-            "Giới tính": point.data.gender,
-            "Email": point.data.email,
-            "Số điện thoại": point.data.phone,
-            "Facebook": point.data.facebook,
-            "Điểm": point.point,
-        };
-        //console.log(data)
-        dataArr.push(data);
-    });
-
+    if (joinPoint === null) {
+        points.forEach((point) => {
+            const data = {
+                "Mã thành viên": point._id.toString(),
+                "Mã sinh viên": point.data.username,
+                "Tên": point.data.name,
+                "Giới tính": point.data.gender,
+                "Email": point.data.email,
+                "Số điện thoại": point.data.phone,
+                "Facebook": point.data.facebook,
+                "Điểm": point.point,
+            };
+            //console.log(data)
+            dataArr.push(data);
+        });
+    } else {
+        points.forEach((point) => {
+            const data = {
+                "Mã thành viên": point._id.toString(),
+                "Mã sinh viên": point.data.username,
+                "Tên": point.data.name,
+                "Giới tính": point.data.gender,
+                "Email": point.data.email,
+                "Số điện thoại": point.data.phone,
+                "Facebook": point.data.facebook,
+                "Điểm": point.point,
+                "Hoàn thành": point.point > joinPoint ? "X" : "",
+            };
+            //console.log(data)
+            dataArr.push(data);
+        });
+    }
     return dataArr;
 };
 
@@ -182,6 +225,7 @@ const convertFundHistoriesToExport = (fundhistories) => {
 module.exports = {
     convertClubsToExport,
     convertActivityToExport,
+    convertActivityConfigToExport,
     convertLogsToExport,
     convertMembersToExport,
     convertPointsToExport,

@@ -54,7 +54,7 @@ const Collaborators = ({ setShow, activity, showSnackbar }) => {
                     <TabPanel className='body-member' value={value} index={0}>
                         <CollaboratorsList
                             setShow={setShow}
-                            activity={activity}
+                            activityId={activity._id}
                             showSnackbar={showSnackbar}
                             isFinished={isFinished}
                         />

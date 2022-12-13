@@ -24,6 +24,18 @@ const activitySchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    joinPoint: {
+        type: Number,
+        default: 0
+    },
+    configType: {
+        type: String,
+        default: "percent" // percent/quantity
+    },
+    configMilestone: [{
+        percentOrQuantity: Number,
+        point: Number,
+    }]
 }, {timestamps: true})
 
 const Activity = mongoose.model('activities', activitySchema)

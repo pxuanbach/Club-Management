@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Container, Draggable } from 'react-smooth-dnd'
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, Stack, Modal, Box, styled } from '@mui/material';
 import BlockUi from 'react-block-ui';
 import 'react-block-ui/style.css';
 import './FormActivity.scss'
@@ -12,6 +12,35 @@ import axiosInstance from '../../../helper/Axios'
 import { cloneDeep } from 'lodash';
 import { UserContext } from '../../../UserContext';
 import moment from 'moment';
+import ActivityConfig from './ActivityConfig';
+import SeverityOptions from '../../../helper/SeverityOptions';
+import CollaboratorsInActivity from './action/CollaboratorsInActivity';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+};
+
+const styleCollaborator = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 1000,
+  height: '100%',
+  bgcolor: 'background.paper',
+  border: 'none',
+  boxShadow: 24,
+  p: 4,
+  overflowY: 'scroll'
+};
 
 const FormActivity = ({ match, isLeader }) => {
   const { user } = useContext(UserContext);
@@ -21,9 +50,14 @@ const FormActivity = ({ match, isLeader }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [isFinished, setIsFinished] = useState(false);
+  const [isSumaried, setIsSumaried] = useState(false);
+  const [showFormConfig, setShowFormConfig] = useState(false);
+  const [showFormCollaborator, setShowFormCollaborator] = useState(false);
+  const [options, setOptions] = useState(SeverityOptions.error)
 
-  const showSnackbar = (message) => {
-    setAlertMessage(message)
+  const showSnackbar = (message, options) => {
+    setAlertMessage(message);
+    setOptions(options);
     setOpenSnackbar(true);
   }
 
@@ -108,7 +142,8 @@ const FormActivity = ({ match, isLeader }) => {
     axiosInstance.get(`/activity/one/${activityId}`)
       .then(response => {
         //response.data
-        setIsFinished(moment() > moment(response.data.endDate))
+        setIsFinished(moment() > moment(response.data.endDate));
+        setIsSumaried(response.data.sumary !== "")
         setColumns(response.data.boards)
         setIsLoading(false);
       }).catch(err => {
@@ -182,10 +217,48 @@ const FormActivity = ({ match, isLeader }) => {
         open={openSnackbar}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity="error">{alertMessage}</Alert>
+        <Alert severity={options}>{alertMessage}</Alert>
       </Snackbar>
+      <Modal
+        open={showFormConfig}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        onClose={() => {
+          setShowFormConfig(false);
+        }}
+      >
+        <Box sx={style}>
+          <ActivityConfig
+            show={showFormConfig}
+            setShow={setShowFormConfig}
+            activityId={activityId}
+            showSnackbar={showSnackbar}
+            isFinished={isFinished}
+            isLeader={isLeader}
+          />
+        </Box>
+      </Modal>
+      <Modal
+        open={showFormCollaborator}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        onClose={() => {
+          setShowFormCollaborator(false);
+        }}
+      >
+        <Box sx={styleCollaborator}>
+          <CollaboratorsInActivity
+            setShow={setShowFormCollaborator}
+            activityId={activityId}
+            showSnackbar={showSnackbar}
+            isFinished={isFinished}
+            isLeader={isLeader}
+            isSumaried={isSumaried}
+          />
+        </Box>
+      </Modal>
       {user && <>
-        <div className='div-back'>
+        <Stack className='div-back' direction="row" justifyContent="space-between">
           <Link className="btn-back"
             style={{ color: 'white' }}
             to={`${match}`}
@@ -193,7 +266,23 @@ const FormActivity = ({ match, isLeader }) => {
             <i class="fa-solid fa-angle-left"></i>
             Trở về
           </Link>
-        </div>
+          <Stack direction="row" spacing={1}>
+            <div
+              onClick={() => setShowFormCollaborator(true)}
+              className="btn-back"
+              style={{ color: 'white', marginRight: '15px' }}>
+              <i class="fas fa-user-friends"></i>
+              Cộng tác viên
+            </div>
+            <div
+              onClick={() => setShowFormConfig(true)}
+              className="btn-back"
+              style={{ color: 'white', marginRight: '15px' }}>
+              <i class="fa-solid fa-gear"></i>
+              Cài đặt
+            </div>
+          </Stack>
+        </Stack>
         <div className='board-columns'>
           <Container
             orientation='horizontal'

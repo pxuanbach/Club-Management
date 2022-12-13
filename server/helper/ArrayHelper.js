@@ -16,6 +16,21 @@ function isElementInArrayObject(key, array) {
     return false;
 }
 
+function elementInArrayObject(key, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i]._id.toString() === key.toString()) {
+            return {
+                element: array[i], 
+                index: i
+            }
+        }
+    }
+    return {
+        element: null, 
+        index: -1
+    }
+}
+
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
   }
@@ -41,5 +56,6 @@ module.exports = {
     isElementInArrayObject,
     uniqueArray,
     uniqueIdObjArray,
-    notContainsNullArray
+    notContainsNullArray,
+    elementInArrayObject
 }

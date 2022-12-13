@@ -18,7 +18,7 @@
   text-decoration: none;
   color: #1B264D;
   cursor: pointer;
-  
+  user-select: none;
 }
 .btn-back >i{
   margin-right: 8px;
