@@ -9,6 +9,7 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
+import BlockUi from 'react-block-ui';
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -27,16 +28,15 @@ const CustomTextField = styled(TextField)({
 });
 
 const CollaboratorsInActivity = ({
-  setShow,
-  activityId,
-  showSnackbar,
-  isFinished,
+  setShow, activityId, showSnackbar, 
+  isFinished, isLeader, isSumaried
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState();
   const [collaborators, setCollaborators] = useState([]);
   const [collaboratorCardSelected, setCollaboratorCardSelected] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const isReadOnly = !Boolean(!isFinished && isLeader)
 
   const handleChangeSearch = (event) => {
     setSearch(event.target.value);
@@ -70,6 +70,7 @@ const CollaboratorsInActivity = ({
   };
 
   const getCollaborators = () => {
+    setIsLoading(true)
     axiosInstance
       .get(`/point/activity/${activityId}`, {
         params: {
@@ -85,7 +86,10 @@ const CollaboratorsInActivity = ({
         //err.response.data.error
         console.log(err);
         showSnackbar(err.response.data.error);
-      });
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   };
 
   useEffect(() => {
@@ -140,7 +144,7 @@ const CollaboratorsInActivity = ({
   );
 
   return (
-    <div className="addmember-modal">
+    <BlockUi tag="div" blocking={isLoading} className="addmember-modal">
       <CustomDialog
         open={openDialog}
         setOpen={setOpenDialog}
@@ -149,10 +153,21 @@ const CollaboratorsInActivity = ({
         handleAgree={handleRemoveCollaborators}
       />
       <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <h2>Cộng tác viên</h2>
+        <Button
+          disabled={isLoading}
+          onClick={handleClose}
+          variant="text"
+          disableElevation
+        >
+          <CloseIcon sx={{ color: "#1B264D" }} />
+        </Button>
+      </Stack>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
         <div className="stack-left">
           <CustomTextField
             id="search-field"
-            label="Tìm kiếm cộng tác viên"
+            label="Tìm kiếm"
             variant="standard"
             value={search}
             onChange={handleChangeSearch}
@@ -178,14 +193,6 @@ const CollaboratorsInActivity = ({
             </Button>
           </Tooltip>
         </div>
-        <Button
-          disabled={isLoading}
-          onClick={handleClose}
-          variant="text"
-          disableElevation
-        >
-          <CloseIcon sx={{ color: "#1B264D" }} />
-        </Button>
       </Stack>
       <div className="members__body">
         <MaterialReactTable
@@ -193,7 +200,7 @@ const CollaboratorsInActivity = ({
           data={collaborators}
           enableExpanding
           enableExpandAll //default
-          enableRowActions
+          enableRowActions={!isSumaried && isLeader}
           initialState={{ density: "compact" }}
           enableDensityToggle={false}
           enableFullScreenToggle={false}
@@ -232,7 +239,7 @@ const CollaboratorsInActivity = ({
           }}
         />
       </div>
-    </div>
+    </BlockUi>
   );
 };
 

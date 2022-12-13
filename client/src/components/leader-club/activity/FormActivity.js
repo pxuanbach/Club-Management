@@ -14,7 +14,7 @@ import { UserContext } from '../../../UserContext';
 import moment from 'moment';
 import ActivityConfig from './ActivityConfig';
 import SeverityOptions from '../../../helper/SeverityOptions';
-import CollaboratorsList from './action/CollaboratorsInActivity';
+import CollaboratorsInActivity from './action/CollaboratorsInActivity';
 
 const style = {
   position: 'absolute',
@@ -50,6 +50,7 @@ const FormActivity = ({ match, isLeader }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [isFinished, setIsFinished] = useState(false);
+  const [isSumaried, setIsSumaried] = useState(false);
   const [showFormConfig, setShowFormConfig] = useState(false);
   const [showFormCollaborator, setShowFormCollaborator] = useState(false);
   const [options, setOptions] = useState(SeverityOptions.error)
@@ -141,7 +142,8 @@ const FormActivity = ({ match, isLeader }) => {
     axiosInstance.get(`/activity/one/${activityId}`)
       .then(response => {
         //response.data
-        setIsFinished(moment() > moment(response.data.endDate))
+        setIsFinished(moment() > moment(response.data.endDate));
+        setIsSumaried(response.data.sumary !== "")
         setColumns(response.data.boards)
         setIsLoading(false);
       }).catch(err => {
@@ -231,6 +233,8 @@ const FormActivity = ({ match, isLeader }) => {
             setShow={setShowFormConfig}
             activityId={activityId}
             showSnackbar={showSnackbar}
+            isFinished={isFinished}
+            isLeader={isLeader}
           />
         </Box>
       </Modal>
@@ -243,11 +247,13 @@ const FormActivity = ({ match, isLeader }) => {
         }}
       >
         <Box sx={styleCollaborator}>
-          <CollaboratorsList
+          <CollaboratorsInActivity
             setShow={setShowFormCollaborator}
             activityId={activityId}
             showSnackbar={showSnackbar}
-            isFinished={false}
+            isFinished={isFinished}
+            isLeader={isLeader}
+            isSumaried={isSumaried}
           />
         </Box>
       </Modal>

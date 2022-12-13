@@ -216,7 +216,7 @@ module.exports.create = (req, res) => {
       cards: [],
     },
   ];
-  const sortedConfigMilestone = configMilestone.sort((a, b) => b.percentOrQuantity - a.percentOrQuantity)
+  const sortedConfigMilestone = configMilestone.sort((a, b) => a.percentOrQuantity - b.percentOrQuantity);
   const activity = new Activity({
     club,
     title,

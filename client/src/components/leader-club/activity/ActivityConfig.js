@@ -22,7 +22,7 @@ import SeverityOptions from "../../../helper/SeverityOptions";
 export const DynamicInputField = ({
   inputFields, selectCriteriaOption,
   handlePercentOrQuantityChange, sortInputFields,
-  handleFormChange, removeFields
+  handleFormChange, removeFields, isReadOnly
 }) => {
 
   return (
@@ -61,7 +61,7 @@ export const DynamicInputField = ({
               type="number"
               onChange={event => handleFormChange(index, event)}
             />
-            <Button onClick={() => removeFields(index)}>
+            <Button disabled={isReadOnly} onClick={() => removeFields(index)}>
               <RemoveCircleIcon />
             </Button>
           </Stack>
@@ -71,30 +71,38 @@ export const DynamicInputField = ({
   )
 }
 
-const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
+const ActivityConfig = ({
+  show, setShow, activityId, showSnackbar,
+  isFinished, isLeader
+}) => {
   const [selectCriteriaOption, setSelectCriteriaOption] = useState("percent");
   const [joinPoint, setJoinPoint] = useState(0)
   const [inputFields, setInputFields] = useState([
     { percentOrQuantity: '', point: '' }
   ])
+  const isReadOnly = !Boolean(!isFinished && isLeader)
 
   const handlePercentOrQuantityChange = (index, event) => {
-    let data = [...inputFields];
-    if (selectCriteriaOption === "percent") {
-      if (event.target.value >= 0 && event.target.value <= 100) {
+    if (!isReadOnly) {
+      let data = [...inputFields];
+      if (selectCriteriaOption === "percent") {
+        if (event.target.value >= 0 && event.target.value <= 100) {
+          data[index]["percentOrQuantity"] = event.target.value;
+          setInputFields(data);
+        }
+      } else {
         data[index]["percentOrQuantity"] = event.target.value;
         setInputFields(data);
       }
-    } else {
-      data[index]["percentOrQuantity"] = event.target.value;
-      setInputFields(data);
     }
   }
 
   const handleFormChange = (index, event) => {
-    let data = [...inputFields];
-    data[index][event.target.name] = event.target.value;
-    setInputFields(data);
+    if (!isReadOnly) {
+      let data = [...inputFields];
+      data[index][event.target.name] = event.target.value;
+      setInputFields(data);
+    }
   }
 
   const addFields = () => {
@@ -207,7 +215,11 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
               label="Điểm"
               size="small"
               type="number"
-              onChange={e => setJoinPoint(e.target.value)}
+              onChange={e => {
+                if (!isReadOnly) {
+                  setJoinPoint(e.target.value)
+                }
+              }}
             />
           </Stack>
           <Stack
@@ -222,6 +234,8 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
             <FormControl sx={{ m: 1, minWidth: 160 }} fullWidth size="small">
               <InputLabel id="filter-select-small">Loại tiêu chí</InputLabel>
               <Select
+              // disabled={isReadOnly}
+                readOnly={isReadOnly}
                 labelId="filter-select-small"
                 id="filter-select-small"
                 value={selectCriteriaOption}
@@ -251,43 +265,18 @@ const ActivityConfig = ({ show, setShow, activityId, showSnackbar }) => {
               sortInputFields={sortInputFields}
               handleFormChange={handleFormChange}
               removeFields={removeFields}
+              isReadOnly={isReadOnly}
             />
-            <Button onClick={addFields} startIcon={<AddCircleIcon />}>Thêm mốc...</Button>
+            <Button
+              disabled={isReadOnly}
+              onClick={addFields}
+              startIcon={<AddCircleIcon />}>
+              Thêm mốc...
+            </Button>
           </Stack>
-          {/* <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
-            justifyContent="stretch"
-          >
-            <Typography sx={{ minWidth: "150px" }}>Cách tính điểm</Typography>
-            <FormControl fullWidth size="small">
-              <InputLabel id="filter-select-small">Cách tính</InputLabel>
-              <Select
-                labelId="filter-select-small"
-                id="filter-select-small"
-                value={selectWayCalOption}
-                onChange={(e) => {
-                  setSelectWayCalOption(e.target.value);
-                }}
-                label="Cách tính"
-              >
-                <MenuItem value={0}>Tính điểm theo tiêu chí hoàn thành</MenuItem>
-                <MenuItem value={1}>Tính điểm theo thẻ hoạt động</MenuItem>
-              </Select>
-            </FormControl>
-            <HtmlTooltip
-              title={
-                <React.Fragment>
-                  <Typography>{wayCalTip}</Typography>
-                </React.Fragment>
-              }
-            >
-              <HelpIcon sx={{ cursor: "pointer" }} />
-            </HtmlTooltip>
-          </Stack> */}
           <Stack direction="row" spacing={1} justifyContent="flex-end">
             <Button
+              disabled={isReadOnly}
               onClick={handleSaveConfig}
               variant="contained"
               disableElevation

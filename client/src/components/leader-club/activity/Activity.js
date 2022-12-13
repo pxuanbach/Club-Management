@@ -30,8 +30,8 @@ const Activity = ({ match, club_id }) => {
         isLeader = user._id === club.leader._id
     }
     return (
-        <Switch>
-            {user ? (<>
+        <>
+            {user ? <Switch>
                 <Route path={`${match}/:activityId`}>
                     <FormActivity
                         match={match}
@@ -50,8 +50,9 @@ const Activity = ({ match, club_id }) => {
                             <CircularProgress />
                         </Box>}
                 </Route>
-            </>) : (<></>)}
-        </Switch>
+                
+            </Switch> : (<></>)}
+        </>
 
     )
 }

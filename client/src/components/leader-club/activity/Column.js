@@ -26,6 +26,7 @@ const Column = ({
     const open = Boolean(anchorEl);
     let cards = column.cards
 
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };

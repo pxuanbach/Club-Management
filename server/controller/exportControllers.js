@@ -17,7 +17,8 @@ const {
     convertUsersToExport,
     convertGeneralInfoToExport,
     convertPointDetailsToExport,
-    convertFundHistoriesToExport
+    convertFundHistoriesToExport,
+    convertActivityConfigToExport
 } = require("../helper/ReportDataHelper")
 
 
@@ -93,9 +94,14 @@ module.exports.exportActivity = async (req, res) => {
         const collaboratorPoints = await activityPointsOfActivity(activity, "", activity.collaborators)
 
         var activityWS = xlsx.utils.json_to_sheet(convertActivityToExport(activity), { skipHeader: 1 });
-        var membersWS = xlsx.utils.json_to_sheet(convertPointsToExport(memberPoints));
+        xlsx.utils.sheet_add_json(
+            activityWS, 
+            convertActivityConfigToExport(activity), 
+            { origin: `A9` }
+        )
+        var membersWS = xlsx.utils.json_to_sheet(convertPointsToExport(memberPoints, activity.joinPoint));
         var collaboratorsWS = xlsx.utils.json_to_sheet(
-            convertPointsToExport(collaboratorPoints)
+            convertPointsToExport(collaboratorPoints, activity.joinPoint)
         );
         var wb = xlsx.utils.book_new();
 
@@ -115,8 +121,9 @@ module.exports.exportActivity = async (req, res) => {
 
         // column width
         var generalWscols = [
-            { wch: 22 },
-            { wch: 30 },
+            { wch: 25 },
+            { wch: 25 },
+            { wch: 20 },
         ];
         generalWS['!cols'] = generalWscols
         activityWS['!cols'] = generalWscols
@@ -129,6 +136,7 @@ module.exports.exportActivity = async (req, res) => {
             { wch: 12 },    // phone
             { wch: 50 },    // facebook
             { wch: 10 },    // point
+            { wch: 10 },    // done?
         ]
         membersWS['!cols'] = membersWscols
         collaboratorsWS['!cols'] = membersWscols
@@ -474,7 +482,7 @@ module.exports.exportMemberPoints = async (req, res) => {
             }
         ]
         var pointsWS = xlsx.utils.json_to_sheet(jsonObjArr, { skipHeader: 1 });
-        xlsx.utils.sheet_add_json(pointsWS, convertPointsToExport(points), { origin: "A5" })
+        xlsx.utils.sheet_add_json(pointsWS, convertPointsToExport(points, null), { origin: "A5" })
         var wb = xlsx.utils.book_new();
 
         // column width
@@ -487,7 +495,10 @@ module.exports.exportMemberPoints = async (req, res) => {
             { wch: 25 },    // id
             { wch: 20 },    // username, filter date
             { wch: 20 },    // name
+            { wch: 10 },    // gender
             { wch: 25 },    // email
+            { wch: 12 },    // phone
+            { wch: 50 },    // facebook
             { wch: 10 },    // point
         ]
         pointsWS['!cols'] = pointsWscols

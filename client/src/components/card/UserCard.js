@@ -5,9 +5,6 @@ import {
 } from '@mui/material'
 import FacebookIcon from '@mui/icons-material/Facebook';
 import MailIcon from '@mui/icons-material/Mail';
-import SendIcon from '@mui/icons-material/Send';
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import './UserCard.css'
 
 const UserCard = ({ user, isLeader, handleUserExit }) => {
@@ -52,12 +49,12 @@ const UserCard = ({ user, isLeader, handleUserExit }) => {
                             <SendIcon sx={{ color: '#1B264D' }} />
                         </IconButton>
                     </Tooltip> */}
-                    {isLeader &&
+                    {/* {isLeader &&
                         <Tooltip title="Xóa khỏi thẻ">
                             <IconButton onClick={handleUserExit}>
                                 <HighlightOffIcon sx={{ color: '#1B264D' }} />
                             </IconButton>
-                        </Tooltip>}
+                        </Tooltip>} */}
                 </CardActions>
             </Card>
         </Box>

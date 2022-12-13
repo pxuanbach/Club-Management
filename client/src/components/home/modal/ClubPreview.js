@@ -242,7 +242,7 @@ const ClubPreview = ({ user, club, showSnackbar }) => {
                               (milestone, index) => (
                                 <Typography>
                                   Mốc {index + 1}: {milestone.percentOrQuantity}
-                                  {activity.configType === "percent" ? "%" : " "}
+                                  {activity.configType === "percent" ? "% " : " "}
                                   - {milestone.point} điểm.
                                 </Typography>
                               )
@@ -259,11 +259,9 @@ const ClubPreview = ({ user, club, showSnackbar }) => {
                     <b>{moment(activity.startDate).format("DD/MM/YYYY")}</b> -{" "}
                     <b>{moment(activity.endDate).format("DD/MM/YYYY")}</b>
                   </span>
-                  {activity.joinPoint && (
-                    <span>
+                  {activity.joinPoint !== 0 ? <span>
                       Chỉ cần tham gia là được cộng {activity.joinPoint} điểm.
-                    </span>
-                  )}
+                    </span> : <></>}
                 </Stack>
                 <div>
                   {activity.requested ? (

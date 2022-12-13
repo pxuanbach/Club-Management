@@ -426,6 +426,7 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
                                         handleUserExit={handleUserExit}
                                         user={userSelected}
                                         isLeader={isLeader}
+
                                     />
                                 </Popover>
                             </div>
