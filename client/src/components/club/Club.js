@@ -5,7 +5,7 @@ import Activity from "../leader-club/activity/Activity";
 import Calendar from "../leader-club/calendar/Calendar";
 import Member from "../leader-club/member/Member";
 import Message from "../leader-club/message/Message";
-import Fund from "../leader-club/fund/Fund";
+import FundTabbar from "../leader-club/fund/FundTabbar";
 import Notification from "../leader-club/invite/Notification";
 import ClubLog from '../log/ClubLog'
 import NavbarClub from "../leader-club/Navbar-Club";
@@ -57,7 +57,7 @@ const Club = () => {
                 <Member club={club} />
               </Route>
               <Route path={`/club/${club_id}/${club_name}/fund`}>
-                <Fund club_id={club_id} />
+                <FundTabbar club={club} />
               </Route>
               <Route path={`/club/${club_id}/${club_name}/invite`}>
                 <Notification club={club} />
