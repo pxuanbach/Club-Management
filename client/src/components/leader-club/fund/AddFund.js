@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
 import {
     Button, TextField, ToggleButton, ToggleButtonGroup,
-    Tooltip, Chip, LinearProgress, Typography, Box
+    Tooltip, Chip, LinearProgress, Typography, Box,
+    InputAdornment
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { styled } from "@mui/material/styles";
@@ -184,7 +185,8 @@ const AddFund = ({ setShowFormAdd, club_id, user, fundHistoryCreated, showSnackb
                         variant="outlined"
                         size="small"
                         InputProps={{
-                            inputComponent: NumberFormatCustom
+                            inputComponent: NumberFormatCustom,
+                            endAdornment: <InputAdornment position="end">đ</InputAdornment>
                         }}
                         onChange={handleChangeTotal}
                         helperText={totalErr}

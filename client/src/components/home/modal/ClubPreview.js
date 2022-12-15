@@ -182,6 +182,7 @@ const ClubPreview = ({ user, club, showSnackbar }) => {
               <span>
                 Số lượng thành viên: <b>{club.members_num}</b>
               </span>
+              <span>Mức quỹ hàng tháng: <b>{club.monthlyFund}</b> đ. Nộp đúng hạn được <b>{club.monthlyFundPoint}</b> điểm.</span>
             </Stack>
           </Stack>
           <Box>{renderButtonJoinClub()}</Box>

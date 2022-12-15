@@ -9,6 +9,7 @@ import MonthlyFundList from './MonthlyFundList';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import FundConfig from './FundConfig';
 
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
@@ -19,9 +20,22 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const MonthlyFundtab = ({ club_id, user }) => {
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    border: 'none',
+    boxShadow: 24,
+    p: 4,
+  };
+
+const MonthlyFundtab = ({ club, user }) => {
     const [fundHistorys, setFundHistorys] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [showFormConfig, setShowFormConfig] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [search, setSearch] = useState('');
 
@@ -35,7 +49,7 @@ const MonthlyFundtab = ({ club_id, user }) => {
     }
 
     const getFundHistories = () => {
-        axiosInstance.get(`/fund/list/${club_id}`, {
+        axiosInstance.get(`/fund/list/${club._id}`, {
             // params: {
             //     applyFilter: applyFilter,
             //     startDate: startDate,
@@ -68,6 +82,23 @@ const MonthlyFundtab = ({ club_id, user }) => {
             >
                 <Alert severity="error">{alertMessage}</Alert>
             </Snackbar>
+            <Modal
+            open={showFormConfig}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            onClose={() => {
+              setShowFormConfig(false);
+            }}
+          >
+            <Box sx={style}>
+              <FundConfig
+                show={showFormConfig} 
+                setShow={setShowFormConfig}
+                club={club}
+                showSnackbar={showSnackbar}
+              />
+            </Box>
+          </Modal>
             <Box sx={{ marginTop: 6, p: 2 }}>
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="flex-end">
                     <Stack direction="row" spacing={1} alignItems="flex-end">
@@ -108,6 +139,7 @@ const MonthlyFundtab = ({ club_id, user }) => {
                     <Stack direction="row" spacing={1}>
                         <Tooltip title='Tìm kiếm' placement='right-start'>
                             <Button
+                                onClick={() => setShowFormConfig(true)}
                                 style={{ background: '#1B264D' }}
                                 className='btn-config'
                                 variant="contained"

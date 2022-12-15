@@ -190,7 +190,7 @@ module.exports.getMembersJoinLogs = async (req, res) => {
         type: { $in: logType },
         content: member._id,
         club: clubId,
-      }).sort({createdAt: -1});
+      }).sort({ createdAt: -1 });
       if (log.length > 0) {
         member.dateJoin = log[0].createdAt
       }
@@ -545,6 +545,20 @@ module.exports.removeMembers = async (req, res) => {
     res.send(users);
   } catch (err) {
     console.log(err);
+    res.status(500).send({ error: err.message });
+  }
+};
+
+module.exports.updateFundConfig = async (req, res) => {
+  const clubId = req.params.clubId;
+  const { monthlyFund, monthlyFundPoint } = req.body;
+  try {
+    let club = await Club.findById(clubId)
+    club.monthlyFund = monthlyFund
+    club.monthlyFundPoint = monthlyFundPoint
+    const savedClub = await club.save()
+    res.status(200).send(savedClub)
+  } catch (err) {
     res.status(500).send({ error: err.message });
   }
 };

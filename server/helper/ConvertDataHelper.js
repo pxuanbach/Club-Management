@@ -10,6 +10,8 @@ function ConvertClub(data) {
     club.fund = data.fund;
     club.leader = data.leader;
     club.treasurer = data.treasurer;
+    club.monthlyFund = data.monthlyFund
+    club.monthlyFundPoint = data.monthlyFundPoint
     //Relation field
     club.members_num = 2 + data.members.length; // + ...
 
@@ -31,6 +33,8 @@ function ConvertClubs(data) {
         club.fund = elm.fund;
         club.leader = elm.leader;
         club.treasurer = elm.treasurer;
+        club.monthlyFund = elm.monthlyFund
+        club.monthlyFundPoint = elm.monthlyFundPoint
         //Relation field
         club.members_num = 2 + elm.members.length; // + ...
 
