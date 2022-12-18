@@ -3,6 +3,8 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const cors = require("cors");
 
+const scheduler = require('./scheduler/index')
+
 //Routes
 const authRoutes = require("./routes/authRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
@@ -76,6 +78,8 @@ io.on("connection", (socket) => {
         console.log("on disconnect io", io.sockets.adapter.rooms);
     });
 });
+
+scheduler.initScheduledJobs();
 
 http.listen(PORT, () => {
     console.log(`listening on port ${PORT}`);

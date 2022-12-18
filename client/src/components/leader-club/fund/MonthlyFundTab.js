@@ -9,7 +9,13 @@ import MonthlyFundList from './MonthlyFundList';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import FundConfig from './FundConfig';
+import AddMonthlyFund from './AddMonthlyFund'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import moment from 'moment';
 
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
@@ -30,14 +36,28 @@ const style = {
     border: 'none',
     boxShadow: 24,
     p: 4,
-  };
+};
+
+const styleAddMonthlyFund = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 800,
+    bgcolor: 'background.paper',
+    border: 'none',
+    boxShadow: 24,
+    p: 4,
+};
 
 const MonthlyFundtab = ({ club, user }) => {
     const [fundHistorys, setFundHistorys] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [showFormConfig, setShowFormConfig] = useState(false);
+    const [showFormAddMonthlyFund, setShowFormAddMonthlyFund] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [search, setSearch] = useState('');
+    const [currentMonth, setCurrentMonth] = useState(new Date());
 
     const handleChangeSearch = (event) => {
         setSearch(event.target.value)
@@ -83,25 +103,63 @@ const MonthlyFundtab = ({ club, user }) => {
                 <Alert severity="error">{alertMessage}</Alert>
             </Snackbar>
             <Modal
-            open={showFormConfig}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-            onClose={() => {
-              setShowFormConfig(false);
-            }}
-          >
-            <Box sx={style}>
-              <FundConfig
-                show={showFormConfig} 
-                setShow={setShowFormConfig}
-                club={club}
-                showSnackbar={showSnackbar}
-              />
-            </Box>
-          </Modal>
+                open={showFormConfig}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                onClose={() => {
+                    setShowFormConfig(false);
+                }}
+            >
+                <Box sx={style}>
+                    <FundConfig
+                        show={showFormConfig}
+                        setShow={setShowFormConfig}
+                        club={club}
+                        showSnackbar={showSnackbar}
+                    />
+                </Box>
+            </Modal>
+            <Modal
+                open={showFormAddMonthlyFund}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                onClose={() => {
+                    setShowFormAddMonthlyFund(false);
+                }}
+            >
+                <Box sx={styleAddMonthlyFund}>
+                    <AddMonthlyFund
+                        show={showFormAddMonthlyFund}
+                        setShow={setShowFormAddMonthlyFund}
+                        club={club}
+                        showSnackbar={showSnackbar}
+                    />
+                </Box>
+            </Modal>
             <Box sx={{ marginTop: 6, p: 2 }}>
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="flex-end">
                     <Stack direction="row" spacing={1} alignItems="flex-end">
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DatePicker
+                                size="small"
+                                views={['year', 'month']}
+                                label="Tháng"
+                                inputFormat='MM/YYYY'
+                                maxDate={moment()}
+                                value={currentMonth}
+                                onChange={(newValue) => {
+                                    setCurrentMonth(newValue);
+                                }}
+                                renderInput={(params) =>
+                                    <TextField
+                                        {...params}
+                                        size='small'
+                                        sx={{ width: 150 }}
+                                        helperText={null}
+                                    />
+                                }
+                            />
+                        </LocalizationProvider>
                         <Box
                             sx={{
                                 '& > :not(style)': { width: '30ch' },
@@ -137,7 +195,18 @@ const MonthlyFundtab = ({ club, user }) => {
                         </Tooltip>
                     </Stack>
                     <Stack direction="row" spacing={1}>
-                        <Tooltip title='Tìm kiếm' placement='right-start'>
+                        <Tooltip title='Xác nhận quỹ tháng' placement='right-start'>
+                            <Button
+                                onClick={() => setShowFormAddMonthlyFund(true)}
+                                style={{ background: '#1B264D' }}
+                                className='btn-confirm-monthlyfund'
+                                variant="contained"
+                                disableElevation
+                                startIcon={<PlaylistAddCheckIcon />}>
+                                Xác nhận quỹ tháng
+                            </Button>
+                        </Tooltip>
+                        <Tooltip title='Cài đặt quỹ' placement='right-start'>
                             <Button
                                 onClick={() => setShowFormConfig(true)}
                                 style={{ background: '#1B264D' }}
