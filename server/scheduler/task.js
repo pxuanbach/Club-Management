@@ -1,5 +1,6 @@
 const Club = require('../models/Club');
 const FundHistory = require('../models/FundHistory');
+const Point = require('../models/Point');
 const moment = require('moment');
 
 const isMonthlyFundExist = async (club, start, end) => {
@@ -62,6 +63,34 @@ const createNewMonthlyFundOfClubs = async () => {
     })
 }
 
+const sumaryMonthlyFundPointOfClubs = async () => {
+    const clubs = await Club.find({isblocked: false});
+    const previousMonthStartDate = moment().subtract(1, 'months').startOf('month');
+    const previousMonthEndDate = moment().subtract(1, 'months').endOf('month');
+    clubs.map(async (club) => {
+        if (club.monthlyFundPoint > 0) {
+            const fundHistory = await isMonthlyFundExist(
+                club, previousMonthStartDate, previousMonthEndDate
+            );
+            if (fundHistory !== null) {
+                fundHistory.submitted.map(async (sub) => {
+                    if (sub.total > 0) {
+                        const point = new Point({
+                            title: `Nộp quỹ tháng ${previousMonthStartDate.format("MM/YYYY")}`,
+                            club: club._id,
+                            value: club.monthlyFundPoint,
+                            author: club.treasurer,
+                            user: sub.member_id,
+                        });
+                        await point.save()
+                    }
+                })
+            }
+        }
+    })
+}
+
 module.exports = {
-    createNewMonthlyFundOfClubs
+    createNewMonthlyFundOfClubs,
+    sumaryMonthlyFundPointOfClubs
 }

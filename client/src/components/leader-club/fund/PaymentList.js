@@ -45,7 +45,7 @@ export default function DataTable({ rows }) {
         return (
           <Chip sx={{ p: 1, fontSize: 14 }}
             label={value.row.type}
-            color={value.row.type === "Thu" ? "success" : "error"}
+            color={value.row.type === "Thu" ? "success" : value.row.type === "Chi" ? "error" : "primary"}
           />
         )
       }
@@ -53,7 +53,7 @@ export default function DataTable({ rows }) {
     {
       field: 'createdAt',
       headerName: 'Thời gian',
-      flex: 0.7,
+      flex: 0.5,
       valueGetter: (value) => formatter.format(Date.parse(value.row.createdAt)) + 'p',
     },
     {
@@ -65,7 +65,7 @@ export default function DataTable({ rows }) {
     {
       field: 'file_url',
       headerName: 'Tệp liên kết',
-      flex: 0.7,
+      flex: 0.6,
       headerAlign: 'center',
       align: 'center',
       renderCell: (value) => {

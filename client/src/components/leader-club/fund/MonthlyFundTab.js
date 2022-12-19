@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
     Modal, Button, Tooltip, Box, TextField, styled,
-    Alert, Snackbar, CircularProgress, Stack, FormControlLabel,
-    Checkbox
+    Alert, Snackbar, CircularProgress, Stack,
 } from '@mui/material';
 import axiosInstance from '../../../helper/Axios';
 import MonthlyFundList from './MonthlyFundList';
@@ -11,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import FundConfig from './FundConfig';
-import AddMonthlyFund from './AddMonthlyFund'
+import AddMonthlyFund from './AddMonthlyFund';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -69,13 +68,13 @@ const MonthlyFundtab = ({ club, user }) => {
     }
 
     const getFundHistories = () => {
-        axiosInstance.get(`/fund/list/${club._id}`, {
-            // params: {
-            //     applyFilter: applyFilter,
-            //     startDate: startDate,
-            //     endDate: endDate,
-            //     search: search
-            // },
+        axiosInstance.get(`/fund/monthlyfund/${club._id}`, {
+            params: {
+                applyFilter: false,
+                startDate: new Date(moment().startOf("month")),
+                endDate: new Date(moment().endOf("month")),
+                search: search
+            },
             headers: { "Content-Type": "application/json" }
         })
             .then(response => {
@@ -91,6 +90,10 @@ const MonthlyFundtab = ({ club, user }) => {
     useEffect(() => {
         getFundHistories()
     }, [])
+
+    useEffect(() => {
+        getFundHistories()
+    }, [currentMonth])
 
     return (
         <div>
@@ -125,6 +128,7 @@ const MonthlyFundtab = ({ club, user }) => {
                 aria-describedby="modal-modal-description"
                 onClose={() => {
                     setShowFormAddMonthlyFund(false);
+                    getFundHistories();
                 }}
             >
                 <Box sx={styleAddMonthlyFund}>
@@ -133,13 +137,14 @@ const MonthlyFundtab = ({ club, user }) => {
                         setShow={setShowFormAddMonthlyFund}
                         club={club}
                         showSnackbar={showSnackbar}
+                        isReadOnly={false}
                     />
                 </Box>
             </Modal>
             <Box sx={{ marginTop: 6, p: 2 }}>
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="flex-end">
                     <Stack direction="row" spacing={1} alignItems="flex-end">
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                        {/* <LocalizationProvider dateAdapter={AdapterMoment}>
                             <DatePicker
                                 size="small"
                                 views={['year', 'month']}
@@ -159,7 +164,7 @@ const MonthlyFundtab = ({ club, user }) => {
                                     />
                                 }
                             />
-                        </LocalizationProvider>
+                        </LocalizationProvider> */}
                         <Box
                             sx={{
                                 '& > :not(style)': { width: '30ch' },

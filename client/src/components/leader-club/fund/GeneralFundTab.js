@@ -90,7 +90,7 @@ const GeneralFundTab = ({ club_id, user }) => {
       ...prevClub,
       fund: data.fund
     }))
-    if (data.fundHistory.type === 'Thu') {
+    if (data.fundHistory.type === 'Thu' || data.fundHistory.type === 'Thu mỗi tháng') {
       setCollect(collect + data.fundHistory.total)
     } else {
       setPay(pay + data.fundHistory.total)

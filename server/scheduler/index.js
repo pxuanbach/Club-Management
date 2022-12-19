@@ -1,5 +1,5 @@
 const CronJob = require("node-cron");
-const { createNewMonthlyFundOfClubs } = require('./task')
+const { createNewMonthlyFundOfClubs, sumaryMonthlyFundPointOfClubs } = require('./task')
 
 /**
  ┌────────────── second (optional) 	0-59
@@ -12,10 +12,12 @@ const { createNewMonthlyFundOfClubs } = require('./task')
  * * * * * *
 */
 const cronExpression = "* * 1 * *"    // run task every month
+// const cronExpression = "1 * * * * *"    // run task every minutes
 exports.initScheduledJobs = async () => {
     const scheduledJobFunction = CronJob.schedule(cronExpression, async () => {
         console.log("I'm executed on a schedule!");
         // Add your custom logic here
+        await sumaryMonthlyFundPointOfClubs();
         await createNewMonthlyFundOfClubs();
     });
 

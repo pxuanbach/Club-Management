@@ -24,106 +24,55 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const AddMonthlyFund = ({
-    show, setShow, club, showSnackbar, isReadOnly
+const ViewMonthlyFund = ({
+    show, setShow, fund
 }) => {
-    const current = moment();
+    const isReadOnly = true
     const [currentMonthlyFund, setCurrentMonthlyFund] = useState()
     const [submittedList, setSubmittedList] = useState([]);
     const [submittedCount, setSubmittedCount] = useState(0);
-    const [globalCheck, setGlobalCheck] = useState(false);
     const [search, setSearch] = useState('')
 
     let euroGerman = Intl.NumberFormat("en-DE");
 
     const getCurrentMonthlyFund = async () => {
-        try {
-            const res = await axiosInstance.get(`/fund/monthlyfund/${club._id}/one`)
-            const data = res.data
-            // console.log(data)
-            let count = 0
-            data.submitted.map((obj) => {
-                if (obj.total > 0) {
-                    count++;
-                }
-            })
-            setSubmittedCount(count)
-            setSubmittedList(data.submitted)
-            setCurrentMonthlyFund(data)
-        } catch (err) {
-            showSnackbar(err.response.data.error)
-        }
+        const res = await axiosInstance.get(`/fund/${fund._id}`)
+        const data = res.data
+        console.log(data)
+        let count = 0
+        data.submitted.map((obj) => {
+            if (obj.total > 0) {
+                count++;
+            }
+        })
+        setSubmittedCount(count)
+        setSubmittedList(data.submitted)
+        setCurrentMonthlyFund(data)
     }
 
     const handleSearch = async (e) => {
         e.preventDefault()
         if (search !== "") {
-            try {
-                const res = await axiosInstance.get(`/fund/monthlyfund/${club._id}/one`)
-                const data = res.data
-                // console.log(data)
-                let count = 0
-                const updatedSubmitted = data.submitted.filter((obj) => {
-                    if (obj.member_id.name.includes(search)
-                        || obj.member_id.username.includes(search)
-                        || obj.member_id.email.includes(search)) {
-                        if (obj.total > 0) {
-                            count++;
-                        }
-                        return obj
-                    }
-                })
-                setSubmittedCount(count)
-                setSubmittedList(updatedSubmitted)
-                setCurrentMonthlyFund(data)
-            } catch (err) {
-                showSnackbar(err.response.data.error)
-            }
-        } else {
-            getCurrentMonthlyFund()
-        }
-    }
-
-    const handleChangeAllCheckbox = (e) => {
-        e.preventDefault();
-        setGlobalCheck(e.target.checked)
-    }
-
-    const handleChangeSingleCheckbox = (e, param) => {
-        e.preventDefault();
-        const updateSumitted = submittedList.map((submitted) => {
-            if (submitted._id === param._id) {
-                return {
-                    ...submitted,
-                    total: e.target.checked === true ? club.monthlyFund : 0
-                }
-            }
-            return submitted
-        })
-        setSubmittedList(updateSumitted)
-    }
-
-    const handleSaveSubmittedList = async () => {
-        try {
-            const res = await axiosInstance.patch(
-                `/fund/monthlyfund/${club._id}`,
-                JSON.stringify({ submittedList }),
-                {
-                    headers: { "Content-Type": "application/json" }
-                }
-            )
+            const res = await axiosInstance.get(`/fund/${fund._id}`)
             const data = res.data
+            // console.log(data)
             let count = 0
-            data.submitted.map((obj) => {
-                if (obj.total > 0) {
-                    count++;
+            const updatedSubmitted = data.submitted.filter((obj) => {
+                if (obj.member_id.name.includes(search)
+                    || obj.member_id.username.includes(search)
+                    || obj.member_id.email.includes(search)) {
+                    if (obj.total > 0) {
+                        count++;
+                    }
+                    return obj
                 }
             })
             setSubmittedCount(count)
-            setSubmittedList(data.submitted)
+            setSubmittedList(updatedSubmitted)
             setCurrentMonthlyFund(data)
-        } catch (err) {
-            showSnackbar(err?.response?.data.error)
+
+        } else {
+            getCurrentMonthlyFund()
         }
     }
 
@@ -170,15 +119,12 @@ const AddMonthlyFund = ({
             renderHeader: () => (
                 <Checkbox
                     disabled={isReadOnly}
-                    checked={globalCheck}
-                    onChange={handleChangeAllCheckbox}
                 />
             ),
             renderCell: (value) => {
                 return <Checkbox
                     disabled={isReadOnly}
                     checked={value.row.total > 0}
-                    onChange={(e) => handleChangeSingleCheckbox(e, value.row)}
                 />;
             },
         }
@@ -188,21 +134,11 @@ const AddMonthlyFund = ({
         getCurrentMonthlyFund()
     }, [])
 
-    useEffect(() => {
-        const updateSumitted = submittedList.map((submitted) => {
-            return {
-                ...submitted,
-                total: globalCheck === true ? club.monthlyFund : 0
-            }
-        })
-        setSubmittedList(updateSumitted)
-    }, [globalCheck])
-
     return (
         <div>
             <Stack direction="column" spacing={4}>
                 <Stack direction="row" justifyContent="space-between">
-                    <h2>Quỹ tháng {current.format("MM/YYYY")}</h2>
+                    <h2>Quỹ tháng {moment(currentMonthlyFund?.createdAt).format("MM/YYYY")}</h2>
                     <Button
                         // disabled={isLoading}
                         onClick={() => setShow(false)}
@@ -218,8 +154,8 @@ const AddMonthlyFund = ({
                         spacing={1.5}
                         justifyContent="stretch"
                     >
-                        <Typography sx={{ minWidth: 250 }}>Mức thu hàng tháng {" "}
-                            {euroGerman.format(club.monthlyFund)}.</Typography>
+                        <Typography sx={{ minWidth: 250 }}>Tổng thu {" "}
+                            {euroGerman.format(currentMonthlyFund?.total)} đ.</Typography>
                         <Typography>{submittedCount}/{submittedList.length} đã nộp.</Typography>
                         <Stack direction="row" spacing={1} alignItems="flex-end">
                             <CustomTextField
@@ -269,30 +205,10 @@ const AddMonthlyFund = ({
                             rowsPerPageOptions={[7]}
                         />
                     </div>
-                    {isReadOnly === false ? <Stack
-                        direction="row"
-                        spacing={1}
-                        justifyContent="flex-end"
-                    >
-                        <Button
-                            onClick={handleSaveSubmittedList}
-                            variant="contained"
-                            disableElevation
-                        >
-                            Xác nhận
-                        </Button>
-                        <Button
-                            onClick={() => setShow(false)}
-                            variant="outlined"
-                            disableElevation
-                        >
-                            Hủy
-                        </Button>
-                    </Stack> : <></>}
                 </Stack>
             </Stack>
         </div>
     )
 }
 
-export default AddMonthlyFund;
+export default ViewMonthlyFund;

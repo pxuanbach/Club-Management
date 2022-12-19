@@ -1,24 +1,31 @@
 const FundHistory = require('../models/FundHistory')
 const Club = require('../models/Club')
+const Point = require('../models/Point')
 const cloudinary = require('../helper/Cloudinary')
 const fs = require('fs');
 const Buffer = require('buffer').Buffer
 const moment = require('moment')
 
 module.exports.getFundHistories = async (
-    clubId, startDate, endDate, applyFilter, search = ''
+    clubId, startDate, endDate, applyFilter, search = '', type = ''
 ) => {
     let startDateValue = startDate
     let endDateValue = endDate
     if (applyFilter === "false") {
-        const funds = await FundHistory.find({
+        let filterQuery =  {
             club: clubId,
             content: { $regex: search ? search : '' },
-        }).populate('author').sort({ createdAt: -1 })
+        }
+        if (type !== '') {
+            filterQuery = {...filterQuery, type: type}
+        }
+        const funds = await FundHistory.find(filterQuery)
+            .populate('author')
+            .sort({ createdAt: -1 })
         let collect = 0;
         let pay = 0;
         funds.forEach((fh) => {
-            if (fh.type === "Thu") {
+            if (fh.type === "Thu" || fh.type === "Thu mỗi tháng") {
                 collect += fh.total
             } else {
                 pay += fh.total
@@ -37,18 +44,22 @@ module.exports.getFundHistories = async (
     if (endDate === undefined) {
         endDateValue = moment().endOf('month')
     }
-    const funds = await FundHistory.find({
+    let filterQuery =  {
         club: clubId,
         content: { $regex: search ? search : '' },
         createdAt: {
             $gte: new Date(startDateValue),
             $lte: new Date(endDateValue)
         },
-    }).populate('author').sort({ createdAt: -1 })
+    }
+    if (type !== '') {
+        filterQuery = {...filterQuery, type: type}
+    }
+    const funds = await FundHistory.find(filterQuery).populate('author').sort({ createdAt: -1 })
     let collect = 0;
     let pay = 0;
     funds.forEach((fh) => {
-        if (fh.type === "Thu") {
+        if (fh.type === "Thu" || fh.type === "Thu mỗi tháng") {
             collect += fh.total
         } else {
             pay += fh.total
@@ -128,6 +139,46 @@ module.exports.getList = async (req, res) => {
     }
 }
 
+module.exports.getMonthlyFunds = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { startDate, endDate, applyFilter, search } = req.query
+    try {
+        result = await this.getFundHistories(
+            clubId, startDate, endDate, applyFilter, search, "Thu mỗi tháng"
+        )
+        res.send(result)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports.getMonthlyFund = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { startDate, endDate } = req.query
+    try {
+        let startDateValue = startDate
+        let endDateValue = endDate
+        if (startDate === undefined) {
+            startDateValue = moment().startOf('month')
+        }
+        if (endDate === undefined) {
+            endDateValue = moment().endOf('month')
+        }
+        let filterQuery =  {
+            club: clubId,
+            type: "Thu mỗi tháng",
+            createdAt: {
+                $gte: new Date(startDateValue),
+                $lte: new Date(endDateValue)
+            },
+        }
+        const fund = await FundHistory.findOne(filterQuery).populate("submitted.member_id")
+        res.status(200).send(fund)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
 module.exports.getColPayInMonth = (req, res) => {
     const clubId = req.params.clubId;
     const date = new Date();
@@ -181,4 +232,55 @@ module.exports.search = (req, res) => {
         }).catch(err => {
             res.status(500).json({ error: err.message })
         })
+}
+
+module.exports.getFundHistoryById = async (req, res) => {
+    const fundId = req.params.fundId;
+    try {
+        const fund = await FundHistory.findById(fundId).populate("submitted.member_id")
+        if (fund === undefined || fund === null) {
+            res.status(404).send({ error: `Không tìm thấy quỹ này` })
+        }
+        res.send(fund)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports.updateSubmitted = async (req, res) => {
+    const clubId = req.params.clubId;
+    const {submittedList} = req.body
+    const startDate = moment().startOf('month')
+    const endDate = moment().endOf('month')
+    try {
+        let filterQuery =  {
+            club: clubId,
+            type: "Thu mỗi tháng",
+            createdAt: {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            },
+        }
+        let fund = await FundHistory.findOne(filterQuery).populate('club');
+        if (fund === undefined || fund === null) {
+            res.status(404).send({ error: `Không tìm thấy quỹ tháng ${startDate.format("MM/YYYY")}.` })
+        }
+        total = 0
+        const validSubmittedList = submittedList.map(async (sub) => {
+            total = total + sub.total;
+            return {
+                total: sub.total,
+                member_id: sub.member_id._id
+            }
+        })
+        fund.submitted = validSubmittedList
+        fund.total = total
+        const savedFund = await fund.save()
+        const result = await savedFund
+            .populate("submitted.member_id")
+            .execPopulate();
+        res.send(result)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
 }
