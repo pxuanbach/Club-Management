@@ -18,7 +18,7 @@ const style = {
   p: 4,
 };
 
-export default function MonthlyFundList({ rows }) {
+export default function MonthlyFundList({ rows, user }) {
   const [anchorUser, setAnchorUser] = useState(null);
   const [userSelected, setUserSelected] = useState();
   const [showFormViewMonthlyFund, setShowFormViewMonthlyFund] = useState(false);
@@ -137,6 +137,7 @@ export default function MonthlyFundList({ rows }) {
             show={showFormViewMonthlyFund}
             setShow={setShowFormViewMonthlyFund}
             fund={fundSelected}
+            user={user}
           />
         </Box>
       </Modal>

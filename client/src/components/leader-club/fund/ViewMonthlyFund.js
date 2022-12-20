@@ -14,6 +14,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import axiosInstance from "../../../helper/Axios";
 import CloseIcon from "@mui/icons-material/Close";
 import moment from "moment";
+import FileDownload from 'js-file-download';
 
 const CustomTextField = styled(TextField)({
     "& label.Mui-focused": {
@@ -25,7 +26,7 @@ const CustomTextField = styled(TextField)({
 });
 
 const ViewMonthlyFund = ({
-    show, setShow, fund
+    show, setShow, fund, user
 }) => {
     const isReadOnly = true
     const [currentMonthlyFund, setCurrentMonthlyFund] = useState()
@@ -73,6 +74,24 @@ const ViewMonthlyFund = ({
 
         } else {
             getCurrentMonthlyFund()
+        }
+    }
+
+    const exportMonthlyFundFile = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axiosInstance.get(
+                `/export/monthlyfund/${currentMonthlyFund._id}/${user._id}`, {
+                headers: { "Content-Type": "application/vnd.ms-excel" },
+                responseType: 'blob'
+            });
+            const data = res.data;
+            if (data) {
+                FileDownload(data, Date.now() + `${fund.content}.xlsx`)
+            }
+        } catch (err) {
+            console.log(err)
+            // showSnackbar(err.response.data.error)
         }
     }
 
@@ -157,36 +176,47 @@ const ViewMonthlyFund = ({
                         <Typography sx={{ minWidth: 250 }}>Tổng thu {" "}
                             {euroGerman.format(currentMonthlyFund?.total)} đ.</Typography>
                         <Typography>{submittedCount}/{submittedList.length} đã nộp.</Typography>
-                        <Stack direction="row" spacing={1} alignItems="flex-end">
-                            <CustomTextField
-                                id="search-field"
-                                label="Tìm kiếm người dùng"
-                                variant="standard"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                size="small"
-                                onKeyPress={(event) =>
-                                    event.key === "Enter" ? handleSearch(event) : null
-                                }
-                            />
-                            <Tooltip title="Tìm kiếm" placement="right-start">
-                                <Button variant="text" disableElevation
-                                    onClick={handleSearch}
-                                >
-                                    <SearchIcon sx={{ color: "#1B264D" }} />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip title="Làm mới" placement="right-start">
-                                <Button
-                                    sx={{ borderColor: "#1B264D" }}
-                                    className="btn-refresh"
-                                    variant="outlined"
-                                    disableElevation
-                                    onClick={getCurrentMonthlyFund}
-                                >
-                                    <RefreshIcon sx={{ color: "#1B264D" }} />
-                                </Button>
-                            </Tooltip>
+                        <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
+                            <Stack direction="row" spacing={1} alignItems="flex-end">
+                                <CustomTextField
+                                    id="search-field"
+                                    label="Tìm kiếm người dùng"
+                                    variant="standard"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    size="small"
+                                    onKeyPress={(event) =>
+                                        event.key === "Enter" ? handleSearch(event) : null
+                                    }
+                                />
+                                <Tooltip title="Tìm kiếm" placement="right-start">
+                                    <Button variant="text" disableElevation
+                                        onClick={handleSearch}
+                                    >
+                                        <SearchIcon sx={{ color: "#1B264D" }} />
+                                    </Button>
+                                </Tooltip>
+                                <Tooltip title="Làm mới" placement="right-start">
+                                    <Button
+                                        sx={{ borderColor: "#1B264D" }}
+                                        className="btn-refresh"
+                                        variant="outlined"
+                                        disableElevation
+                                        onClick={getCurrentMonthlyFund}
+                                    >
+                                        <RefreshIcon sx={{ color: "#1B264D" }} />
+                                    </Button>
+                                </Tooltip>
+                            </Stack>
+                            <Button
+                                onClick={exportMonthlyFundFile}
+                                style={{ background: "#1B264D", minWidth: '140px' }}
+                                variant="contained"
+                                disableElevation
+                                startIcon={<i class="fa-solid fa-file-export"></i>}
+                            >
+                                Xuất file
+                            </Button>
                         </Stack>
                     </Stack>
                     <div

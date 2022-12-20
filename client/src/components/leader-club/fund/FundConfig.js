@@ -31,7 +31,7 @@ function NumberFormatCustom(props) {
 }
 
 const FundConfig = ({
-    show, setShow, club, showSnackbar,
+    show, setShow, club, showSnackbar, isReadOnly
 }) => {
     const [monthlyFund, setMonthlyFund] = useState(club ? club.monthlyFund : 0);
     const [monthlyFundPoint, setMonthlyFundPoint] = useState(club ? club.monthlyFundPoint : 0);
@@ -55,7 +55,7 @@ const FundConfig = ({
         }
     }
 
-    
+
 
     return (
         <div>
@@ -70,8 +70,8 @@ const FundConfig = ({
                     >
                         <Typography sx={{ minWidth: 250 }}>Mức thu hàng tháng</Typography>
                         <TextField
-                        id="formatted-numberformat-input"
-                        name="numberformat"
+                            id="formatted-numberformat-input"
+                            name="numberformat"
                             value={monthlyFund}
                             fullWidth
                             label="Số tiền"
@@ -84,6 +84,9 @@ const FundConfig = ({
                                 endAdornment: <InputAdornment position="end">đ</InputAdornment>
                             }}
                             InputLabelProps={{ shrink: true }}
+                            inputProps={
+                                { readOnly: isReadOnly, }
+                            }
                         />
                     </Stack>
                     <Stack
@@ -94,6 +97,7 @@ const FundConfig = ({
                     >
                         <Typography sx={{ minWidth: 250 }}>Điểm cộng nếu nộp đúng hạn (+)</Typography>
                         <TextField
+                            readOnly={isReadOnly}
                             value={monthlyFundPoint}
                             fullWidth
                             label="Điểm"
@@ -102,16 +106,19 @@ const FundConfig = ({
                             onChange={e => {
                                 setMonthlyFundPoint(e.target.value)
                             }}
+                            inputProps={
+                                { readOnly: isReadOnly, }
+                            }
                         />
                     </Stack>
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <Button
+                        {isReadOnly ? <></> : <Button
                             onClick={handleSaveConfig}
                             variant="contained"
                             disableElevation
                         >
                             Lưu
-                        </Button>
+                        </Button>}
                         <Button
                             onClick={() => setShow(false)}
                             variant="outlined"

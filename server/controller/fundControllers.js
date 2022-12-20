@@ -240,6 +240,7 @@ module.exports.getFundHistoryById = async (req, res) => {
         const fund = await FundHistory.findById(fundId).populate("submitted.member_id")
         if (fund === undefined || fund === null) {
             res.status(404).send({ error: `Không tìm thấy quỹ này` })
+            return
         }
         res.send(fund)
     } catch (err) {
@@ -263,10 +264,11 @@ module.exports.updateSubmitted = async (req, res) => {
         }
         let fund = await FundHistory.findOne(filterQuery).populate('club');
         if (fund === undefined || fund === null) {
-            res.status(404).send({ error: `Không tìm thấy quỹ tháng ${startDate.format("MM/YYYY")}.` })
+            res.status(404).send({ error: `Không tìm thấy quỹ tháng ${startDate.format("MM/YYYY")}.` });
+            return
         }
         total = 0
-        const validSubmittedList = submittedList.map(async (sub) => {
+        const validSubmittedList = submittedList.map((sub) => {
             total = total + sub.total;
             return {
                 total: sub.total,

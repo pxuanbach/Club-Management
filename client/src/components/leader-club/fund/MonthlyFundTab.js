@@ -57,6 +57,7 @@ const MonthlyFundtab = ({ club, user }) => {
     const [alertMessage, setAlertMessage] = useState('');
     const [search, setSearch] = useState('');
     const [currentMonth, setCurrentMonth] = useState(new Date());
+    const isTreasurer = Boolean(user._id === club.treasurer._id)
 
     const handleChangeSearch = (event) => {
         setSearch(event.target.value)
@@ -88,6 +89,7 @@ const MonthlyFundtab = ({ club, user }) => {
     }
 
     useEffect(() => {
+        console.log(club)
         getFundHistories()
     }, [])
 
@@ -119,6 +121,7 @@ const MonthlyFundtab = ({ club, user }) => {
                         setShow={setShowFormConfig}
                         club={club}
                         showSnackbar={showSnackbar}
+                        isReadOnly={!isTreasurer}
                     />
                 </Box>
             </Modal>
@@ -200,7 +203,7 @@ const MonthlyFundtab = ({ club, user }) => {
                         </Tooltip>
                     </Stack>
                     <Stack direction="row" spacing={1}>
-                        <Tooltip title='Xác nhận quỹ tháng' placement='right-start'>
+                        {isTreasurer ? <Tooltip title='Xác nhận quỹ tháng' placement='right-start'>
                             <Button
                                 onClick={() => setShowFormAddMonthlyFund(true)}
                                 style={{ background: '#1B264D' }}
@@ -210,7 +213,7 @@ const MonthlyFundtab = ({ club, user }) => {
                                 startIcon={<PlaylistAddCheckIcon />}>
                                 Xác nhận quỹ tháng
                             </Button>
-                        </Tooltip>
+                        </Tooltip> : <></>}
                         <Tooltip title='Cài đặt quỹ' placement='right-start'>
                             <Button
                                 onClick={() => setShowFormConfig(true)}
@@ -225,7 +228,7 @@ const MonthlyFundtab = ({ club, user }) => {
                     </Stack>
                 </Stack>
                 <Box sx={{ paddingY: 2, paddingX: 2 }}>
-                    <MonthlyFundList rows={fundHistorys} />
+                    <MonthlyFundList rows={fundHistorys} user={user}/>
                 </Box>
             </Box >
         </div >

@@ -214,12 +214,32 @@ const convertFundHistoriesToExport = (fundhistories) => {
             "Người xác nhận": fh.author.name,
             "MSSV người xác nhận": fh.author.username,
             "Email người xác nhận": fh.author.email,
+            "Ngày tạo phiếu": moment(fh.createdAt).format("DD/MM/YYYY HH:mm:ss")
         };
         //console.log(data)
         dataArr.push(data);
     });
 
     return dataArr;
+}
+
+const convertMonthlyFundHistoriesToExport = (submittedList) => {
+    let dataArr = [];
+    submittedList.forEach((submitted) => {
+        const data = {
+            "Mã thành viên": submitted.member_id._id.toString(),
+            "Mã sinh viên": submitted.member_id.username,
+            "Tên": submitted.member_id.name,
+            "Giới tính": submitted.member_id.gender,
+            "Email": submitted.member_id.email,
+            "Số điện thoại": submitted.member_id.phone,
+            "Facebook": submitted.member_id.facebook,
+            "Đã nộp": submitted.total > 0 ? "X" : "",
+        };
+        //console.log(data)
+        dataArr.push(data);
+    })
+    return dataArr
 }
 
 module.exports = {
@@ -232,5 +252,6 @@ module.exports = {
     convertUsersToExport,
     convertGeneralInfoToExport,
     convertPointDetailsToExport,
-    convertFundHistoriesToExport
+    convertFundHistoriesToExport,
+    convertMonthlyFundHistoriesToExport
 }
