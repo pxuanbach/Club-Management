@@ -29,7 +29,15 @@ const clubSchema = new mongoose.Schema({
     members: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
-    }]
+    }],
+    monthlyFund: {
+        type: Number,
+        default: 0
+    },
+    monthlyFundPoint: {
+        type: Number,
+        default: 0
+    }
 })
 
 const Club = mongoose.model('club', clubSchema)

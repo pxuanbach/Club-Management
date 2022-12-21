@@ -18,8 +18,10 @@ const {
     convertGeneralInfoToExport,
     convertPointDetailsToExport,
     convertFundHistoriesToExport,
-    convertActivityConfigToExport
-} = require("../helper/ReportDataHelper")
+    convertActivityConfigToExport,
+    convertMonthlyFundHistoriesToExport
+} = require("../helper/ReportDataHelper");
+const FundHistory = require("../models/FundHistory");
 
 
 module.exports.exportClubs = async (req, res) => {
@@ -253,7 +255,7 @@ module.exports.exportClubFunds = async (req, res) => {
             return;
         }
         const fundData = await getFundHistories(clubId, startDate, endDate, applyFilter)
-        console.log(fundData)
+        // console.log(fundData)
 
         var generalWS = xlsx.utils.json_to_sheet(
             convertGeneralInfoToExport({
@@ -320,11 +322,12 @@ module.exports.exportClubFunds = async (req, res) => {
         var fundWscols = [
             { wch: 25 },    // id
             { wch: 40 },    // content
-            { wch: 8 },     // type
+            { wch: 15 },     // type
             { wch: 12 },    // value
             { wch: 18 },    // name
             { wch: 18 },    // mssv
             { wch: 24 },    // email
+            { wch: 24 },    // createdAt
         ]
         fundWS['!cols'] = fundWscols
 
@@ -620,6 +623,106 @@ module.exports.exportUserPointsOfClub = async (req, res) => {
 
         xlsx.utils.book_append_sheet(wb, generalWS, "Thông tin chung");
         xlsx.utils.book_append_sheet(wb, pointDetailWS, "Bảng điểm chi tiết");
+
+        var excelBinary = xlsx.write(wb, { bookType: "xlsx", type: "binary" });
+
+        fs.writeFileSync(excelOutput, excelBinary, "binary");
+
+        res.download(excelOutput, (err) => {
+            if (err) {
+                fs.unlinkSync(excelOutput);
+                res.status(400).send({ error: "Không thể tải tệp excel" });
+            }
+            fs.unlinkSync(excelOutput);
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+module.exports.exportMonthlyFundOfClub = async (req, res) => {
+    const fundId = req.params.fundId;
+    const createdBy = req.params.createdBy;
+    try {
+        const excelOutput = Date.now().toString() + "monthlyfund.xlsx";
+        const monthlyFund = await FundHistory.findById(fundId)
+            .populate("submitted.member_id")
+        if (monthlyFund === undefined || monthlyFund === null) {
+            res.status(404).send({ error: "Không tìm thấy quỹ này." });
+            return;
+        }
+        const createdByUser = await User.findById(createdBy)
+        if (createdByUser === undefined || createdByUser === null) {
+            res.status(404).send({ error: "Không xác định được người tạo báo cáo." });
+            return;
+        }
+
+        const club = await Club.findById(monthlyFund.club)
+            .populate("leader")
+            .populate("treasurer");
+        var generalWS = xlsx.utils.json_to_sheet(
+            convertGeneralInfoToExport(
+                {
+                    ...club._doc,
+                    createdBy: createdByUser,
+                },
+            ),
+            { skipHeader: 1 }
+        );
+        const jsonObjArr = [
+            {
+                key: "Mã phiếu",
+                value: monthlyFund._id.toString()
+            },
+            {
+                key: "Nội dung",
+                value: monthlyFund.content
+            },
+            {
+                key: "Mức thu hàng tháng",
+                value: club.monthlyFund
+            },
+            {
+                key: "Tổng thu",
+                value: monthlyFund.total,
+            },
+            {
+                key: "Điểm cộng",
+                value: club.monthlyFundPoint
+            },
+            {
+                key: "Ngày tạo phiếu",
+                value: moment(monthlyFund.createdAt).format("DD/MM/YYYY HH:mm:ss"),
+            },
+        ]
+        var monthlyFundWS = xlsx.utils.json_to_sheet(jsonObjArr, { skipHeader: 1 });
+        xlsx.utils.sheet_add_json(
+            monthlyFundWS, 
+            convertMonthlyFundHistoriesToExport(monthlyFund.submitted), 
+            { origin: "A8" }
+        )
+        var wb = xlsx.utils.book_new();
+
+        // column width
+        var generalWscols = [
+            { wch: 22 },
+            { wch: 30 },
+        ];
+        generalWS['!cols'] = generalWscols
+        var monthlyFundWscols = [
+            { wch: 25 },    // id
+            { wch: 25 },    // mssv, content
+            { wch: 18 },    // name
+            { wch: 8 },    // gender
+            { wch: 24 },    // email
+            { wch: 12 },    // phone
+            { wch: 40 },    // point
+            { wch: 8 },     // submitted
+        ]
+        monthlyFundWS['!cols'] = monthlyFundWscols
+
+        xlsx.utils.book_append_sheet(wb, generalWS, "Thông tin chung");
+        xlsx.utils.book_append_sheet(wb, monthlyFundWS, "Quỹ tháng");
 
         var excelBinary = xlsx.write(wb, { bookType: "xlsx", type: "binary" });
 

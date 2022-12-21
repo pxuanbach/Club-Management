@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Modal, Button, Tooltip, Box, TextField, styled,
   Alert, Snackbar, CircularProgress, Stack, FormControlLabel,
   Checkbox
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { UserContext } from '../../../UserContext';
 import AddFund from './AddFund';
 import PaymentList from "./PaymentList"
 import NumberFormat from 'react-number-format';
@@ -38,10 +37,9 @@ const style = {
   p: 4,
 };
 
-const Fund = ({ club_id }) => {
+const GeneralFundTab = ({ club_id, user }) => {
   let date = new Date();
   let isTreasurer = false;
-  const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [club, setClub] = useState();
@@ -92,7 +90,7 @@ const Fund = ({ club_id }) => {
       ...prevClub,
       fund: data.fund
     }))
-    if (data.fundHistory.type === 'Thu') {
+    if (data.fundHistory.type === 'Thu' || data.fundHistory.type === 'Thu mỗi tháng') {
       setCollect(collect + data.fundHistory.total)
     } else {
       setPay(pay + data.fundHistory.total)
@@ -181,9 +179,8 @@ const Fund = ({ club_id }) => {
             <Box className='loading-temp'>
               <CircularProgress />
             </Box> :
-            <>
+            <Box sx={{marginTop: 7}}>
               <div>
-                <h2 className='title-header'>Tổng quan</h2>
                 <div className="dashboard-overview">
                   <div className="dashboard-overview-row">
                     <div>
@@ -319,11 +316,11 @@ const Fund = ({ club_id }) => {
                   <PaymentList rows={fundHistorys} />
                 </div>
               </div>
-            </>}
+            </Box>}
         </div>
       )}
     </>
   )
 }
 
-export default Fund
+export default GeneralFundTab

@@ -8,7 +8,7 @@ const fundHistorySchema = new mongoose.Schema({
     },
     content: String,
     type: {
-        type: String,
+        type: String,   // Thu/Chi/Thu mỗi tháng
         required: true
     },
     total: {
@@ -22,6 +22,16 @@ const fundHistorySchema = new mongoose.Schema({
         ref: 'user',
         required: true
     },
+    submitted: [{
+        member_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user',
+        },
+        total: {
+            type: Number,
+            default: 0
+        },
+    }]
 }, {timestamps: true})
 
 const FundHistory = mongoose.model('fundHistory', fundHistorySchema)

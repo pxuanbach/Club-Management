@@ -20,6 +20,7 @@ router.patch('/block/:clubId', clubController.block)
 router.patch('/promote/:clubId', clubController.promote)
 router.patch('/removemember/:clubId', clubController.removeMember)
 router.patch('/removemembers/:clubId', clubController.removeMembers)
+router.patch('/fundconfig/:clubId', clubController.updateFundConfig)
 router.delete('/delete/:clubId/:cloudId', clubController.delete)
 
 module.exports = router;

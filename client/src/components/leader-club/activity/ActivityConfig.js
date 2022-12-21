@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormControl,
   InputLabel,
@@ -7,16 +7,11 @@ import {
   Stack,
   Typography,
   TextField,
-  Tooltip,
-  styled,
-  tooltipClasses,
   Button, Box
 } from "@mui/material";
-import HelpIcon from "@mui/icons-material/Help";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import axiosInstance from "../../../helper/Axios";
-import { UserContext } from "../../../UserContext";
 import SeverityOptions from "../../../helper/SeverityOptions";
 
 export const DynamicInputField = ({
