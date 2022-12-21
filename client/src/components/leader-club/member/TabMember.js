@@ -20,6 +20,8 @@ import CustomDialog from "../../dialog/CustomDialog";
 import moment from 'moment'
 import FileDownload from 'js-file-download';
 import "./TabMember.css";
+import QuantityJoinByTime from "../../statistic/QuantityJoinByTime";
+import { Stack } from "@mui/system";
 
 const CustomTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -229,6 +231,9 @@ const TabMember = ({ club }) => {
           </div>
         </div>
       </div>
+      <Stack direction="row">
+        <QuantityJoinByTime club={club}/>
+      </Stack>
       <div className="div-table-tabmember">
         <div className="header-table-tabmember">
           <h3 className="name-h4">Thành viên (x)</h3>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
   Modal, Button, Tooltip, Box, TextField, styled,
   Alert, Snackbar, CircularProgress, Stack, FormControlLabel,
-  Checkbox
+  Checkbox, Grid
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddFund from './AddFund';
@@ -14,7 +14,9 @@ import RangeDatePicker from "../activity/utilities/RangeDatePicker";
 import moment from "moment";
 import "./Fund.css"
 import "../../../assets/css/grid.css"
-import '../../manage/Mng.css'
+import '../../manage/Mng.css';
+import FundWithTypeByTime from '../../statistic/FundWithTypeByTime';
+import FundGrowthByTime from '../../statistic/FundGrowthByTime';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -38,7 +40,6 @@ const style = {
 };
 
 const GeneralFundTab = ({ club_id, user }) => {
-  let date = new Date();
   let isTreasurer = false;
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -54,6 +55,7 @@ const GeneralFundTab = ({ club_id, user }) => {
     new Date(moment().startOf("month"))
   );
   const [endDate, setEndDate] = useState(new Date(moment().endOf("month")));
+  const [isExpandStatistic, setIsExpandStatistic] = useState(false);
 
   const handleChangeSearch = (event) => {
     setSearch(event.target.value)
@@ -179,7 +181,7 @@ const GeneralFundTab = ({ club_id, user }) => {
             <Box className='loading-temp'>
               <CircularProgress />
             </Box> :
-            <Box sx={{marginTop: 7}}>
+            <Box sx={{ marginTop: 7 }}>
               <div>
                 <div className="dashboard-overview">
                   <div className="dashboard-overview-row">
@@ -261,6 +263,25 @@ const GeneralFundTab = ({ club_id, user }) => {
                   </div>
                 </div>
               </div>
+              <Box sx={{ width: '100%', p: 2 }}>
+                <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                  <Grid item xs={isExpandStatistic ? 12 : 6}>
+                    <FundWithTypeByTime
+                      club={club}
+                      isExpand={isExpandStatistic}
+                      expand={() => setIsExpandStatistic(!isExpandStatistic)}
+                    />
+                  </Grid>
+                  <Grid item xs={isExpandStatistic ? 12 : 6}>
+                    <FundGrowthByTime
+                      club={club}
+                      isExpand={isExpandStatistic}
+                      expand={() => setIsExpandStatistic(!isExpandStatistic)}
+                    />
+                  </Grid>
+                </Grid>
+
+              </Box>
               <div>
                 <div className='div-title-search'>
                   <h2 className='title-header2'>Lịch sử thu chi</h2>
