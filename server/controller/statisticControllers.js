@@ -81,6 +81,69 @@ module.exports.statisticMemberOfClub = async (req, res) => {
     }
 }
 
+module.exports.statisticFundGrowthOfClub = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { selectOption } = req.query;
+    let timeFormat = "YYYY-MM-DD"
+    if (selectOption !== undefined) {
+        timeFormat = selectOption
+    }
+    try {
+        const funds = await FundHistory.find({ club: clubId })
+            .sort({ createdAt: 1 });
+
+        const groups = funds.reduce((groups, obj) => {
+            const date = moment(obj.createdAt).format(timeFormat);
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+            groups[date].push(obj);
+            return groups;
+        }, {});
+        let arr = []
+        let fund = 0
+        Object.keys(groups).map((date) => {
+            groups[date].forEach(obj => {
+                if (obj.type === "Thu" || obj.type === "Thu mỗi tháng") {
+                    fund = fund + obj.total
+                } else {
+                    fund = fund - obj.total
+                }
+            });
+            let temp = {
+                Date: date,
+                value: fund,
+            }
+            arr.push(temp)
+        });
+        if (arr.length <= 1) {
+            let date = arr[0].Date
+            switch (timeFormat) {
+                case "YYYY-MM-DD":
+                    date = moment(date).subtract(1, 'days').startOf('day').format(timeFormat)
+                    break;
+                case "YYYY-MM":
+                    date = moment(date).subtract(1, 'months').startOf('month').format(timeFormat)
+                    break;
+                case "YYYY":
+                    date = moment(date).subtract(1, 'years').startOf('year').format(timeFormat)
+                    break;
+                default:
+                    break;
+            }
+            const temp = {
+                Date: date,
+                value: 0,
+            }
+            res.send([temp].concat(arr))
+            return
+        }
+        res.send(arr)
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+}
+
 module.exports.statisticFundWithTypeOfClub = async (req, res) => {
     const clubId = req.params.clubId;
     const { selectOption, typeArr } = req.query
@@ -163,15 +226,15 @@ module.exports.statisticFundWithTypeOfClub = async (req, res) => {
     }
 }
 
-module.exports.statisticFundGrowthOfClub = async (req, res) => {
+module.exports.statisticMonthlyFundGrowthOfClub = async (req, res) => {
     const clubId = req.params.clubId;
     const { selectOption } = req.query;
-    let timeFormat = "YYYY-MM-DD"
+    let timeFormat = "YYYY-MM"
     if (selectOption !== undefined) {
         timeFormat = selectOption
     }
     try {
-        const funds = await FundHistory.find({ club: clubId })
+        const funds = await FundHistory.find({ club: clubId, type: "Thu mỗi tháng" })
             .sort({ createdAt: 1 });
 
         const groups = funds.reduce((groups, obj) => {
@@ -183,14 +246,10 @@ module.exports.statisticFundGrowthOfClub = async (req, res) => {
             return groups;
         }, {});
         let arr = []
-        let fund = 0
         Object.keys(groups).map((date) => {
+            let fund = 0
             groups[date].forEach(obj => {
-                if (obj.type === "Thu" || obj.type === "Thu mỗi tháng") {
-                    fund = fund + obj.total
-                } else {
-                    fund = fund - obj.total
-                }
+                fund = fund + obj.total
             });
             let temp = {
                 Date: date,
@@ -201,9 +260,68 @@ module.exports.statisticFundGrowthOfClub = async (req, res) => {
         if (arr.length <= 1) {
             let date = arr[0].Date
             switch (timeFormat) {
-                case "YYYY-MM-DD":
-                    date = moment(date).subtract(1, 'days').startOf('day').format(timeFormat)
+                case "YYYY-MM":
+                    date = moment(date).subtract(1, 'months').startOf('month').format(timeFormat)
                     break;
+                case "YYYY":
+                    date = moment(date).subtract(1, 'years').startOf('year').format(timeFormat)
+                    break;
+                default:
+                    break;
+            }
+            const temp = {
+                Date: date,
+                value: 0,
+            }
+            res.send([temp].concat(arr))
+            return
+        }
+        res.send(arr)
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+}
+
+module.exports.statisticQuantitySubmittedMonthlyFundOfClub = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { selectOption } = req.query
+    let timeFormat = "YYYY-MM"
+    if (selectOption !== undefined) {
+        timeFormat = selectOption
+    }
+    try {
+        const funds = await FundHistory.find({ club: clubId, type: "Thu mỗi tháng" })
+            .sort({ createdAt: 1 });
+
+        const groups = funds.reduce((groups, obj) => {
+            const date = moment(obj.createdAt).format(timeFormat);
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+            let quantity = 0
+            obj.submitted.forEach((sub) => {
+                if (sub.total > 0) {
+                    quantity = quantity + 1
+                } 
+            })
+            groups[date].push({quantity});
+            return groups;
+        }, {});
+        let arr = []
+        Object.keys(groups).map((date) => {
+            let quantity = 0
+            groups[date].forEach(obj => {
+                quantity = quantity + obj.quantity
+            });
+            let temp = {
+                Date: date,
+                value: quantity,
+            }
+            arr.push(temp)
+        });
+        if (arr.length <= 1) {
+            let date = arr[0].Date
+            switch (timeFormat) {
                 case "YYYY-MM":
                     date = moment(date).subtract(1, 'months').startOf('month').format(timeFormat)
                     break;

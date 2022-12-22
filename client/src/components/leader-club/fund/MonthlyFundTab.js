@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     Modal, Button, Tooltip, Box, TextField, styled,
-    Alert, Snackbar, CircularProgress, Stack,
+    Alert, Snackbar, Grid, Stack,
 } from '@mui/material';
 import axiosInstance from '../../../helper/Axios';
 import MonthlyFundList from './MonthlyFundList';
@@ -11,10 +11,9 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import FundConfig from './FundConfig';
 import AddMonthlyFund from './AddMonthlyFund';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import moment from 'moment';
+import MonthlyFundGrowthByTime from '../../statistic/MonthlyFundGrowthByTime';
+import QuantitySubmittedMonthlyFundGrowthByTime from '../../statistic/QuantitySubmittedMonthlyFundByTime';
 
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
@@ -57,7 +56,8 @@ const MonthlyFundtab = ({ club, user }) => {
     const [alertMessage, setAlertMessage] = useState('');
     const [search, setSearch] = useState('');
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const isTreasurer = Boolean(user._id === club.treasurer._id)
+    const isTreasurer = Boolean(user._id === club.treasurer._id);
+    const [isExpandStatistic, setIsExpandStatistic] = useState(false);
 
     const handleChangeSearch = (event) => {
         setSearch(event.target.value)
@@ -145,29 +145,27 @@ const MonthlyFundtab = ({ club, user }) => {
                 </Box>
             </Modal>
             <Box sx={{ marginTop: 6, p: 2 }}>
+                <Box sx={{ width: '100%', p: 2, transition: '0.5s' }}>
+                    <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                        <Grid item xs={isExpandStatistic ? 12 : 6}>
+                            <QuantitySubmittedMonthlyFundGrowthByTime
+                                club={club}
+                                isExpand={isExpandStatistic}
+                                expand={() => setIsExpandStatistic(!isExpandStatistic)}
+                            />
+                        </Grid>
+                        <Grid item xs={isExpandStatistic ? 12 : 6}>
+                            <MonthlyFundGrowthByTime
+                                club={club}
+                                isExpand={isExpandStatistic}
+                                expand={() => setIsExpandStatistic(!isExpandStatistic)}
+                            />
+                        </Grid>
+                    </Grid>
+
+                </Box>
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="flex-end">
                     <Stack direction="row" spacing={1} alignItems="flex-end">
-                        {/* <LocalizationProvider dateAdapter={AdapterMoment}>
-                            <DatePicker
-                                size="small"
-                                views={['year', 'month']}
-                                label="Tháng"
-                                inputFormat='MM/YYYY'
-                                maxDate={moment()}
-                                value={currentMonth}
-                                onChange={(newValue) => {
-                                    setCurrentMonth(newValue);
-                                }}
-                                renderInput={(params) =>
-                                    <TextField
-                                        {...params}
-                                        size='small'
-                                        sx={{ width: 150 }}
-                                        helperText={null}
-                                    />
-                                }
-                            />
-                        </LocalizationProvider> */}
                         <Box
                             sx={{
                                 '& > :not(style)': { width: '30ch' },
@@ -228,7 +226,7 @@ const MonthlyFundtab = ({ club, user }) => {
                     </Stack>
                 </Stack>
                 <Box sx={{ paddingY: 2, paddingX: 2 }}>
-                    <MonthlyFundList rows={fundHistorys} user={user}/>
+                    <MonthlyFundList rows={fundHistorys} user={user} />
                 </Box>
             </Box >
         </div >

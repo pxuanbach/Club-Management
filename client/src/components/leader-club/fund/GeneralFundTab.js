@@ -263,7 +263,7 @@ const GeneralFundTab = ({ club_id, user }) => {
                   </div>
                 </div>
               </div>
-              <Box sx={{ width: '100%', p: 2 }}>
+              <Box sx={{ width: '100%', p: 2, transition: '0.5s' }}>
                 <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                   <Grid item xs={isExpandStatistic ? 12 : 6}>
                     <FundWithTypeByTime
