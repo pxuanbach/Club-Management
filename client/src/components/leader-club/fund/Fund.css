@@ -21,7 +21,7 @@
     flex-direction: row;
     justify-content: space-between;
     padding-top: 20px;
-    gap: 30px;
+    gap: 20px;
 }
 .dashboard-overview-row-cell{
     width: max-content;

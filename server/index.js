@@ -18,6 +18,7 @@ const exportRoutes = require("./routes/exportRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const logRoutes = require("./routes/logRoutes");
 const pointRoutes = require("./routes/pointRoutes");
+const staticRoutes = require('./routes/statisticRoutes');
 
 const corsOptions = {
     origin: "http://localhost:3000",
@@ -47,6 +48,7 @@ app.use("/export", exportRoutes);
 app.use("/request", requestRoutes);
 app.use("/log", logRoutes);
 app.use("/point", pointRoutes);
+app.use("/statistic", staticRoutes);
 
 //Connect DB
 mongoose
