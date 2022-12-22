@@ -5,7 +5,7 @@ import { Line } from '@ant-design/plots';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import ZoomInMapIcon from '@mui/icons-material/ZoomInMap';
 
-const QuantityJoinByTime = ({ club, isExpand, expand }) => {
+const QuantityLeaveByTime = ({ club, isExpand, expand }) => {
     const [data, setData] = useState([]);
     const [selectOption, setSelectOption] = useState('YYYY-MM-DD');
 
@@ -16,7 +16,7 @@ const QuantityJoinByTime = ({ club, isExpand, expand }) => {
     const getData = async () => {
         try {
             const res = await axiosInstance.get(
-                `statistic/club/${club._id}/memberjoin`,
+                `statistic/club/${club._id}/memberleave`,
                 {
                     params: {
                         selectOption
@@ -72,7 +72,7 @@ const QuantityJoinByTime = ({ club, isExpand, expand }) => {
                     display: 'flex',
                     alignItems: 'center',
                 }}>
-                    <h3>Số lượng thành viên tham gia</h3>
+                    <h3>Số lượng thành viên rời khỏi</h3>
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <InputLabel id="demo-select-small">Theo</InputLabel>
                         <Select
@@ -97,4 +97,4 @@ const QuantityJoinByTime = ({ club, isExpand, expand }) => {
     )
 }
 
-export default QuantityJoinByTime
+export default QuantityLeaveByTime

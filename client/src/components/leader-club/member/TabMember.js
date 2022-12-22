@@ -7,7 +7,7 @@ import {
   TextField,
   Modal,
   Snackbar,
-  Alert,
+  Alert, Grid
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
@@ -21,7 +21,7 @@ import moment from 'moment'
 import FileDownload from 'js-file-download';
 import "./TabMember.css";
 import QuantityJoinByTime from "../../statistic/QuantityJoinByTime";
-import { Stack } from "@mui/system";
+import QuantityLeaveByTime from "../../statistic/QuantityLeaveByTime";
 
 const CustomTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -56,6 +56,7 @@ const TabMember = ({ club }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [options, setOptions] = useState();
+  const [isExpandStatistic, setIsExpandStatistic] = useState(false);
 
   const showSnackbar = (message, options) => {
     setOptions(options);
@@ -231,9 +232,24 @@ const TabMember = ({ club }) => {
           </div>
         </div>
       </div>
-      <Stack direction="row">
-        <QuantityJoinByTime club={club}/>
-      </Stack>
+      <Box sx={{ width: '100%', p: 2, transition: '0.5s' }}>
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+          <Grid item xs={isExpandStatistic ? 12 : 6}>
+            <QuantityJoinByTime
+              club={club}
+              isExpand={isExpandStatistic}
+              expand={() => setIsExpandStatistic(!isExpandStatistic)}
+            />
+          </Grid>
+          <Grid item xs={isExpandStatistic ? 12 : 6}>
+            <QuantityLeaveByTime
+              club={club}
+              isExpand={isExpandStatistic}
+              expand={() => setIsExpandStatistic(!isExpandStatistic)}
+            />
+          </Grid>
+        </Grid>
+      </Box>
       <div className="div-table-tabmember">
         <div className="header-table-tabmember">
           <h3 className="name-h4">Thành viên (x)</h3>

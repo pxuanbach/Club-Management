@@ -113,7 +113,7 @@ const FundWithTypeByTime = ({ club, isExpand, expand }) => {
                     display: 'flex',
                     alignItems: 'center',
                 }}>
-                    <h3>Thống kê quỹ theo từng loại </h3>
+                    <h3>Thống kê thu/chi quỹ</h3>
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <InputLabel id="demo-select-small">Theo</InputLabel>
                         <Select

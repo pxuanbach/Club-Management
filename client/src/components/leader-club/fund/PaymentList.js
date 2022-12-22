@@ -33,14 +33,14 @@ export default function DataTable({ rows }) {
       field: 'content',
       headerName: 'Nội dung',
       sortable: false,
-      flex: 1.2
+      flex: 1
     },
     {
       field: 'type',
       headerName: 'Loại',
       align: 'center',
       headerAlign: 'center',
-      flex: 0.5,
+      flex: 0.7,
       renderCell: (value) => {
         return (
           <Chip sx={{ p: 1, fontSize: 14 }}

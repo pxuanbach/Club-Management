@@ -5,7 +5,7 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 
 
-module.exports.statisticMemberOfClub = async (req, res) => {
+module.exports.statisticMemberJoinOfClub = async (req, res) => {
     const clubId = req.params.clubId;
     const { selectOption } = req.query
     let timeFormat = "YYYY-MM-DD"
@@ -13,33 +13,71 @@ module.exports.statisticMemberOfClub = async (req, res) => {
         timeFormat = selectOption
     }
     try {
-        const club = await Club.findById(clubId)
-            .populate("leader")
-            .populate("treasurer")
-            .populate("members");
-        if (club === null || club === undefined) {
-            res.status(404).send({ error: "Không tìm thấy câu lạc bộ nào." })
-            return
-        }
-        const memberArr = [...club.members, club.leader, club.treasurer]
-        const logType = ["promote_leader", "promote_treasurer", "member_join"];
-        let cloneMembers = JSON.parse(JSON.stringify(memberArr));
-        const promises = cloneMembers.map(async (member) => {
-            const log = await ClubLog.find({
-                type: { $in: logType },
-                content: member._id,
-                club: clubId,
-            }).sort({ createdAt: -1 });
-            if (log.length > 0) {
-                member.dateJoin = log[0].createdAt
-            }
-            return member
+        const logs = await ClubLog.find({
+            club: clubId, 
+            type: "member_join"
         });
-        const result = await Promise.all(promises);
 
         // this gives an object with dates as keys
-        const groups = result.reduce((groups, obj) => {
-            const date = moment(obj.dateJoin).format(timeFormat);
+        const groups = logs.reduce((groups, obj) => {
+            const date = moment(obj.createdAt).format(timeFormat);
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+            groups[date].push(obj);
+            return groups;
+        }, {});
+        // Edit: to add it in the array format instead
+        const groupArrays = Object.keys(groups).map((date) => {
+            console.log()
+            return {
+                "Date": date,
+                "scales": groups[date].length
+            };
+        });
+        if (groupArrays.length <= 1) {
+            let date = groupArrays[0].Date
+            switch (timeFormat) {
+                case "YYYY-MM-DD":
+                    date = moment(date).subtract(1, 'days').startOf('day').format(timeFormat)
+                    break;
+                case "YYYY-MM":
+                    date = moment(date).subtract(1, 'months').startOf('month').format(timeFormat)
+                    break;
+                case "YYYY":
+                    date = moment(date).subtract(1, 'years').startOf('year').format(timeFormat)
+                    break;
+                default:
+                    break;
+            }
+            const temp = {
+                Date: date,
+                scales: 0,
+            }
+            res.send([temp].concat(groupArrays))
+            return
+        }
+        res.send(groupArrays)
+    } catch (err) {
+        res.status(500).send({ error: err.message })
+    }
+}
+
+module.exports.statisticMemberLeaveOfClub = async (req, res) => {
+    const clubId = req.params.clubId;
+    const { selectOption } = req.query
+    let timeFormat = "YYYY-MM-DD"
+    if (selectOption !== undefined) {
+        timeFormat = selectOption
+    }
+    try {
+        const logs = await ClubLog.find({
+            club: clubId, 
+            type: "member_out"
+        });
+        // this gives an object with dates as keys
+        const groups = logs.reduce((groups, obj) => {
+            const date = moment(obj.createdAt).format(timeFormat);
             if (!groups[date]) {
                 groups[date] = [];
             }
