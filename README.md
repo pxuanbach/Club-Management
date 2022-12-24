@@ -18,7 +18,7 @@
 - Hiển thị tổng quan về giao diện khi đăng nhập bằng tài khoản admin
 - Tab quản lý lịch trình
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015736-c96318f0-f88f-4711-a42e-f336e4ad84b3.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432551-10c274b4-a302-48c4-844f-fd06cb7e5811.png" alt="..." width="1000" />
 
 - Tab nhắn tin cá nhân
 
