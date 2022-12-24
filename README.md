@@ -18,44 +18,48 @@
 - Hiển thị tổng quan về giao diện khi đăng nhập bằng tài khoản admin
 - Tab quản lý lịch trình
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015736-c96318f0-f88f-4711-a42e-f336e4ad84b3.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432551-10c274b4-a302-48c4-844f-fd06cb7e5811.png" alt="..." width="1000" />
 
 - Tab nhắn tin cá nhân
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015799-5a3e279c-fd3a-468b-ba51-9f3bd7c7316f.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432593-9b278d97-b0bc-4cd3-9def-d7f47fb1a7c4.png" alt="..." width="1000" />
 
 - Tab quản lý câu lạc bộ
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015838-74fc82e2-627d-453d-a466-186d32fc2588.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432606-41f238ab-b4e4-43b7-8d70-934cc850b833.png" alt="..." width="1000" />
 
 - Tab quản lý tài khoản
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015873-e52588d0-168b-4d39-8035-745541bb76a1.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432612-eb2afea0-d843-4eb9-979c-9f487394fb45.png" alt="..." width="1000" />
 
 - Thông tin cá nhân
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015916-7732b014-12a0-4dc9-8d92-669a833d6ed1.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432627-14c1abbc-0bdd-4f93-a736-f5fb7d845253.png" alt="..." width="1000" />
 
 - Câu lạc bộ của tôi
 
-  <img src="https://user-images.githubusercontent.com/71374867/172015945-7d25d35d-6c6e-47c4-8cca-5a34cda99124.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432646-5b64329a-2389-4cb7-a00c-70cdbd0fa2ef.png" alt="..." width="1000" />
+  
+- Câu lạc bộ khác
+
+  <img src="https://user-images.githubusercontent.com/71374867/209432701-5a04456c-755b-47da-8c25-21add45859f4.png" alt="..." width="1000" />
   
 - Khi vào một câu lạc bộ:
 
 - Quản lý hoạt động
 
-  <img src="https://user-images.githubusercontent.com/71374867/172016021-57434a00-2460-410b-abff-11ce0f8640ea.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432730-78f15257-fe4f-44ae-b276-6a4b731d9f6f.png" alt="..." width="1000" />
   
 
   + Chọn một hoạt động:
   
 
-  <img src="https://user-images.githubusercontent.com/71374867/172016066-b6c923df-001f-4c1c-b824-cca33028f360.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432753-e602ec91-6a6e-4c90-be82-f0fdd3ba328d.png" alt="..." width="1000" />
   
   + Chọn một task công việc:
   
 
-  <img src="https://user-images.githubusercontent.com/71374867/173212425-8ba54949-2a86-477f-aac5-9d0f4a68ba05.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432770-3d018a49-8d79-4230-a90a-e0223251ab2a.png" alt="..." width="1000" />
 
 - Quản lý thành viên
 
@@ -63,22 +67,35 @@
   + Tab thành viên
   
 
-  <img src="https://user-images.githubusercontent.com/71374867/172016123-52f91412-ed03-403f-9d39-9a7bc2845a6d.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432790-1528205a-2422-4090-bf61-46ec9a9e763f.png" alt="..." width="1000" />
   
   
   + Tab Nhóm
   
  
-  <img src="https://user-images.githubusercontent.com/71374867/172016209-fea7ab85-a510-41ec-9ebd-22546fb55a7c.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432799-46ce62fe-aba0-4701-9905-c13980add158.png" alt="..." width="1000" />
+  
+  
+  + Tab Điểm
+  
+  <img src="https://user-images.githubusercontent.com/71374867/209432825-7fbff6f3-4668-42fb-afa5-f1b1e136ec57.png" alt="..." width="1000" />
   
 
 - Tin nhắn nhóm
 
-  <img src="https://user-images.githubusercontent.com/71374867/172016226-d44a9f92-6fac-48c6-ba32-2e8656f76c09.png" alt="..." width="1000" />
+  <img src="https://user-images.githubusercontent.com/71374867/209432837-73bb2601-0663-4bdb-9612-cace534280eb.png" alt="..." width="1000" />
   
 - Quản lý quỹ
 
-   <img src="https://user-images.githubusercontent.com/71374867/172016260-ef380f01-24fe-4257-ab23-c3dc30010f11.png" alt="..." width="1000" />
+   <img src="https://user-images.githubusercontent.com/71374867/209432847-f4ec5a05-d369-43e9-8b0c-bca46cc113c9.png" alt="..." width="1000" />
+
+- Quản lý lời mời
+
+   <img src="https://user-images.githubusercontent.com/71374867/209432872-776a1f07-04f0-4928-b1b1-289fe023f53d.png" alt="..." width="1000" />
+   
+- Nhật ký
+
+   <img src="https://user-images.githubusercontent.com/71374867/209432889-9bba07d9-d16a-4abd-a692-ee931896785c.png" alt="..." width="1000" />
 
 ## Thư viện và công nghệ
 - [Socket.IO](https://socket.io/).
@@ -95,11 +112,11 @@
 - [MongoDB](https://www.mongodb.com/).
 - [Cloudinary](https://cloudinary.com/).
 ## Database Diagram
-![image](https://user-images.githubusercontent.com/71374867/172015322-a99c53c9-84a0-4736-843c-b0abb183c445.png)
+![image](https://user-images.githubusercontent.com/71374867/209432931-0adc0da5-0f2d-4a03-b0d4-5f2faeaf6cd8.png)
 ## Tác giả
 - Phạm Xuân Bách - 19521233
-- Nguyễn Tiến Đạt - 19521345.
+- Nguyễn Tiến Đạt - 19521345
 ## Giấy phép
 Được phân phối theo Apache license 2.0. Xem [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) để biết thêm thông tin chi tiết.
 ## Giảng viên hướng dẫn
-- Mai Trọng Khang
+- Huỳnh Hồ Thị Mộng Trinh
