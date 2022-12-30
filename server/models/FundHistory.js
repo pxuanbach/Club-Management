@@ -31,6 +31,10 @@ const fundHistorySchema = new mongoose.Schema({
             type: Number,
             default: 0
         },
+        submittedAt: {
+            type: Date,
+            default: Date.now
+        }
     }]
 }, {timestamps: true})
 

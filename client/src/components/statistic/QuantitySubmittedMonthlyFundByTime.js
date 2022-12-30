@@ -70,8 +70,8 @@ const QuantitySubmittedMonthlyFundGrowthByTime = ({ club, isExpand, expand }) =>
                     display: 'flex',
                     alignItems: 'center',
                 }}>
-                    <h3>Số lượng thành viên nộp quỹ</h3>
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                    <h3>Số lượng thành viên nộp quỹ hàng tháng</h3>
+                    {/* <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <InputLabel id="demo-select-small">Theo</InputLabel>
                         <Select
                             labelId="demo-select-small"
@@ -83,7 +83,7 @@ const QuantitySubmittedMonthlyFundGrowthByTime = ({ club, isExpand, expand }) =>
                             <MenuItem value="YYYY-MM">Tháng</MenuItem>
                             <MenuItem value="YYYY">Năm</MenuItem>
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                 </Box>
                 <Button sx={{ p: 0, minWidth: 0, p: 0.6 }} onClick={expand}>
                     {isExpand ? <ZoomInMapIcon /> : <ZoomOutMapIcon />}

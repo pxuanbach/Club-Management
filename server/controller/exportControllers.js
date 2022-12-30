@@ -713,11 +713,11 @@ module.exports.exportMonthlyFundOfClub = async (req, res) => {
             { wch: 25 },    // id
             { wch: 25 },    // mssv, content
             { wch: 18 },    // name
-            { wch: 8 },    // gender
+            { wch: 8 },     // gender
             { wch: 24 },    // email
             { wch: 12 },    // phone
-            { wch: 40 },    // point
-            { wch: 8 },     // submitted
+            { wch: 18 },     // submittedAt
+            { wch: 10 },     // submitted
         ]
         monthlyFundWS['!cols'] = monthlyFundWscols
 
