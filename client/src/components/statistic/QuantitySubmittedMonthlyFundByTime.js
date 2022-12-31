@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Stack, FormControl, Select, MenuItem, InputLabel, Button, Box } from "@mui/material";
+import { 
+    Stack, FormControl, Select, MenuItem, InputLabel, 
+    Button, Box, Tooltip, 
+} from "@mui/material";
 import axiosInstance from "../../helper/Axios";
 import { Line } from '@ant-design/plots';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import ZoomInMapIcon from '@mui/icons-material/ZoomInMap';
+import RefreshIcon from '@mui/icons-material/Refresh'
 
 const QuantitySubmittedMonthlyFundGrowthByTime = ({ club, isExpand, expand }) => {
     const [data, setData] = useState([]);
@@ -69,8 +73,18 @@ const QuantitySubmittedMonthlyFundGrowthByTime = ({ club, isExpand, expand }) =>
                 <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
+                    gap: 1
                 }}>
                     <h3>Số lượng thành viên nộp quỹ hàng tháng</h3>
+                    <Tooltip title='Làm mới' placement='right-start'>
+                        <Button sx={{ borderColor: '#1B264D' }}
+                            className='btn-refresh'
+                            variant="outlined"
+                            disableElevation
+                            onClick={getData}>
+                            <RefreshIcon sx={{ color: '#1B264D' }} />
+                        </Button>
+                    </Tooltip>
                     {/* <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <InputLabel id="demo-select-small">Theo</InputLabel>
                         <Select
