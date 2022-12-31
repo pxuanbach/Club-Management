@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import axiosInstance from "../../../helper/Axios";
 import NumberFormat from "react-number-format";
+import SeverityOptions from '../../../helper/SeverityOptions'
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
@@ -31,7 +32,7 @@ function NumberFormatCustom(props) {
 }
 
 const FundConfig = ({
-    show, setShow, club, showSnackbar, isReadOnly
+    show, setShow, club, setClub, showSnackbar, isReadOnly
 }) => {
     const [monthlyFund, setMonthlyFund] = useState(club ? club.monthlyFund : 0);
     const [monthlyFundPoint, setMonthlyFundPoint] = useState(club ? club.monthlyFundPoint : 0);
@@ -47,15 +48,14 @@ const FundConfig = ({
                 headers: { "Content-Type": "application/json" }
             })
             const data = res.data
-
+            setClub(data)
+            showSnackbar("Cập nhật cài đặt quỹ thành công!", SeverityOptions.success)
         } catch (err) {
             if (err.response.data.error) {
                 showSnackbar(err.response.data.error)
             }
         }
     }
-
-
 
     return (
         <div>

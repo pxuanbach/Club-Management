@@ -130,6 +130,12 @@ const ViewMonthlyFund = ({
             valueGetter: (value) => value.row.member_id.email
         },
         {
+            field: "submittedAt",
+            headerName: "Ngày nộp",
+            flex: 1,
+            valueGetter: (value) => moment(value.row.submittedAt).format("DD/MM/YYYY HH:mm")
+        },
+        {
             field: "submitted",
             flex: 0.4,
             sortable: false,

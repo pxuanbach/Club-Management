@@ -47,6 +47,9 @@ const AddMonthlyFund = ({
                     count++;
                 }
             })
+            if (count === data.submitted.length) {
+                setGlobalCheck(true)
+            }
             setSubmittedCount(count)
             setSubmittedList(data.submitted)
             setCurrentMonthlyFund(data)
@@ -95,7 +98,8 @@ const AddMonthlyFund = ({
             if (submitted._id === param._id) {
                 return {
                     ...submitted,
-                    total: e.target.checked === true ? club.monthlyFund : 0
+                    total: e.target.checked === true ? club.monthlyFund : 0,
+                    submittedAt: new Date()
                 }
             }
             return submitted
@@ -162,8 +166,14 @@ const AddMonthlyFund = ({
             valueGetter: (value) => value.row.member_id.email
         },
         {
+            field: "submittedAt",
+            headerName: "Ngày nộp",
+            flex: 1,
+            valueGetter: (value) => moment(value.row.submittedAt).format("DD/MM/YYYY HH:mm")
+        },
+        {
             field: "submitted",
-            flex: 0.4,
+            flex: 0.5,
             sortable: false,
             filterable: false,
             hideable: false,
@@ -190,9 +200,21 @@ const AddMonthlyFund = ({
 
     useEffect(() => {
         const updateSumitted = submittedList.map((submitted) => {
-            return {
-                ...submitted,
-                total: globalCheck === true ? club.monthlyFund : 0
+            if (globalCheck === true) {
+                if (submitted.total <= 0) {
+                    return {
+                        ...submitted,
+                        total: club.monthlyFund,
+                        submittedAt: new Date()
+                    }
+                } 
+                return submitted
+            } else {
+                return {
+                    ...submitted,
+                    total: 0,
+                    submittedAt: new Date()
+                }
             }
         })
         setSubmittedList(updateSumitted)

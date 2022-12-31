@@ -557,7 +557,11 @@ module.exports.updateFundConfig = async (req, res) => {
     club.monthlyFund = monthlyFund
     club.monthlyFundPoint = monthlyFundPoint
     const savedClub = await club.save()
-    res.status(200).send(savedClub)
+    const result = await savedClub
+      .populate("leader")
+      .populate("treasurer")
+      .execPopulate();
+    res.status(200).send(result)
   } catch (err) {
     res.status(500).send({ error: err.message });
   }

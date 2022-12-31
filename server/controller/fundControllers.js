@@ -272,7 +272,8 @@ module.exports.updateSubmitted = async (req, res) => {
             total = total + sub.total;
             return {
                 total: sub.total,
-                member_id: sub.member_id._id
+                member_id: sub.member_id._id,
+                submittedAt: sub.submittedAt
             }
         })
         fund.submitted = validSubmittedList

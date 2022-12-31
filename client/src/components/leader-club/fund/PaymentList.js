@@ -70,7 +70,11 @@ export default function DataTable({ rows }) {
       align: 'center',
       renderCell: (value) => {
         return (
-          <a href={value.row.file_url}>Link</a>
+          <>
+            {value.row.file_url ?
+              <a href={value.row.file_url}>Link</a>
+              : <></>}
+          </>
         )
       }
     },
