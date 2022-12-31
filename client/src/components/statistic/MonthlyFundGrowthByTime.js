@@ -76,7 +76,7 @@ const MonthlyFundGrowthByTime = ({ club, isExpand, expand }) => {
                     display: 'flex',
                     alignItems: 'center',
                 }}>
-                    <h3>Biến động quỹ hàng tháng</h3>
+                    <h3>Biến động quỹ</h3>
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <InputLabel id="demo-select-small">Theo</InputLabel>
                         <Select

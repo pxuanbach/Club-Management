@@ -55,7 +55,7 @@ const FundTabbar = ({ club }) => {
             <GeneralFundTab club_id={club._id} user={user}/>
           </TabPanel>
           <TabPanel className='body-fund' value={value} index={1}>
-            <MonthlyFundtab club={club} user={user}/>
+            <MonthlyFundtab club_id={club._id} user={user}/>
           </TabPanel>
         </Box>
       )}

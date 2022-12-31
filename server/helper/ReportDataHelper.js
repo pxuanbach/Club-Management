@@ -233,8 +233,8 @@ const convertMonthlyFundHistoriesToExport = (submittedList) => {
             "Giới tính": submitted.member_id.gender,
             "Email": submitted.member_id.email,
             "Số điện thoại": submitted.member_id.phone,
-            "Facebook": submitted.member_id.facebook,
-            "Đã nộp": submitted.total > 0 ? "X" : "",
+            "Thời gian nộp": submitted.total ? moment(submitted.submittedAt).format("DD/MM/YYYY HH:mm:ss") : "",
+            "Số tiền nộp": submitted.total,
         };
         //console.log(data)
         dataArr.push(data);

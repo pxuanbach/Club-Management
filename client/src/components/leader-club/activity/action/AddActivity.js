@@ -211,6 +211,7 @@ const AddActivity = ({ setShow, club_id, acitivityCreated, showSnackbar }) => {
                                 </Select>
                             </FormControl>
                         </Stack>
+                        <span><i>Hoàn thành được tính từ <b>mốc 1</b> và chỉ tính các thẻ ở cột <b>đã xong</b>.</i></span>
                         <Stack
                             fullWidth
                             sx={{ borderLeft: '5px solid #1976d2', paddingLeft: '20px' }}
