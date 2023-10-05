@@ -15,6 +15,9 @@ down-pro:
 down-v:
 	docker compose down -v
 
+pull-pro:
+	docker compose -f docker-compose.yml -f deployment.yml pull
+
 build:
 	docker compose up -d --build
 

@@ -21,7 +21,7 @@ const pointRoutes = require("./routes/pointRoutes");
 const staticRoutes = require('./routes/statisticRoutes');
 
 const corsOptions = {
-    origin: "*",
+    origin: process.env.CLIENT_ADDRESS,
     credentials: true,
     optionsSuccessStatus: 200,
     methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
