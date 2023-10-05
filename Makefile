@@ -3,8 +3,14 @@ params := server
 up:
 	docker compose up -d
 
+up-pro:
+	docker compose -f docker-compose.yml -f deployment.yml up -d
+
 down:
 	docker compose down
+
+down-pro:
+	docker compose -f docker-compose.yml -f deployment.yml down
 
 down-v:
 	docker compose down -v
