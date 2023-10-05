@@ -61,13 +61,13 @@ userSchema.pre('save', function(next) {
     // generate a salt
     bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
         if (err) return next(err);
-        console.log('no hash', user.password)
+        console.log('- No hash', user.username)
         // hash the password using our new salt
         bcrypt.hash(user.password, salt, function(err, hash) {
             if (err) return next(err);
             // override the cleartext password with the hashed one
             user.password = hash;
-            console.log('hash', user.password)
+            // console.log('hash', user.password)
             next();
         });
     });

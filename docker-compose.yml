@@ -10,6 +10,18 @@ services:
       - ./client/src:/app/src:delegated
       - '/app/node_modules'
 
+  mongo:
+    image: mongo:6.0-jammy
+    ports:
+      - '27016:27017'
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: PassW0rd
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+      - mongo-data:/data/db
+
   backend:
     build:
       context: "./server"
@@ -20,6 +32,10 @@ services:
       - '/app/node_modules'
       - app-data:/root:delegated  
     env_file: "./server/.env"
+    depends_on:
+      - mongo
+
 
 volumes:
   app-data:
+  mongo-data:

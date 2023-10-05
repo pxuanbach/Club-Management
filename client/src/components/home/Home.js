@@ -79,12 +79,16 @@ const Home = ({user}) => {
 
   const getListClub = async () => {
     // let isAdmin = user?.username.includes("admin");
-    let res = await axiosInstance.get(`/club/list/${user._id}`, {
-      headers: { "Content-Type": "application/json" },
-    });
-    let data = res.data;
-    if (data) {
-      setClubs(data);
+    try {
+      let res = await axiosInstance.get(`/club/list/${user._id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      let data = res.data;
+      if (data) {
+        setClubs(data);
+      }
+    } catch (error) {
+      showSnackbar(error.message, SeverityOptions.error)
     }
   };
 

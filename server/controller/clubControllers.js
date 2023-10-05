@@ -112,7 +112,7 @@ module.exports.getList = async (req, res) => {
   if (clubs.length) {
     res.status(200).send(ConvertClubs(clubs));
   } else {
-    res.status(500).json({ clubs: "none" });
+    res.status(400).json({ clubs: "none" });
   }
 };
 
@@ -136,7 +136,7 @@ module.exports.getListNotJoin = async (req, res) => {
   if (clubs.length) {
     res.status(200).send(ConvertClubs(clubs));
   } else {
-    res.status(500).json({ clubs: "none" });
+    res.status(400).json({ clubs: "none" });
   }
 };
 

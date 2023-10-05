@@ -52,7 +52,10 @@ app.use("/statistic", staticRoutes);
 
 //Connect DB
 mongoose
-    .connect(process.env.MONGODB_URI, {
+    .connect(`mongodb://${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/`,{
+        user: process.env.MONGODB_USERNAME,
+        pass: process.env.MONGODB_PASSWORD,
+        dbName: process.env.MONGODB_DBNAME,
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
