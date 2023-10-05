@@ -2,19 +2,9 @@ version: "3.9"
 
 services:
   frontend:
-    build:
-      context: "./client"
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./client/src:/app/src:delegated
-      - '/app/node_modules'
     env_file: "./client/.env"
 
   mongo:
-    image: mongo:6.0-jammy
-    ports:
-      - '27016:27017'
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -24,14 +14,6 @@ services:
       - mongo-data:/data/db
 
   backend:
-    build:
-      context: "./server"
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./server/:/app/:delegated
-      - '/app/node_modules'
-      - app-data:/root:delegated  
     env_file: "./server/.env"
     depends_on:
       - mongo

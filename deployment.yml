@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: pxuanbach/club-mng:client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client/src:/app/src:delegated
+      - '/app/node_modules'
+
+  mongo:
+    image: mongo:6.0-jammy
+    ports:
+      - '27016:27017'
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    image: pxuanbach/club-mng:server
+    volumes:
+      - ./server/:/app/:delegated
+      - '/app/node_modules'
+      - app-data:/root:delegated  
+
+
+volumes:
+  app-data:
+  mongo-data:
