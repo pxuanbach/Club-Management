@@ -21,9 +21,10 @@ const pointRoutes = require("./routes/pointRoutes");
 const staticRoutes = require('./routes/statisticRoutes');
 
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
+    methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 };
 const http = require("http").createServer(app);
 const mongoose = require("mongoose");
@@ -34,6 +35,10 @@ dotenv.config();
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.get("/", (req, res) => {
+    res.status(200).json({health: "ok"})
+})
 
 //use route
 app.use(authRoutes);

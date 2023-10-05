@@ -9,6 +9,7 @@ services:
     volumes:
       - ./client/src:/app/src:delegated
       - '/app/node_modules'
+    env_file: "./client/.env"
 
   mongo:
     image: mongo:6.0-jammy
