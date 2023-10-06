@@ -6,8 +6,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./client/src:/app/src:delegated
-      - '/app/node_modules'
+      - ./client/src:/app/src
 
   mongo:
     image: mongo:6.0-jammy
@@ -21,11 +20,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./server/:/app/:delegated
-      - '/app/node_modules'
-      - app-data:/root:delegated  
+      - ./server/:/app/
 
 
 volumes:
-  app-data:
   mongo-data:
