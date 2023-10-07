@@ -529,6 +529,8 @@ module.exports.removeMembers = async (req, res) => {
   const clubId = req.params.clubId;
   const { members } = req.body;
   try {
+    const club = await Club.findById(clubId);
+
     await Club.updateOne(
       { _id: clubId },
       { $pull: { members: { $in: members } } }
@@ -538,13 +540,15 @@ module.exports.removeMembers = async (req, res) => {
       { $pull: { clubs: clubId } }
     );
     const promises = members.map(async (member) => {
-      const log = await saveLog(clubId, "member_out", member);
-      return log;
+      if (club.leader.toString() !== member && club.treasurer.toString() !== member) {
+        const log = await saveLog(clubId, "member_out", member);
+        return log;
+      }
     });
     const result = await Promise.all(promises);
-    res.send(users);
+    res.status(200).send(users);
   } catch (err) {
-    console.log(err);
+    console.log("🚀 ~ file: clubControllers.js:551 ~ module.exports.removeMembers= ~ err:", err)
     res.status(500).send({ error: err.message });
   }
 };

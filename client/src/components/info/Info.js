@@ -13,6 +13,7 @@ import KeyIcon from '@mui/icons-material/Key';
 import ImageInfo from '../../assets/logoweb.png'
 import { UserContext } from '../../UserContext';
 import axiosInstance from '../../helper/Axios';
+import { Redirect } from 'react-router-dom';
 
 function NumberFormatCustom(props) {
   const { inputRef, onChange, ...other } = props;
@@ -181,6 +182,10 @@ const Info = () => {
       setGender(user.gender)
     }
   }, [user])
+
+  if (!user) {
+    return <Redirect to="/login" />;
+  }
 
   return (
     <div className='page-infor' style={{ display: "flex" }}>

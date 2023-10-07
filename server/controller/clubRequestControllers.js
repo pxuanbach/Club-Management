@@ -8,6 +8,13 @@ async function userAcceptJoinClubRequest(clubId, userId) {
   try {
     user_oid = mongoose.Types.ObjectId(userId);
     const club = await Club.findById(clubId);
+    if (!club) {
+      return;
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return;
+    }
     if (club.leader === user_oid) {
       return;
     }
@@ -18,9 +25,13 @@ async function userAcceptJoinClubRequest(clubId, userId) {
       return;
     }
     club.members.push(user_oid);
-    return await club.save();
+    user.clubs.push(club._id);
+
+    await user.save();
+    await club.save();
+    return "Saved"
   } catch (err) {
-    console.log("joinClubRequest", err);
+    console.log("🚀 ~ file: clubRequestControllers.js:23 ~ userAcceptJoinClubRequest ~ err:", err)
   }
 }
 

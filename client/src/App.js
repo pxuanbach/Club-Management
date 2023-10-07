@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect, useHistory } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { UserContext } from "./UserContext";
 import { socket, SocketContext } from './SocketContext'
@@ -28,9 +28,10 @@ function App() {
         //console.log(data)
         setUser(data);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     }
+
     verifyUser();
   }, [])
 

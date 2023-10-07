@@ -86,7 +86,7 @@ const AddClub = ({ setShowFormAdd, clubs, setClubs, showSnackbar }) => {
             showSnackbar("Thêm câu lạc bộ thành công!", SeverityOptions.success)
             resetState();
         }).catch(err => {
-            showSnackbar(err.response.data.error, SeverityOptions.error)
+            showSnackbar(err.response.data?.error, SeverityOptions.error)
         }).finally(() => {
             setIsLoading(false)
         })

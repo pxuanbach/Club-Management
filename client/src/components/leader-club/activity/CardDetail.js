@@ -112,7 +112,8 @@ const CardDetail = ({ setShowForm, card, isLeader, getColumnsActivity, isFinishe
 
     const handleShowPopover = (event, data, setDate, setAnchorEl) => {
         setAnchorEl(event.currentTarget);
-        setDate(data);
+        if (setDate !== null)
+            setDate(data);
     };
 
     const handleClosePopover = (setAnchorEl) => {

@@ -27,9 +27,14 @@ module.exports.statisticMemberJoinOfClub = async (req, res) => {
             groups[date].push(obj);
             return groups;
         }, {});
+
+        if (JSON.stringify(groups) === '{}') {
+            res.status(200).send([])
+            return
+        }
+
         // Edit: to add it in the array format instead
         const groupArrays = Object.keys(groups).map((date) => {
-            console.log()
             return {
                 "Date": date,
                 "scales": groups[date].length
@@ -59,6 +64,7 @@ module.exports.statisticMemberJoinOfClub = async (req, res) => {
         }
         res.send(groupArrays)
     } catch (err) {
+        console.log("🚀 ~ file: statisticControllers.js:62 ~ module.exports.statisticMemberJoinOfClub= ~ err:", err)
         res.status(500).send({ error: err.message })
     }
 }
@@ -84,6 +90,12 @@ module.exports.statisticMemberLeaveOfClub = async (req, res) => {
             groups[date].push(obj);
             return groups;
         }, {});
+
+        if (JSON.stringify(groups) === '{}') {
+            res.status(200).send([])
+            return
+        }
+
         // Edit: to add it in the array format instead
         const groupArrays = Object.keys(groups).map((date) => {
             return {
@@ -138,6 +150,12 @@ module.exports.statisticFundGrowthOfClub = async (req, res) => {
             groups[date].push(obj);
             return groups;
         }, {});
+
+        if (JSON.stringify(groups) === '{}') {
+            res.status(200).send([])
+            return
+        }
+
         let arr = []
         let fund = 0
         Object.keys(groups).map((date) => {
@@ -207,6 +225,11 @@ module.exports.statisticFundWithTypeOfClub = async (req, res) => {
             groups[date].push(obj);
             return groups;
         }, {});
+        
+        if (JSON.stringify(groups) === '{}') {
+            res.status(200).send([])
+            return
+        } 
 
         let arr = []
         Object.keys(groups).map((date) => {
@@ -231,6 +254,7 @@ module.exports.statisticFundWithTypeOfClub = async (req, res) => {
             arr.push(payFund)
         });
         if (arr.length <= 3) {
+            console.log(arr)
             let date = arr[0].Date
             switch (timeFormat) {
                 case "YYYY-MM-DD":
@@ -260,6 +284,7 @@ module.exports.statisticFundWithTypeOfClub = async (req, res) => {
         }
         res.send(arr)
     } catch (err) {
+        console.error("🚀 ~ file: statisticControllers.js:263 ~ module.exports.statisticFundWithTypeOfClub= ~ err:", err)
         res.status(500).send({ error: err.message })
     }
 }
@@ -283,6 +308,12 @@ module.exports.statisticMonthlyFundGrowthOfClub = async (req, res) => {
             groups[date].push(obj);
             return groups;
         }, {});
+
+        if (JSON.stringify(groups) === '{}') {
+            res.status(200).send([])
+            return
+        }
+
         let arr = []
         Object.keys(groups).map((date) => {
             let fund = 0
@@ -311,7 +342,7 @@ module.exports.statisticMonthlyFundGrowthOfClub = async (req, res) => {
                 Date: date,
                 value: 0,
             }
-            res.send([temp].concat(arr))
+            res.status(200).send([temp].concat(arr))
             return
         }
         res.send(arr)
@@ -345,6 +376,12 @@ module.exports.statisticQuantitySubmittedMonthlyFundOfClub = async (req, res) =>
             groups[date].push({quantity});
             return groups;
         }, {});
+
+        if (JSON.stringify(groups) === '{}') {
+            res.status(200).send([])
+            return
+        }
+
         let arr = []
         Object.keys(groups).map((date) => {
             let quantity = 0

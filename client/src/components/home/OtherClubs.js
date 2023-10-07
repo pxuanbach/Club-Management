@@ -207,7 +207,7 @@ const OtherClubs = ({ user }) => {
                     </Stack>
                 </div>
                 <div className="div-card-team">
-                    {clubs &&
+                    {clubs && clubs.length > 0 &&
                         clubs.map((club) => (
                             <a
                                 onClick={() => {
