@@ -263,6 +263,7 @@ const TabContent = ({ match, club_id, isLeader, user }) => {
       <div id='formcontent' className='div-tabcontent'>
         <div className='header-tabcontent'>
           <Stack direction="row" spacing={3} alignItems="center" justifyContent="center">
+            <div></div>
             <h2 className='name-content'>Bảng hoạt động</h2>
             <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
               <InputLabel id="filter-select-small">Lựa chọn</InputLabel>

@@ -133,7 +133,7 @@ const ClubLog = ({ club }) => {
                     {logs &&
                         logs.map((log) => (
                             <Box
-                                sx={{ padding: 2 }}
+                                sx={{ padding: 1 }}
                             >
                                 {renderLogByType(log)}
                             </Box>
