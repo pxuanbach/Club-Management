@@ -1,29 +1,54 @@
-# STAGE: 1
-FROM node:14-alpine as build
-
-COPY package.json /app-stage-1/
-
-WORKDIR /app-stage-1
-
-RUN npm install --legacy-peer-deps
-
-COPY . /app-stage-1
-
-# We need this to download node-prune. size ~1.5 MB
-RUN apk --no-cache add curl
-
-# run node prune to prune dependencies. It Helped me to save ~38 MB. 
-RUN curl -sf https://gobinaries.com/tj/node-prune | sh
-
-RUN /usr/local/bin/node-prune
-
-# STAGE: 2
-FROM node:14-alpine
-
+# module install
+FROM node:16-alpine as module-install-stage
+# set working directory
 WORKDIR /app
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
-COPY --from=build /app-stage-1/ /app/
+COPY package.json /app/package.json
 
-# ENV NODE_ENV production
+RUN apk add yarn curl
 
-CMD ["npm", "start"]
+RUN yarn add node-sass
+
+RUN yarn install --production
+
+# build
+FROM node:16-alpine as build-stage
+COPY --from=module-install-stage /app/node_modules/ /app/node_modules
+WORKDIR /app
+COPY . .
+RUN yarn build
+
+# serve
+# FROM node:18-alpine
+
+# WORKDIR /app
+
+# COPY --from=build-stage /app/build/ /app
+# COPY .env /app
+
+# RUN npm install -g serve
+
+# # start app
+# CMD serve -s /app -l 3000
+
+FROM nginx:1.16.0-alpine
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+WORKDIR /usr/share/nginx/html
+
+RUN apk add --no-cache bash
+
+COPY configure-runtime.sh .
+
+COPY .env .
+
+COPY --from=build-stage /app/build/ /usr/share/nginx/html
+
+RUN chmod +x configure-runtime.sh
+
+EXPOSE 80
+
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/configure-runtime.sh && nginx -g \"daemon off;\""]

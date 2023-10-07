@@ -82,7 +82,10 @@ module.exports.getScheduler = async (req, res) => {
     Activity.find({ _id: { $in: uniqueArrId } })
     .populate('club')
     .then(result => {
-        res.status(200).send(result)
+        if (result)
+            res.status(200).send(result)
+        else
+            res.status(200).send([])
     }).catch(err => {
         res.status(500).send({ error: "Activity find err - " + err.message })
     })

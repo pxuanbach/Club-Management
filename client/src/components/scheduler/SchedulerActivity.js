@@ -104,11 +104,12 @@ const SchedulerActivity = () => {
       .then(response => {
         //response.data
         const newData = applyColor(response.data)
-        setScheduler(newData)
+        if (newData)
+          setScheduler(newData)
       }).catch(err => {
         //err.response.data.error
         console.log(err)
-        showSnackbar(err.response.data.error)
+        showSnackbar(err.response.data?.error)
       })
       setIsLoading(false)
   }

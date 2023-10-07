@@ -1,5 +1,11 @@
 params := server
 
+fe-bash:
+	docker compose exec frontend bash
+
+init-admin:
+	docker compose -f docker-compose.yml -f deployment.yml exec backend npm run init-admin
+
 up:
 	docker compose up -d
 
@@ -22,7 +28,7 @@ build:
 	docker compose up -d --build
 
 build-image:
-	docker build -t pxuanbach/club-mng:$(params) ./$(params) 
+	docker build -t pxuanbach/club-mng-$(params) ./$(params)
 
 push-image: 
-	docker push pxuanbach/club-mng:$(params) 
+	docker push pxuanbach/club-mng-$(params) 

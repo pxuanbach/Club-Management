@@ -16,6 +16,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [generalErr, setGeneralErr] = useState('');
     const [usernameErr, setUsernameErr] = useState('');
     const [passwordErr, setPasswordErr] = useState('');
 
@@ -26,6 +27,7 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         //console.log(username, password)
+        setGeneralErr('')
         setUsernameErr('')
         setPasswordErr('')
         try {
@@ -39,11 +41,17 @@ const Login = () => {
                 setUser(response.data.user);
             }).catch(err => {
                 //console.log(err.response.data)
-                setUsernameErr(err.response.data.errors.username);
-                setPasswordErr(err.response.data.errors.password);
+                const errData = err.response.data?.errors;
+                if (errData) {
+                    setUsernameErr(errData.username);
+                    setPasswordErr(errData.password);
+                } else {
+                    setGeneralErr("Something went wrong")
+                }
             })
         } catch (error) {
             console.log(error)
+            setGeneralErr(error.message)
         }
     }
 
@@ -57,6 +65,7 @@ const Login = () => {
                     <h2 className='name-club-login'><font className="style" color="E25648">Club</font>Management</h2>
                     <div className='login'>
                         <h1>Đăng nhập</h1>
+                        <span>{generalErr}</span>
                         <div className='login-form' onSubmit={handleSubmit}>
                             <TextField
                                 label="Tài khoản"
@@ -100,7 +109,7 @@ const Login = () => {
                     </div>
                 </div>
                 <div className='div-login-right'>
-                    <img className='imageInfo1' src={ImageInfo1} alt="ảnh logo"/>
+                    <img className='imageInfo1' src={ImageInfo1} alt="club management"/>
                     <h1>Hello, Friend!</h1>
                     <p>Hãy tôi luyện thành một chiến binh, đừng khép mình lại.</p>
                 </div>

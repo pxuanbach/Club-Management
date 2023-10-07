@@ -11,7 +11,7 @@ services:
       - '/app/node_modules'
 
   mongo:
-    image: mongo:6.0-jammy
+    image: mongo:4.4-focal
     ports:
       - '27016:27017'
     volumes:

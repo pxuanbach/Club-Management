@@ -2,25 +2,24 @@ version: "3.9"
 
 services:
   frontend:
-    image: pxuanbach/club-mng:client
+    image: pxuanbach/club-mng-client
     ports:
-      - "3000:3000"
-    volumes:
-      - ./client/src:/app/src
+      - "3000:80"
+    environment:
+      - "REACT_APP_SOCKET_ENDPT=127.0.0.1:5000"
+      - "REACT_APP_API_ENDPT=http://localhost:5000"
 
   mongo:
-    image: mongo:6.0-jammy
+    image: mongo:4.4-focal
     ports:
       - '27016:27017'
     volumes:
       - mongo-data:/data/db
 
   backend:
-    image: pxuanbach/club-mng:server
+    image: pxuanbach/club-mng-server
     ports:
       - "5000:5000"
-    volumes:
-      - ./server/:/app/
 
 
 volumes:
