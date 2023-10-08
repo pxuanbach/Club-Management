@@ -1,0 +1,36 @@
+name: Publish Docker Image
+
+on:
+  push:
+    branches: [ publish ]
+  pull_request: 
+    branches: [ publish ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log into registry 
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Client
+        uses: docker/build-push-action@v5
+        with:
+          context: ./client
+          push: true
+          tags: pxuanbach/club-mng-client:latest, pxuanbach/club-mng-client:${{ github.run_number }}
+
+      - name: Build and push Server
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          push: true
+          tags: pxuanbach/club-mng-server:latest, pxuanbach/club-mng-server:${{ github.run_number }}
