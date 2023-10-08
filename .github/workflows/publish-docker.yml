@@ -9,10 +9,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        Plan: [client, server]
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Create .env file in ${{ matrix.Plan }}
+        if: matrix.Plan == client
+        run: cp ./${{ matrix.Plan }}/env.template ./${{ matrix.Plan }}/.env
 
       - name: Log into registry 
         if: github.event_name != 'pull_request'
@@ -21,16 +28,9 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and push Client
+      - name: Build and push ${{ matrix.Plan }} image
         uses: docker/build-push-action@v5
         with:
-          context: ./client
+          context: ./${{ matrix.Plan }}
           push: true
-          tags: pxuanbach/club-mng-client:latest, pxuanbach/club-mng-client:${{ github.run_number }}
-
-      - name: Build and push Server
-        uses: docker/build-push-action@v5
-        with:
-          context: ./server
-          push: true
-          tags: pxuanbach/club-mng-server:latest, pxuanbach/club-mng-server:${{ github.run_number }}
+          tags: pxuanbach/club-mng-${{ matrix.Plan }}:latest, pxuanbach/club-mng-${{ matrix.Plan }}:${{ github.run_number }}
