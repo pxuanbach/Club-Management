@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env file in ${{ matrix.Plan }}
-        if: matrix.Plan == client
+        if: matrix.Plan == 'client'
         run: cp ./${{ matrix.Plan }}/env.template ./${{ matrix.Plan }}/.env
 
       - name: Log into registry 
